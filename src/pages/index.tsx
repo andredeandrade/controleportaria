@@ -1,76 +1,51 @@
 import Head from 'next/head';
-import { Box, Button, Container, Stack, Typography } from '@mui/material';
-import { DataTable } from '@/components/table/DataTable';
-import type { ColumnDef } from '@tanstack/react-table';
-import { useMemo } from 'react';
-
-type AccessLog = {
-  id: string;
-  visitante: string;
-  unidade: string;
-  status: 'Liberado' | 'Pendente';
-};
+import Box from '@mui/material/Box';
+import { LoginForm } from '@/components/auth/LoginForm';
 
 export default function Home() {
-  const data = useMemo<AccessLog[]>(
-    () => [
-      { id: '1', visitante: 'Carlos Almeida', unidade: 'Bloco A - 102', status: 'Liberado' },
-      { id: '2', visitante: 'Fernanda Souza', unidade: 'Bloco C - 304', status: 'Pendente' },
-      { id: '3', visitante: 'Ricardo Lima', unidade: 'Bloco B - 205', status: 'Liberado' },
-    ],
-    [],
-  );
-
-  const columns = useMemo<ColumnDef<AccessLog>[]>(
-    () => [
-      {
-        accessorKey: 'visitante',
-        header: 'Visitante',
-      },
-      {
-        accessorKey: 'unidade',
-        header: 'Unidade',
-      },
-      {
-        accessorKey: 'status',
-        header: 'Status',
-      },
-    ],
-    [],
-  );
-
   return (
     <>
       <Head>
-        <title>Controle Portaria</title>
+        <title>Login | Controle Portaria</title>
         <meta name="description" content="Sistema de gestão de entrada e saída em portarias" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Box component="main" sx={{ py: { xs: 6, md: 10 } }}>
-        <Container maxWidth="md">
-          <Stack spacing={3}>
-            <Typography variant="h3" component="h1" fontWeight={700}>
-              Controle Portaria
-            </Typography>
-
-            <Typography variant="body1" color="text.secondary">
-              Base do projeto pronta com Next.js + TypeScript + Material UI para iniciar as
-              features.
-            </Typography>
-
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <Button variant="contained" size="large">
-                Iniciar desenvolvimento
-              </Button>
-              <Button variant="outlined" size="large">
-                Ver documentação
-              </Button>
-            </Stack>
-
-            <DataTable data={data} columns={columns} />
-          </Stack>
-        </Container>
+      <Box
+        component="main"
+        sx={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+          px: 2,
+          position: 'relative',
+          overflow: 'hidden',
+          backgroundColor: '#0A1220',
+          backgroundImage:
+            'radial-gradient(circle at 18% 22%, rgba(14, 165, 233, 0.2), transparent 34%), radial-gradient(circle at 82% 14%, rgba(30, 64, 175, 0.25), transparent 30%), linear-gradient(140deg, #04070E 0%, #0B1628 48%, #0E1F35 100%)',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            backgroundImage:
+              'linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px)',
+            backgroundSize: { xs: '28px 28px', md: '34px 34px' },
+            maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.95))',
+          },
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(180deg, rgba(2, 6, 23, 0.2) 0%, rgba(2, 6, 23, 0.75) 100%)',
+          },
+          '> *': {
+            position: 'relative',
+            zIndex: 1,
+          },
+        }}
+      >
+        <LoginForm />
       </Box>
     </>
   );
