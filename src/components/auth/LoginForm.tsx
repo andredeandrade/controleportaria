@@ -1,3 +1,5 @@
+'use client';
+
 import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
 import Box from '@mui/material/Box';
@@ -6,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import AuthTextField from './components/AuthTextField';
@@ -16,6 +19,7 @@ type LoginFormData = {
 };
 
 export function LoginForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const {
     register,
@@ -33,7 +37,7 @@ export function LoginForm() {
   };
 
   const onSubmit = async () => {
-    // Integraremos com a API de autenticação no próximo passo.
+    router.push('/dashboard');
   };
 
   return (
@@ -135,7 +139,7 @@ export function LoginForm() {
             },
           }}
         >
-          Entrar
+          {isSubmitting ? 'Entrando...' : 'Entrar'}
         </Button>
       </Stack>
     </Stack>
