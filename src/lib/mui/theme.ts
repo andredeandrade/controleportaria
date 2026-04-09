@@ -11,14 +11,14 @@ const theme = createTheme({
       main: '#475569',
     },
     background: {
-      default: '#F5F6F8',
-      paper: '#FFFFFF',
+      default: '#0F172A',
+      paper: '#111827',
     },
     text: {
-      primary: '#111827',
-      secondary: '#6B7280',
+      primary: '#F8FAFC',
+      secondary: '#CBD5E1',
     },
-    divider: '#E5E7EB',
+    divider: 'rgba(148, 163, 184, 0.18)',
     success: {
       main: '#166534',
     },
