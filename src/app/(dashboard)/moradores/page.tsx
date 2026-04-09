@@ -1,12 +1,12 @@
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import type { Metadata } from 'next';
+import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Moradores',
-};
+}
 
 export default function MoradoresPage() {
   return (
@@ -42,5 +42,5 @@ export default function MoradoresPage() {
         </Paper>
       </Box>
     </Stack>
-  );
+  )
 }

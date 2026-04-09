@@ -1,7 +1,7 @@
-import '@/styles/globals.css';
-import { AppProviders } from '@/providers';
-import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
+import '@/styles/globals.css'
+import { AppProviders } from '@/providers'
+import type { Metadata } from 'next'
+import type { ReactNode } from 'react'
 
 export const metadata: Metadata = {
   title: {
@@ -9,11 +9,11 @@ export const metadata: Metadata = {
     template: '%s | Controle Portaria',
   },
   description: 'Sistema de gestão de entrada e saída em portarias',
-};
+}
 
 type RootLayoutProps = {
-  children: ReactNode;
-};
+  children: ReactNode
+}
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
@@ -22,5 +22,5 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
-  );
+  )
 }

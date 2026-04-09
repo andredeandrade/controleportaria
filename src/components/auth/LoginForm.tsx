@@ -1,26 +1,26 @@
-'use client';
+'use client'
 
-import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined';
-import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import AuthTextField from './components/AuthTextField';
+import VisibilityOffOutlined from '@mui/icons-material/VisibilityOffOutlined'
+import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import InputAdornment from '@mui/material/InputAdornment'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import AuthTextField from './components/AuthTextField'
 
 type LoginFormData = {
-  email: string;
-  password: string;
-};
+  email: string
+  password: string
+}
 
 export function LoginForm() {
-  const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
   const {
     register,
     handleSubmit,
@@ -30,15 +30,15 @@ export function LoginForm() {
       email: '',
       password: '',
     },
-  });
+  })
 
   const handleTogglePassword = () => {
-    setShowPassword((previousValue) => !previousValue);
-  };
+    setShowPassword((previousValue) => !previousValue)
+  }
 
   const onSubmit = async () => {
-    router.push('/dashboard');
-  };
+    router.push('/dashboard')
+  }
 
   return (
     <Stack spacing={1} sx={{ width: '100%', maxWidth: 360, px: { xs: 0.5, sm: 1 } }}>
@@ -143,5 +143,5 @@ export function LoginForm() {
         </Button>
       </Stack>
     </Stack>
-  );
+  )
 }
