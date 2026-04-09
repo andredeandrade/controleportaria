@@ -1,6 +1,6 @@
-import { TextField, TextFieldProps } from '@mui/material';
+import { TextField, TextFieldProps } from '@mui/material'
 
-export type AuthTextFieldProps = TextFieldProps;
+export type AuthTextFieldProps = TextFieldProps
 
 export default function AuthTextField(props: AuthTextFieldProps) {
   return (
@@ -33,5 +33,5 @@ export default function AuthTextField(props: AuthTextFieldProps) {
         '& .MuiFormHelperText-root': { mx: 0, color: '#FCA5A5' },
       }}
     />
-  );
+  )
 }

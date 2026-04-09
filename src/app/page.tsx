@@ -1,10 +1,10 @@
-import { LoginForm } from '@/components/auth/LoginForm';
-import Box from '@mui/material/Box';
-import type { Metadata } from 'next';
+import { LoginForm } from '@/components/auth/LoginForm'
+import Box from '@mui/material/Box'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Login',
-};
+}
 
 export default function HomePage() {
   return (
@@ -33,8 +33,7 @@ export default function HomePage() {
           content: '""',
           position: 'absolute',
           inset: 0,
-          background:
-            'linear-gradient(180deg, rgba(2, 6, 23, 0.2) 0%, rgba(2, 6, 23, 0.75) 100%)',
+          background: 'linear-gradient(180deg, rgba(2, 6, 23, 0.2) 0%, rgba(2, 6, 23, 0.75) 100%)',
         },
         '> *': {
           position: 'relative',
@@ -44,5 +43,5 @@ export default function HomePage() {
     >
       <LoginForm />
     </Box>
-  );
+  )
 }

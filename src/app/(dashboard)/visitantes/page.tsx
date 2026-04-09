@@ -1,19 +1,19 @@
-import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import type { Metadata } from 'next';
+import Box from '@mui/material/Box'
+import Chip from '@mui/material/Chip'
+import Paper from '@mui/material/Paper'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Visitantes',
-};
+}
 
 const entries = [
   { nome: 'Maria Souza', status: 'Aguardando liberação' },
   { nome: 'Equipe de manutenção', status: 'Entrada prevista às 14:00' },
   { nome: 'Carlos Oliveira', status: 'Documento validado' },
-];
+]
 
 export default function VisitantesPage() {
   return (
@@ -53,5 +53,5 @@ export default function VisitantesPage() {
         </Stack>
       </Paper>
     </Stack>
-  );
+  )
 }

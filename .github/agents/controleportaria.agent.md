@@ -1,7 +1,7 @@
 ---
 name: controleportaria
-description: "Use quando: desenvolvimento do ControlePortaria (sistema de gestão de portaria/condomínio). Especialista em features, arquitetura, debugging, revisão de código e boas práticas com Next.js, Material UI, React Query, TanStack Table e backend Express + PostgreSQL."
-argument-hint: "Descreva a feature, bug ou tarefa que deseja implementar ou revisar."
+description: 'Use quando: desenvolvimento do ControlePortaria (sistema de gestão de portaria/condomínio). Especialista em features, arquitetura, debugging, revisão de código e boas práticas com Next.js, Material UI, React Query, TanStack Table e backend Express + PostgreSQL.'
+argument-hint: 'Descreva a feature, bug ou tarefa que deseja implementar ou revisar.'
 tools: [read, edit, search, execute, todo, web, agent]
 ---
 
