@@ -16,7 +16,11 @@ import { usePathname } from 'next/navigation'
 
 import { useSidebarRoutes } from '@/hooks/useSidebarRoutes'
 
-export default function SideBar() {
+type SideBarProps = {
+  onItemClick?: () => void
+}
+
+export default function SideBar({ onItemClick }: SideBarProps) {
   const pathname = usePathname() ?? ''
   const menuItems = useSidebarRoutes()
 
@@ -34,7 +38,12 @@ export default function SideBar() {
     >
       <Box sx={{ px: 2.5, py: 3 }}>
         <Stack direction="row" spacing={1.5} alignItems="center">
-          <Avatar sx={{ bgcolor: 'primary.main' }}>
+          <Avatar
+            sx={{
+              bgcolor: 'rgba(148, 163, 184, 0.22)',
+              color: '#E2E8F0',
+            }}
+          >
             <PersonOutlineRoundedIcon />
           </Avatar>
 
@@ -67,6 +76,7 @@ export default function SideBar() {
                     component={Link}
                     href={item.href}
                     selected={selected}
+                    onClick={onItemClick}
                     sx={{
                       borderRadius: 2,
                       color: 'rgba(248, 250, 252, 0.92)',
@@ -121,6 +131,7 @@ export default function SideBar() {
                       component={Link}
                       href={child.href}
                       selected={childSelected}
+                      onClick={onItemClick}
                       sx={{
                         ml: 1.5,
                         borderRadius: 2,
