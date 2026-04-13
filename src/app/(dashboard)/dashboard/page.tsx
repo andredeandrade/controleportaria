@@ -12,15 +12,6 @@ export const metadata: Metadata = {
 export default function DashboardPage() {
   return (
     <Stack spacing={3}>
-      <Paper sx={{ p: 3, borderRadius: 3 }}>
-        <Typography variant="h5" fontWeight={700}>
-          Dashboard
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Acesse rapidamente os principais módulos do sistema pela área abaixo.
-        </Typography>
-      </Paper>
-
       <DashboardQuickLinks />
     </Stack>
   )
