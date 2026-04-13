@@ -1,9 +1,8 @@
-import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
+import { RegistrarEntradaForm } from '@/components/movimentacoes/entrada/RegistrarEntradaForm'
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
@@ -21,16 +20,7 @@ export default function RegistrarEntradaPage() {
         </Typography>
       </Stack>
 
-      <FormPaper>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-            <TextFieldStack>
-              <TextFieldLabel required>Nome</TextFieldLabel>
-              <TextField required />
-            </TextFieldStack>
-          </Grid>
-        </Grid>
-      </FormPaper>
+      <RegistrarEntradaForm />
     </Stack>
   )
 }
