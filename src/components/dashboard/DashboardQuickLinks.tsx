@@ -2,10 +2,10 @@
 
 import ArrowOutwardRoundedIcon from '@mui/icons-material/ArrowOutwardRounded'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardActionArea from '@mui/material/CardActionArea'
 import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Link from 'next/link'
@@ -13,10 +13,14 @@ import { useMemo } from 'react'
 
 import { useSidebarRoutes } from '@/hooks/useSidebarRoutes'
 
+const QUICK_LINKS_VIEW_ONLY_HREFS = ['/relatorios']
+
 type QuickAccessItem = {
   label: string
   href: string
-  parentLabel?: string
+  description?: string
+  color?: string
+  buttonLabel: string
   IconComponent?: React.ElementType
 }
 
@@ -25,23 +29,30 @@ export function DashboardQuickLinks() {
 
   const quickAccessItems = useMemo<QuickAccessItem[]>(() => {
     return routes.flatMap((route) => {
-      const mainRoute = route.href
+      const mainRoute = route.href && route.showInQuickLinks !== false
         ? [
             {
               label: route.label,
               href: route.href,
+              description: route.description,
+              color: route.color,
+              buttonLabel: QUICK_LINKS_VIEW_ONLY_HREFS.includes(route.href) ? 'Ver' : 'Cadastrar',
               IconComponent: route.IconComponent,
             },
           ]
         : []
 
       const childRoutes =
-        route.children?.map((child) => ({
-          label: child.label,
-          href: child.href,
-          parentLabel: route.label,
-          IconComponent: route.IconComponent,
-        })) ?? []
+        route.children
+          ?.filter((child) => child.showInQuickLinks !== false)
+          .map((child) => ({
+            label: child.label,
+            href: child.href,
+            description: child.description,
+            color: child.color ?? route.color,
+            buttonLabel: QUICK_LINKS_VIEW_ONLY_HREFS.includes(child.href) ? 'Ver' : 'Cadastrar',
+            IconComponent: route.IconComponent,
+          })) ?? []
 
       return [...mainRoute, ...childRoutes]
     })
@@ -68,24 +79,42 @@ export function DashboardQuickLinks() {
               <CardContent sx={{ p: 2.5 }}>
                 <Stack spacing={2}>
                   <Stack direction="row" spacing={1.25} alignItems="center">
-                    {Icon ? <Icon color="primary" /> : null}
+                    {Icon ? <Icon sx={{ color: item.color ?? 'primary.main' }} /> : null}
                     <Box sx={{ minWidth: 0 }}>
                       <Typography fontWeight={700}>{item.label}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Acesse rapidamente este módulo.
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          minHeight: '2.5em',
+                        }}
+                      >
+                        {item.description}
                       </Typography>
                     </Box>
                   </Stack>
 
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    {item.parentLabel ? (
-                      <Chip label={item.parentLabel} size="small" variant="outlined" />
-                    ) : (
-                      <Box />
-                    )}
-
-                    <ArrowOutwardRoundedIcon color="action" fontSize="small" />
-                  </Stack>
+                  <Button
+                    component="span"
+                    size="small"
+                    variant="contained"
+                    endIcon={<ArrowOutwardRoundedIcon />}
+                    tabIndex={-1}
+                    sx={{
+                      pointerEvents: 'none',
+                      alignSelf: 'flex-start',
+                      ml: 'calc(1.5rem + 10px)',
+                      bgcolor: item.color,
+                      color: '#fff',
+                      '&:hover': { bgcolor: item.color },
+                    }}
+                  >
+                    {item.buttonLabel}
+                  </Button>
                 </Stack>
               </CardContent>
             </CardActionArea>

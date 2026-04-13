@@ -15,6 +15,12 @@ import type { ElementType } from 'react'
 export type SidebarChildRoute = {
   label: string
   href: string
+  /** Cor de destaque usada no ícone e botão do card de acesso rápido */
+  color?: string
+  /** Descrição exibida no card de acesso rápido do dashboard */
+  description?: string
+  /** Exibir como card nos acesso rápido do dashboard. Padrão: true */
+  showInQuickLinks?: boolean
 }
 
 export type SidebarRoute = {
@@ -22,6 +28,12 @@ export type SidebarRoute = {
   href?: string
   IconComponent?: ElementType
   children?: SidebarChildRoute[]
+  /** Cor de destaque usada no ícone e botão do card de acesso rápido */
+  color?: string
+  /** Descrição exibida no card de acesso rápido do dashboard */
+  description?: string
+  /** Exibir como card nos acessos rápidos do dashboard. Padrão: true */
+  showInQuickLinks?: boolean
 }
 
 const sidebarRoutesConfig: SidebarRoute[] = [
@@ -29,49 +41,65 @@ const sidebarRoutesConfig: SidebarRoute[] = [
     label: 'Dashboard',
     href: '/dashboard',
     IconComponent: DashboardRoundedIcon,
+    showInQuickLinks: false,
   },
   {
     label: 'Movimentações',
     IconComponent: SwapHorizRoundedIcon,
+    color: '#06B6D4',
     children: [
-      { label: 'Entrada', href: '/movimentacoes/entrada' },
-      { label: 'Saída', href: '/movimentacoes/saida' },
+      { label: 'Entrada', href: '/movimentacoes/entrada', description: 'Registre a entrada de pessoas no condomínio.' },
+      { label: 'Saída', href: '/movimentacoes/saida', description: 'Registre a saída de pessoas do condomínio.' },
     ],
   },
   {
     label: 'Moradores',
     href: '/moradores',
     IconComponent: ApartmentRoundedIcon,
+    color: '#3B82F6',
+    description: 'Gerencie os moradores e suas unidades.',
   },
   {
     label: 'Visitantes',
     href: '/visitantes',
     IconComponent: BadgeOutlinedIcon,
+    color: '#A78BFA',
+    description: 'Cadastre e consulte visitantes.',
   },
   {
     label: 'Prestadores de Serviços',
     href: '/prestadores-servicos',
     IconComponent: Groups2RoundedIcon,
+    color: '#F59E0B',
+    description: 'Gerencie prestadores de serviços autorizados.',
   },
   {
     label: 'Eventos',
     href: '/eventos',
     IconComponent: EventRoundedIcon,
+    color: '#10B981',
+    description: 'Agende e acompanhe eventos do condomínio.',
   },
   {
     label: 'Ocorrências',
     href: '/ocorrencias',
     IconComponent: ReportProblemRoundedIcon,
+    color: '#EF4444',
+    description: 'Registre e acompanhe ocorrências.',
   },
   {
     label: 'Autorizações',
     href: '/autorizacoes',
     IconComponent: AssignmentTurnedInRoundedIcon,
+    color: '#06B6D4',
+    description: 'Gerencie autorizações de acesso.',
   },
   {
     label: 'Relatórios',
     href: '/relatorios',
     IconComponent: HistoryRoundedIcon,
+    color: '#F97316',
+    description: 'Visualize relatórios de movimentações e eventos.',
   },
 ]
 

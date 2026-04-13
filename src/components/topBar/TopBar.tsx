@@ -30,7 +30,7 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
         backdropFilter: 'blur(8px)',
       }}
     >
-      <Toolbar sx={{ minHeight: 72, display: 'flex', alignItems: 'center' }}>
+      <Toolbar sx={{ minHeight: 72, display: 'flex', alignItems: 'center', position: 'relative' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, minWidth: 0 }}>
           <IconButton
             edge="start"
@@ -53,6 +53,9 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
               display: 'inline-flex',
               alignItems: 'center',
               lineHeight: 1,
+              position: { xs: 'absolute', md: 'static' },
+              left: { xs: '50%', md: 'auto' },
+              transform: { xs: 'translateX(-50%)', md: 'none' },
               '&:hover': {
                 opacity: 0.88,
               },
@@ -62,21 +65,28 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
           </Typography>
         </Box>
 
-        <Button
-          component={Link}
-          href="/"
-          color="inherit"
-          startIcon={<LogoutRoundedIcon />}
-          sx={{
-            textTransform: 'none',
-            borderColor: 'rgba(148, 163, 184, 0.28)',
-            '&:hover': {
-              backgroundColor: 'rgba(30, 41, 59, 0.72)',
-            },
-          }}
-        >
-          Sair
-        </Button>
+        <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+          <IconButton component={Link} href="/" color="inherit" aria-label="Sair" sx={{ display: { xs: 'inline-flex', md: 'none' } }}>
+            <LogoutRoundedIcon />
+          </IconButton>
+
+          <Button
+            component={Link}
+            href="/"
+            color="inherit"
+            startIcon={<LogoutRoundedIcon />}
+            sx={{
+              display: { xs: 'none', md: 'inline-flex' },
+              textTransform: 'none',
+              borderColor: 'rgba(148, 163, 184, 0.28)',
+              '&:hover': {
+                backgroundColor: 'rgba(30, 41, 59, 0.72)',
+              },
+            }}
+          >
+            Sair
+          </Button>
+        </Box>
       </Toolbar>
     </AppBar>
   )
