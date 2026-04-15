@@ -2,10 +2,10 @@
 
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import IconButton from '@mui/material/IconButton'
+import { styled } from '@mui/material/styles'
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import type { IconButtonProps } from '@mui/material/IconButton'
-import type { SxProps, Theme } from '@mui/material/styles'
 
 type BackToPreviousPageButtonProps = {
   ariaLabel: string
@@ -14,6 +14,14 @@ type BackToPreviousPageButtonProps = {
   iconButtonProps?: Omit<IconButtonProps, 'onClick' | 'aria-label' | 'children'>
 }
 
+const StyledBackButton = styled(IconButton)({
+  padding: 0,
+  color: 'inherit',
+  '&:hover': {
+    backgroundColor: 'transparent',
+  },
+})
+
 export function BackToPreviousPageButton({
   children,
   ariaLabel,
@@ -21,18 +29,7 @@ export function BackToPreviousPageButton({
   iconButtonProps,
 }: BackToPreviousPageButtonProps) {
   const router = useRouter()
-  const {
-    sx: iconButtonSx,
-    disableRipple,
-    ...restIconButtonProps
-  } = iconButtonProps ?? {}
-  const defaultSx: SxProps<Theme> = {
-    p: 0,
-    color: 'inherit',
-    '&:hover': {
-      backgroundColor: 'transparent',
-    },
-  }
+  const { sx: iconButtonSx, disableRipple, ...restIconButtonProps } = iconButtonProps ?? {}
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -44,15 +41,15 @@ export function BackToPreviousPageButton({
   }
 
   return (
-    <IconButton
+    <StyledBackButton
       onClick={handleBack}
       aria-label={ariaLabel}
       size="small"
       disableRipple={disableRipple ?? true}
-      sx={iconButtonSx ?? defaultSx}
+      sx={iconButtonSx}
       {...restIconButtonProps}
     >
       {children ?? <ArrowBackRoundedIcon fontSize="small" />}
-    </IconButton>
+    </StyledBackButton>
   )
 }

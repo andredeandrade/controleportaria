@@ -2,7 +2,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { RegistrarEntradaForm } from '@/components/movimentacoes/entrada/RegistrarEntradaForm'
+import { RegisterEntryForm } from '@/components/movimentacoes/entrada/RegisterEntryForm'
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export default function RegistrarEntradaPage() {
         </Typography>
       </Stack>
 
-      <RegistrarEntradaForm />
+      <RegisterEntryForm />
     </Stack>
   )
 }
