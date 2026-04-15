@@ -31,7 +31,6 @@ export default function EntradaPage() {
           justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}
           sx={{
             width: { xs: '100%', sm: 'auto' },
-            pl: { xs: 3, sm: 0 },
           }}
         >
           <RegisterEntryButton />

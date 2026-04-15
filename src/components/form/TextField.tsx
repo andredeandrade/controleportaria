@@ -6,10 +6,10 @@ type TextFieldProps = MuiTextFieldProps
 
 const defaultBorderColor = '#94A3B8'
 
-const StyledTextField = styled(MuiTextField)({
+const StyledTextField = styled(MuiTextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
     backgroundColor: '#FFFFFF',
-    color: 'grey.900',
+    color: theme.palette.grey[900],
     '& .MuiOutlinedInput-notchedOutline': {
       borderColor: defaultBorderColor,
     },
@@ -21,7 +21,7 @@ const StyledTextField = styled(MuiTextField)({
       borderWidth: 1,
     },
   },
-})
+}))
 
 export function TextField({ sx, fullWidth = true, size = 'small', ...props }: TextFieldProps) {
   return <StyledTextField {...props} fullWidth={fullWidth} size={size} sx={sx} />

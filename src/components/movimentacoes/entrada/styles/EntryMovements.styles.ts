@@ -6,11 +6,6 @@ import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
-export const RecentRecordsTitle = styled(Typography)({
-  fontWeight: 700,
-  color: '#FFFFFF',
-})
-
 export const MobileEntryCard = styled(Paper)({
   padding: 16,
   borderRadius: 12,

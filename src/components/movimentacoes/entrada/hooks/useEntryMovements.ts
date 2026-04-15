@@ -40,6 +40,25 @@ const entryMovementRecords: EntryMovementRecord[] = [
 
 export function useEntryMovements() {
   const [selectedRecord, setSelectedRecord] = useState<EntryMovementRecord | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase()
+
+  const filteredRecords = normalizedSearchTerm
+    ? entryMovementRecords.filter((record) => {
+        const searchableValue = [
+          record.name,
+          record.category,
+          record.locomotion,
+          record.plate,
+          record.entryAt,
+        ]
+          .join(' ')
+          .toLowerCase()
+
+        return searchableValue.includes(normalizedSearchTerm)
+      })
+    : entryMovementRecords
 
   const handleOpenExitConfirmation = (record: EntryMovementRecord) => {
     setSelectedRecord(record)
@@ -49,9 +68,15 @@ export function useEntryMovements() {
     setSelectedRecord(null)
   }
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value)
+  }
+
   return {
-    records: entryMovementRecords,
+    records: filteredRecords,
     selectedRecord,
+    searchTerm,
+    handleSearchChange,
     handleOpenExitConfirmation,
     handleCloseExitConfirmation,
   }
