@@ -2,6 +2,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
+import { ResidentsList } from '@/components/moradores/ResidentsList'
 import { RegisterResidentButton } from '@/components/moradores/RegisterResidentButton'
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 
@@ -37,10 +38,7 @@ export default function MoradoresPage() {
         </Stack>
       </Stack>
 
-      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-        Cadastre moradores com dados de unidade, vínculo e contato, seguindo o mesmo padrão dos
-        formulários já usados no fluxo de movimentações.
-      </Typography>
+      <ResidentsList />
     </Stack>
   )
 }

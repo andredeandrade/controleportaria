@@ -3,14 +3,22 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import type { ExitMovementRecord } from '@/components/movimentacoes/saida/hooks/useExitMovements'
+import type { ResidentRecord } from '@/components/moradores/hooks/useResidents'
 import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
 
-type ExitMovementsMobileListProps = {
-  records: ExitMovementRecord[]
+type ResidentsMobileListProps = {
+  records: ResidentRecord[]
 }
 
-export function ExitMovementsMobileList({ records }: ExitMovementsMobileListProps) {
+function formatVehicles(vehicles: ResidentRecord['vehicles']) {
+  if (vehicles.length === 0) {
+    return 'Sem veículo cadastrado'
+  }
+
+  return vehicles.map((vehicle) => `${vehicle.type}: ${vehicle.plate}`).join(' | ')
+}
+
+export function ResidentsMobileList({ records }: ResidentsMobileListProps) {
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (
@@ -24,30 +32,30 @@ export function ExitMovementsMobileList({ records }: ExitMovementsMobileListProp
             </Stack>
 
             <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Categoria</MobileFieldLabel>
+              <MobileFieldLabel variant="caption">Unidade</MobileFieldLabel>
               <Typography variant="body2" color="#0F172A">
-                {record.category}
+                {record.unit}
               </Typography>
             </Stack>
 
             <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Locomoção</MobileFieldLabel>
+              <MobileFieldLabel variant="caption">Vínculo</MobileFieldLabel>
               <Typography variant="body2" color="#0F172A">
-                {record.locomotion}
+                {record.relation}
               </Typography>
             </Stack>
 
             <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Placa</MobileFieldLabel>
+              <MobileFieldLabel variant="caption">Telefone</MobileFieldLabel>
               <Typography variant="body2" color="#0F172A">
-                {record.plate}
+                {record.phone}
               </Typography>
             </Stack>
 
             <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Saída em</MobileFieldLabel>
+              <MobileFieldLabel variant="caption">Veículos</MobileFieldLabel>
               <Typography variant="body2" color="#0F172A">
-                {record.exitAt}
+                {formatVehicles(record.vehicles)}
               </Typography>
             </Stack>
           </Stack>

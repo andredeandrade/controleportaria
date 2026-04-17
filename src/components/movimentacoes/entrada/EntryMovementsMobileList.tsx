@@ -4,10 +4,10 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import {
-  MobileEntryCard,
   MobileFieldLabel,
   MobileRegisterExitButton,
 } from '@/components/movimentacoes/styles/EntryMovements.styles'
+import { MobileListCard } from '@/styles/MobileList.styles'
 import type { EntryMovementRecord } from '@/components/movimentacoes/entrada/hooks/useEntryMovements'
 
 type EntryMovementsMobileListProps = {
@@ -22,7 +22,7 @@ export function EntryMovementsMobileList({
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (
-        <MobileEntryCard key={record.id} variant="outlined">
+        <MobileListCard key={record.id} variant="outlined">
           <Stack spacing={1.5}>
             <Stack spacing={0.25}>
               <MobileFieldLabel variant="caption">Nome</MobileFieldLabel>
@@ -67,7 +67,7 @@ export function EntryMovementsMobileList({
               Registrar saída
             </MobileRegisterExitButton>
           </Stack>
-        </MobileEntryCard>
+        </MobileListCard>
       ))}
     </Stack>
   )
