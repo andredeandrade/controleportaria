@@ -3,22 +3,17 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import type { ExitMovementRecord } from '@/components/movimentacoes/saida/hooks/useExitMovements'
 import {
   MobileEntryCard,
   MobileFieldLabel,
-  MobileRegisterExitButton,
 } from '@/components/movimentacoes/styles/EntryMovements.styles'
-import type { EntryMovementRecord } from '@/components/movimentacoes/entrada/hooks/useEntryMovements'
 
-type EntryMovementsMobileListProps = {
-  records: EntryMovementRecord[]
-  onRegisterExit: (record: EntryMovementRecord) => void
+type ExitMovementsMobileListProps = {
+  records: ExitMovementRecord[]
 }
 
-export function EntryMovementsMobileList({
-  records,
-  onRegisterExit,
-}: EntryMovementsMobileListProps) {
+export function ExitMovementsMobileList({ records }: ExitMovementsMobileListProps) {
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (
@@ -53,19 +48,11 @@ export function EntryMovementsMobileList({
             </Stack>
 
             <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Entrada em</MobileFieldLabel>
+              <MobileFieldLabel variant="caption">Saída em</MobileFieldLabel>
               <Typography variant="body2" color="#0F172A">
-                {record.entryAt}
+                {record.exitAt}
               </Typography>
             </Stack>
-
-            <MobileRegisterExitButton
-              variant="contained"
-              size="small"
-              onClick={() => onRegisterExit(record)}
-            >
-              Registrar saída
-            </MobileRegisterExitButton>
           </Stack>
         </MobileEntryCard>
       ))}

@@ -12,7 +12,7 @@ import { useState } from 'react'
 import {
   ConfirmExitButton,
   ExitDialogActions,
-} from '@/components/movimentacoes/entrada/styles/EntryMovements.styles'
+} from '@/components/movimentacoes/styles/EntryMovements.styles'
 
 type ExitRegistrationTarget = {
   name: string

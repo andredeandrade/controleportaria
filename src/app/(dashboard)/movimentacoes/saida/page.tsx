@@ -2,6 +2,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
+import { ExitMovementsList } from '@/components/movimentacoes/saida/ExitMovementsList'
 import { RegisterExitButton } from '@/components/movimentacoes/saida/RegisterExitButton'
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 
@@ -37,10 +38,7 @@ export default function SaidaPage() {
         </Stack>
       </Stack>
 
-      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-        Registre a saída de visitantes, moradores, colaboradores e prestadores com o mesmo fluxo já
-        adotado no controle de entrada, mantendo observações e dados de locomoção.
-      </Typography>
+      <ExitMovementsList />
     </Stack>
   )
 }
