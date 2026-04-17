@@ -4,10 +4,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import type { ExitMovementRecord } from '@/components/movimentacoes/saida/hooks/useExitMovements'
-import {
-  MobileEntryCard,
-  MobileFieldLabel,
-} from '@/components/movimentacoes/styles/EntryMovements.styles'
+import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
 
 type ExitMovementsMobileListProps = {
   records: ExitMovementRecord[]
@@ -17,7 +14,7 @@ export function ExitMovementsMobileList({ records }: ExitMovementsMobileListProp
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (
-        <MobileEntryCard key={record.id} variant="outlined">
+        <MobileListCard key={record.id} variant="outlined">
           <Stack spacing={1.5}>
             <Stack spacing={0.25}>
               <MobileFieldLabel variant="caption">Nome</MobileFieldLabel>
@@ -54,7 +51,7 @@ export function ExitMovementsMobileList({ records }: ExitMovementsMobileListProp
               </Typography>
             </Stack>
           </Stack>
-        </MobileEntryCard>
+        </MobileListCard>
       ))}
     </Stack>
   )
