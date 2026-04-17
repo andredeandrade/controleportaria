@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
 import { RegisterEventButton } from '@/components/eventos/RegisterEventButton'
+import { EventsList } from '@/components/eventos/EventsList'
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
@@ -37,10 +38,7 @@ export default function EventosPage() {
         </Stack>
       </Stack>
 
-      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-        Cadastre eventos com data, horário, responsável e lista de convidados para apoiar o controle
-        operacional da portaria.
-      </Typography>
+      <EventsList />
     </Stack>
   )
 }
