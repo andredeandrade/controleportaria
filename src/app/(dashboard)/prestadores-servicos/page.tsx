@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 import { RegisterServiceProviderButton } from '@/components/prestadores-servicos/RegisterServiceProviderButton'
+import { ServiceProvidersList } from '@/components/prestadores-servicos/ServiceProvidersList'
 
 export const metadata: Metadata = {
   title: 'Prestadores de Serviços',
@@ -37,10 +38,7 @@ export default function PrestadoresServicosPage() {
         </Stack>
       </Stack>
 
-      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-        Cadastre prestadores com dados da empresa, responsável e tipo de serviço, seguindo o mesmo
-        padrão dos formulários já usados no projeto.
-      </Typography>
+      <ServiceProvidersList />
     </Stack>
   )
 }
