@@ -7,7 +7,7 @@ import {
   MobileEntryCard,
   MobileFieldLabel,
   MobileRegisterExitButton,
-} from '@/components/movimentacoes/entrada/styles/EntryMovements.styles'
+} from '@/components/movimentacoes/styles/EntryMovements.styles'
 import type { EntryMovementRecord } from '@/components/movimentacoes/entrada/hooks/useEntryMovements'
 
 type EntryMovementsMobileListProps = {

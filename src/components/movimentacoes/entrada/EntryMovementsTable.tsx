@@ -2,7 +2,7 @@
 
 import type { ColumnDef } from '@tanstack/react-table'
 
-import { RegisterExitButton } from '@/components/movimentacoes/entrada/styles/EntryMovements.styles'
+import { RegisterExitButton } from '@/components/movimentacoes/styles/EntryMovements.styles'
 import { DataTable } from '@/components/table/DataTable'
 import type { EntryMovementRecord } from '@/components/movimentacoes/entrada/hooks/useEntryMovements'
 

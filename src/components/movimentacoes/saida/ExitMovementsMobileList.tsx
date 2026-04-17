@@ -7,7 +7,7 @@ import type { ExitMovementRecord } from '@/components/movimentacoes/saida/hooks/
 import {
   MobileEntryCard,
   MobileFieldLabel,
-} from '@/components/movimentacoes/entrada/styles/EntryMovements.styles'
+} from '@/components/movimentacoes/styles/EntryMovements.styles'
 
 type ExitMovementsMobileListProps = {
   records: ExitMovementRecord[]
