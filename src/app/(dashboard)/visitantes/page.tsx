@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
+import { VisitorsList } from '@/components/visitantes/VisitorsList'
 import { RegisterVisitorButton } from '@/components/visitantes/RegisterVisitorButton'
 
 export const metadata: Metadata = {
@@ -37,10 +38,7 @@ export default function VisitantesPage() {
         </Stack>
       </Stack>
 
-      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-        Cadastre visitantes com dados de identificação, unidade relacionada e responsável pela
-        autorização, seguindo o mesmo padrão dos formulários do projeto.
-      </Typography>
+      <VisitorsList />
     </Stack>
   )
 }
