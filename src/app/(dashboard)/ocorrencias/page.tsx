@@ -5,6 +5,8 @@ import type { Metadata } from 'next'
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 import { RegisterOccurrenceButton } from '@/components/ocorrencias/RegisterOccurrenceButton'
 
+import { OccurrencesList } from '@/components/ocorrencias/OccurrencesList'
+
 export const metadata: Metadata = {
   title: 'Ocorrências',
 }
@@ -37,10 +39,7 @@ export default function OcorrenciasPage() {
         </Stack>
       </Stack>
 
-      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
-        Registre ocorrências com classificação, data, hora e relato detalhado para apoiar o
-        acompanhamento operacional da portaria.
-      </Typography>
+      <OccurrencesList />
     </Stack>
   )
 }
