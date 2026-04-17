@@ -3,11 +3,8 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import {
-  MobileFieldLabel,
-  MobileRegisterExitButton,
-} from '@/components/movimentacoes/styles/EntryMovements.styles'
-import { MobileListCard } from '@/styles/MobileList.styles'
+import { MobileRegisterExitButton } from '@/components/movimentacoes/styles/ExitRegistration.styles'
+import { MobileListCard, MobileFieldLabel } from '@/styles/MobileList.styles'
 import type { EntryMovementRecord } from '@/components/movimentacoes/entrada/hooks/useEntryMovements'
 
 type EntryMovementsMobileListProps = {
