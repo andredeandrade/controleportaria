@@ -1,54 +1,46 @@
-import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
-import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
+
+import { RegisterExitButton } from '@/components/movimentacoes/saida/RegisterExitButton'
+import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
   title: 'Saída',
 }
 
-const exitHighlights = [
-  'Confirmação rápida da saída por tipo de acesso.',
-  'Registro de tempo de permanência e observações da portaria.',
-  'Acompanhamento de fluxo para relatórios posteriores.',
-]
-
 export default function SaidaPage() {
   return (
-    <Stack spacing={3}>
-      <Paper sx={{ p: 3, borderRadius: 3 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="space-between">
-          <Box>
-            <Typography variant="h6" fontWeight={700}>
-              Controle de saída
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Espaço para registrar encerramentos de acesso, horários de saída e observações
-              relevantes do turno.
-            </Typography>
-          </Box>
-          <Chip label="Próxima entrega" color="primary" variant="outlined" />
-        </Stack>
-      </Paper>
-
-      <Box
-        sx={{
-          display: 'grid',
-          gap: 2,
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
-        }}
+    <Stack spacing={2}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={2}
+        justifyContent="space-between"
+        alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        {exitHighlights.map((highlight) => (
-          <Paper key={highlight} sx={{ p: 2.5, borderRadius: 3 }}>
-            <Typography fontWeight={700}>Próximo passo</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
-              {highlight}
-            </Typography>
-          </Paper>
-        ))}
-      </Box>
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'grey.900' }}>
+          <BackToPreviousPageButton ariaLabel="Voltar para a pagina anterior" />
+
+          <Typography variant="h6" fontWeight={700} color="inherit">
+            Movimentações de saída
+          </Typography>
+        </Stack>
+
+        <Stack
+          direction="row"
+          justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}
+          sx={{
+            width: { xs: '100%', sm: 'auto' },
+          }}
+        >
+          <RegisterExitButton />
+        </Stack>
+      </Stack>
+
+      <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 720 }}>
+        Registre a saída de visitantes, moradores, colaboradores e prestadores com o mesmo fluxo já
+        adotado no controle de entrada, mantendo observações e dados de locomoção.
+      </Typography>
     </Stack>
   )
 }
