@@ -2,6 +2,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 import { RegisterAuthorizationButton } from '@/components/autorizacoes/RegisterAuthorizationButton'
+import { AuthorizationsList } from '@/components/autorizacoes/AuthorizationsList'
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
@@ -31,7 +32,7 @@ export default function AutorizacoesPage() {
           <RegisterAuthorizationButton />
         </Stack>
       </Stack>
-      {/* Aqui entrará a lista de autorizações futuramente */}
+      <AuthorizationsList />
     </Stack>
   )
 }
