@@ -55,8 +55,8 @@ export function useOccurrences() {
     )
   }, [searchTerm])
 
-  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearchTerm(e.target.value)
+  function handleSearchChange(value: string) {
+    setSearchTerm(value)
   }
 
   return { records, searchTerm, handleSearchChange }
