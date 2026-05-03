@@ -9,11 +9,8 @@ import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Link from 'next/link'
-import { useMemo } from 'react'
 
-import { useSidebarRoutes } from '@/hooks/useSidebarRoutes'
-
-const QUICK_LINKS_VIEW_ONLY_HREFS = ['/relatorios']
+import { useDashboardRoutes } from '@/hooks/useDashboardRoutes'
 
 type QuickAccessItem = {
   label: string
@@ -25,38 +22,16 @@ type QuickAccessItem = {
 }
 
 export function DashboardQuickLinks() {
-  const routes = useSidebarRoutes()
+  const routes = useDashboardRoutes()
 
-  const quickAccessItems = useMemo<QuickAccessItem[]>(() => {
-    return routes.flatMap((route) => {
-      const mainRoute = route.href && route.showInQuickLinks !== false
-        ? [
-            {
-              label: route.label,
-              href: route.href,
-              description: route.description,
-              color: route.color,
-              buttonLabel: QUICK_LINKS_VIEW_ONLY_HREFS.includes(route.href) ? 'Ver' : 'Cadastrar',
-              IconComponent: route.IconComponent,
-            },
-          ]
-        : []
-
-      const childRoutes =
-        route.children
-          ?.filter((child) => child.showInQuickLinks !== false)
-          .map((child) => ({
-            label: child.label,
-            href: child.href,
-            description: child.description,
-            color: child.color ?? route.color,
-            buttonLabel: QUICK_LINKS_VIEW_ONLY_HREFS.includes(child.href) ? 'Ver' : 'Cadastrar',
-            IconComponent: route.IconComponent,
-          })) ?? []
-
-      return [...mainRoute, ...childRoutes]
-    })
-  }, [routes])
+  const quickAccessItems: QuickAccessItem[] = routes.map((route) => ({
+    label: route.label,
+    href: route.href,
+    description: route.description,
+    color: route.color,
+    buttonLabel: route.buttonLabel ?? 'Cadastrar',
+    IconComponent: route.IconComponent,
+  }))
 
   return (
     <Box
