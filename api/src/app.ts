@@ -15,6 +15,7 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import cors from 'cors'
 import { env } from './config/env.js'
 import { router } from './routes/index.js'
+import { HttpError } from './lib/http-error.js'
 
 export const app = express()
 
@@ -47,6 +48,12 @@ app.use((_req: Request, res: Response) => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err)
+
+  if (err instanceof HttpError) {
+    res.status(err.statusCode).json({ error: err.message })
+    return
+  }
+
   res.status(500).json({
     error: env.nodeEnv === 'production' ? 'Erro interno do servidor.' : err.message,
   })

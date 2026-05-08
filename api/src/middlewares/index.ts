@@ -7,3 +7,6 @@
  * - validate.ts      → wrapper Zod para validar body/params/query
  * - rateLimiter.ts   → proteção contra abuso de endpoints
  */
+
+export { authenticate } from './authenticate.js'
+export { authorizeRoles } from './authorize.js'
