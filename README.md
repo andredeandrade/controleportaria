@@ -61,3 +61,48 @@ API:
 ```bash
 pnpm --filter ./api <script>
 ```
+
+## Docker (API + Web + PostgreSQL)
+
+O `docker compose` lê variáveis do arquivo `.env` na raiz do repositório. Comece criando esse arquivo a partir do exemplo:
+
+```bash
+cp .env.example .env
+```
+
+Suba todo o ambiente com um único comando:
+
+```bash
+docker compose up --build
+```
+
+Serviços disponíveis:
+
+- Frontend: http://localhost:3000
+- API: http://localhost:3333/api
+- PostgreSQL: localhost:5432
+
+Para rodar em background:
+
+```bash
+docker compose up --build -d
+```
+
+Para parar os serviços:
+
+```bash
+docker compose down
+```
+
+Para remover também o volume do banco:
+
+```bash
+docker compose down -v
+```
+
+Arquivos de exemplo disponíveis:
+
+- `.env.example`: variáveis usadas pelo `docker compose`
+- `api/.env.example`: variáveis para rodar a API localmente fora do Docker
+
+> Observação: defina um valor forte para `JWT_SECRET` no seu `.env` antes de usar fora de desenvolvimento.
