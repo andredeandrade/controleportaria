@@ -16,7 +16,7 @@ COPY api ./api
 
 WORKDIR /app/api
 
-RUN pnpm build
+RUN pnpm prisma:generate && pnpm build
 
 EXPOSE 3333
 
