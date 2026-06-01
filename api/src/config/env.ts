@@ -18,5 +18,6 @@ export const env = {
   corsOrigin: process.env['CORS_ORIGIN'] ?? 'http://localhost:3000',
   jwtSecret: required('JWT_SECRET'),
   jwtExpiresIn: process.env['JWT_EXPIRES_IN'] ?? '1d',
+  dataEncryptionKey: required('DATA_ENCRYPTION_KEY'),
   nodeEnv: process.env['NODE_ENV'] ?? 'development',
 } as const
