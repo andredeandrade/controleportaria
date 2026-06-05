@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.authService = void 0;
-const prisma_js_1 = require("../../lib/prisma.js");
-const http_error_js_1 = require("../../lib/http-error.js");
-const password_js_1 = require("../../lib/password.js");
-const jwt_js_1 = require("../../lib/jwt.js");
+import { prisma } from '../../lib/prisma.js';
+import { HttpError } from '../../lib/http-error.js';
+import { comparePassword, hashPassword } from '../../lib/password.js';
+import { signAccessToken } from '../../lib/jwt.js';
 const ALLOWED_ROLES = ['ADMIN', 'PORTARIA'];
 function normalizeEmail(email) {
     return email.trim().toLowerCase();
@@ -20,33 +17,33 @@ function validateRole(role) {
         return undefined;
     }
     if (!ALLOWED_ROLES.includes(role)) {
-        throw new http_error_js_1.HttpError(400, 'Role inválida.');
+        throw new HttpError(400, 'Role inválida.');
     }
     return role;
 }
-exports.authService = {
+export const authService = {
     async register(input) {
         const name = input.name.trim();
         const email = normalizeEmail(input.email);
         const role = validateRole(input.role);
         if (name.length < 3) {
-            throw new http_error_js_1.HttpError(400, 'Nome deve ter ao menos 3 caracteres.');
+            throw new HttpError(400, 'Nome deve ter ao menos 3 caracteres.');
         }
         if (!validateEmail(email)) {
-            throw new http_error_js_1.HttpError(400, 'E-mail inválido.');
+            throw new HttpError(400, 'E-mail inválido.');
         }
         if (!validatePassword(input.password)) {
-            throw new http_error_js_1.HttpError(400, 'Senha deve ter no mínimo 8 caracteres.');
+            throw new HttpError(400, 'Senha deve ter no mínimo 8 caracteres.');
         }
-        const existingUser = await prisma_js_1.prisma.user.findUnique({
+        const existingUser = await prisma.user.findUnique({
             where: { email },
             select: { id: true },
         });
         if (existingUser) {
-            throw new http_error_js_1.HttpError(409, 'E-mail já cadastrado.');
+            throw new HttpError(409, 'E-mail já cadastrado.');
         }
-        const passwordHash = await (0, password_js_1.hashPassword)(input.password);
-        const user = await prisma_js_1.prisma.user.create({
+        const passwordHash = await hashPassword(input.password);
+        const user = await prisma.user.create({
             data: {
                 name,
                 email,
@@ -54,7 +51,7 @@ exports.authService = {
                 role: role ?? 'PORTARIA',
             },
         });
-        const token = (0, jwt_js_1.signAccessToken)({
+        const token = signAccessToken({
             sub: user.id,
             email: user.email,
             role: user.role,
@@ -72,19 +69,19 @@ exports.authService = {
     async login(input) {
         const email = normalizeEmail(input.email);
         if (!validateEmail(email) || !input.password) {
-            throw new http_error_js_1.HttpError(400, 'Credenciais inválidas.');
+            throw new HttpError(400, 'Credenciais inválidas.');
         }
-        const user = await prisma_js_1.prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: { email },
         });
         if (!user) {
-            throw new http_error_js_1.HttpError(401, 'E-mail ou senha inválidos.');
+            throw new HttpError(401, 'E-mail ou senha inválidos.');
         }
-        const passwordMatches = await (0, password_js_1.comparePassword)(input.password, user.passwordHash);
+        const passwordMatches = await comparePassword(input.password, user.passwordHash);
         if (!passwordMatches) {
-            throw new http_error_js_1.HttpError(401, 'E-mail ou senha inválidos.');
+            throw new HttpError(401, 'E-mail ou senha inválidos.');
         }
-        const token = (0, jwt_js_1.signAccessToken)({
+        const token = signAccessToken({
             sub: user.id,
             email: user.email,
             role: user.role,
