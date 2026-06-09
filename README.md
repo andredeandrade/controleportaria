@@ -2,6 +2,21 @@
 
 Sistema de gestão de entrada e saída em portarias, multi-tenant (suporte a vários condomínios).
 
+## Multi-tenant por Slug no Frontend
+
+O frontend resolve o tenant a partir do subdomínio e consulta a API para obter o `condominiumId` pelo `slug`.
+
+Fluxo recomendado:
+
+1. Extrair o slug do subdomínio no frontend
+2. Chamar `GET /api/condominiums/slug/:slug/id` para obter o id do condomínio.
+3. Enviar `condominiumId` no body das rotas de autenticação.
+
+Endpoints de autenticação:
+
+- `POST /api/auth/register`: `condominiumId`, `name`, `email`, `password`, `role` (opcional)
+- `POST /api/auth/login`: `condominiumId`, `email`, `password`
+
 ## Stack
 
 - **Frontend (`web`)**: Next.js + TypeScript + Material UI + React Query + TanStack Table

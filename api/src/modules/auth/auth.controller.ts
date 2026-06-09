@@ -15,6 +15,7 @@ export const authController = {
     const body = getBodyAsRecord(req.body)
 
     const result = await authService.register({
+      condominiumId: String(body['condominiumId'] ?? ''),
       name: String(body['name'] ?? ''),
       email: String(body['email'] ?? ''),
       password: String(body['password'] ?? ''),
@@ -28,6 +29,7 @@ export const authController = {
     const body = getBodyAsRecord(req.body)
 
     const result = await authService.login({
+      condominiumId: String(body['condominiumId'] ?? ''),
       email: String(body['email'] ?? ''),
       password: String(body['password'] ?? ''),
     })
