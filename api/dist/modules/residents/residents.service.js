@@ -197,6 +197,7 @@ export const residentsService = {
         const validated = validateCreateInput(input);
         const resident = await prisma.resident.create({
             data: {
+                condominiumId: input.condominiumId,
                 fullName: validated.fullName,
                 unit: validated.unit,
                 relation: validated.relation,
@@ -226,14 +227,17 @@ export const residentsService = {
     },
     async list(input) {
         const { page, pageSize, skip, search } = parsePagination(input);
-        const where = search
-            ? {
-                OR: [
-                    { fullName: { contains: search, mode: 'insensitive' } },
-                    { unit: { contains: search, mode: 'insensitive' } },
-                ],
-            }
-            : undefined;
+        const where = {
+            condominiumId: input.condominiumId,
+            ...(search
+                ? {
+                    OR: [
+                        { fullName: { contains: search, mode: 'insensitive' } },
+                        { unit: { contains: search, mode: 'insensitive' } },
+                    ],
+                }
+                : {}),
+        };
         const [items, total] = await prisma.$transaction([
             prisma.resident.findMany({
                 where,
@@ -258,13 +262,16 @@ export const residentsService = {
             },
         };
     },
-    async getById(id) {
+    async getById(id, condominiumId) {
         const residentId = id.trim();
         if (!residentId) {
             throw new HttpError(400, 'ID do morador é obrigatório.');
         }
-        const resident = await prisma.resident.findUnique({
-            where: { id: residentId },
+        const resident = await prisma.resident.findFirst({
+            where: {
+                id: residentId,
+                condominiumId,
+            },
             include: {
                 vehicles: {
                     orderBy: { createdAt: 'asc' },
@@ -276,14 +283,17 @@ export const residentsService = {
         }
         return toResponse(resident);
     },
-    async update(id, input) {
+    async update(id, input, condominiumId) {
         const residentId = id.trim();
         if (!residentId) {
             throw new HttpError(400, 'ID do morador é obrigatório.');
         }
         const validated = validateUpdateInput(input);
-        const exists = await prisma.resident.findUnique({
-            where: { id: residentId },
+        const exists = await prisma.resident.findFirst({
+            where: {
+                id: residentId,
+                condominiumId,
+            },
             select: { id: true },
         });
         if (!exists) {
@@ -335,13 +345,16 @@ export const residentsService = {
         });
         return toResponse(resident);
     },
-    async remove(id) {
+    async remove(id, condominiumId) {
         const residentId = id.trim();
         if (!residentId) {
             throw new HttpError(400, 'ID do morador é obrigatório.');
         }
-        const exists = await prisma.resident.findUnique({
-            where: { id: residentId },
+        const exists = await prisma.resident.findFirst({
+            where: {
+                id: residentId,
+                condominiumId,
+            },
             select: { id: true },
         });
         if (!exists) {

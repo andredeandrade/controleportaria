@@ -23,9 +23,13 @@ function validateRole(role) {
 }
 export const authService = {
     async register(input) {
+        const condominiumId = input.condominiumId.trim();
         const name = input.name.trim();
         const email = normalizeEmail(input.email);
         const role = validateRole(input.role);
+        if (!condominiumId) {
+            throw new HttpError(400, 'Condomínio é obrigatório.');
+        }
         if (name.length < 3) {
             throw new HttpError(400, 'Nome deve ter ao menos 3 caracteres.');
         }
@@ -36,7 +40,12 @@ export const authService = {
             throw new HttpError(400, 'Senha deve ter no mínimo 8 caracteres.');
         }
         const existingUser = await prisma.user.findUnique({
-            where: { email },
+            where: {
+                condominiumId_email: {
+                    condominiumId,
+                    email,
+                },
+            },
             select: { id: true },
         });
         if (existingUser) {
@@ -45,6 +54,7 @@ export const authService = {
         const passwordHash = await hashPassword(input.password);
         const user = await prisma.user.create({
             data: {
+                condominiumId,
                 name,
                 email,
                 passwordHash,
@@ -55,11 +65,13 @@ export const authService = {
             sub: user.id,
             email: user.email,
             role: user.role,
+            condominiumId: user.condominiumId,
         });
         return {
             token,
             user: {
                 id: user.id,
+                condominiumId: user.condominiumId,
                 name: user.name,
                 email: user.email,
                 role: user.role,
@@ -67,12 +79,18 @@ export const authService = {
         };
     },
     async login(input) {
+        const condominiumId = input.condominiumId.trim();
         const email = normalizeEmail(input.email);
-        if (!validateEmail(email) || !input.password) {
+        if (!condominiumId || !validateEmail(email) || !input.password) {
             throw new HttpError(400, 'Credenciais inválidas.');
         }
         const user = await prisma.user.findUnique({
-            where: { email },
+            where: {
+                condominiumId_email: {
+                    condominiumId,
+                    email,
+                },
+            },
         });
         if (!user) {
             throw new HttpError(401, 'E-mail ou senha inválidos.');
@@ -85,11 +103,13 @@ export const authService = {
             sub: user.id,
             email: user.email,
             role: user.role,
+            condominiumId: user.condominiumId,
         });
         return {
             token,
             user: {
                 id: user.id,
+                condominiumId: user.condominiumId,
                 name: user.name,
                 email: user.email,
                 role: user.role,

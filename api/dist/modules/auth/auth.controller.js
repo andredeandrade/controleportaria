@@ -8,8 +8,12 @@ function getBodyAsRecord(body) {
 }
 export const authController = {
     async register(req, res) {
+        if (!req.tenant) {
+            throw new HttpError(400, 'Condomínio não resolvido pelo subdomínio.');
+        }
         const body = getBodyAsRecord(req.body);
         const result = await authService.register({
+            condominiumId: req.tenant.id,
             name: String(body['name'] ?? ''),
             email: String(body['email'] ?? ''),
             password: String(body['password'] ?? ''),
@@ -18,8 +22,12 @@ export const authController = {
         res.status(201).json(result);
     },
     async login(req, res) {
+        if (!req.tenant) {
+            throw new HttpError(400, 'Condomínio não resolvido pelo subdomínio.');
+        }
         const body = getBodyAsRecord(req.body);
         const result = await authService.login({
+            condominiumId: req.tenant.id,
             email: String(body['email'] ?? ''),
             password: String(body['password'] ?? ''),
         });

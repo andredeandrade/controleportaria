@@ -32,9 +32,14 @@ function validateRole(role?: UserRole): UserRole | undefined {
 
 export const authService = {
   async register(input: RegisterInput) {
+    const condominiumId = input.condominiumId.trim()
     const name = input.name.trim()
     const email = normalizeEmail(input.email)
     const role = validateRole(input.role)
+
+    if (!condominiumId) {
+      throw new HttpError(400, 'Condomínio é obrigatório.')
+    }
 
     if (name.length < 3) {
       throw new HttpError(400, 'Nome deve ter ao menos 3 caracteres.')
@@ -49,7 +54,12 @@ export const authService = {
     }
 
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: {
+        condominiumId_email: {
+          condominiumId,
+          email,
+        },
+      },
       select: { id: true },
     })
 
@@ -61,6 +71,7 @@ export const authService = {
 
     const user = await prisma.user.create({
       data: {
+        condominiumId,
         name,
         email,
         passwordHash,
@@ -72,12 +83,14 @@ export const authService = {
       sub: user.id,
       email: user.email,
       role: user.role,
+      condominiumId: user.condominiumId,
     })
 
     return {
       token,
       user: {
         id: user.id,
+        condominiumId: user.condominiumId,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -86,14 +99,20 @@ export const authService = {
   },
 
   async login(input: LoginInput) {
+    const condominiumId = input.condominiumId.trim()
     const email = normalizeEmail(input.email)
 
-    if (!validateEmail(email) || !input.password) {
+    if (!condominiumId || !validateEmail(email) || !input.password) {
       throw new HttpError(400, 'Credenciais inválidas.')
     }
 
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: {
+        condominiumId_email: {
+          condominiumId,
+          email,
+        },
+      },
     })
 
     if (!user) {
@@ -110,12 +129,14 @@ export const authService = {
       sub: user.id,
       email: user.email,
       role: user.role,
+      condominiumId: user.condominiumId,
     })
 
     return {
       token,
       user: {
         id: user.id,
+        condominiumId: user.condominiumId,
         name: user.name,
         email: user.email,
         role: user.role,

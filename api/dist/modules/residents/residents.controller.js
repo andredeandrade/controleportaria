@@ -70,6 +70,7 @@ export const residentsController = {
         }
         const body = getBodyAsRecord(req.body);
         const resident = await residentsService.create({
+            condominiumId: req.authUser.condominiumId,
             fullName: String(body['fullName'] ?? ''),
             unit: String(body['unit'] ?? ''),
             relation: String(body['relation'] ?? ''),
@@ -83,7 +84,11 @@ export const residentsController = {
         res.status(201).json(resident);
     },
     async list(req, res) {
+        if (!req.authUser) {
+            throw new HttpError(401, 'Não autenticado.');
+        }
         const result = await residentsService.list({
+            condominiumId: req.authUser.condominiumId,
             page: Number(req.query['page'] ?? 1),
             pageSize: Number(req.query['pageSize'] ?? 10),
             search: req.query['search'] ? String(req.query['search']) : undefined,
@@ -91,16 +96,25 @@ export const residentsController = {
         res.json(result);
     },
     async getById(req, res) {
-        const resident = await residentsService.getById(String(req.params['id'] ?? ''));
+        if (!req.authUser) {
+            throw new HttpError(401, 'Não autenticado.');
+        }
+        const resident = await residentsService.getById(String(req.params['id'] ?? ''), req.authUser.condominiumId);
         res.json(resident);
     },
     async update(req, res) {
+        if (!req.authUser) {
+            throw new HttpError(401, 'Não autenticado.');
+        }
         const body = getBodyAsRecord(req.body);
-        const resident = await residentsService.update(String(req.params['id'] ?? ''), parseUpdateInput(body));
+        const resident = await residentsService.update(String(req.params['id'] ?? ''), parseUpdateInput(body), req.authUser.condominiumId);
         res.json(resident);
     },
     async remove(req, res) {
-        await residentsService.remove(String(req.params['id'] ?? ''));
+        if (!req.authUser) {
+            throw new HttpError(401, 'Não autenticado.');
+        }
+        await residentsService.remove(String(req.params['id'] ?? ''), req.authUser.condominiumId);
         res.status(204).send();
     },
 };

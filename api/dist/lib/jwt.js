@@ -14,7 +14,7 @@ export function verifyAccessToken(token) {
             throw new HttpError(401, 'Token inválido.');
         }
         const payload = decoded;
-        if (!payload.sub || !payload.email || !payload.role) {
+        if (!payload.sub || !payload.email || !payload.role || !payload.condominiumId) {
             throw new HttpError(401, 'Token inválido.');
         }
         if (payload.role !== 'ADMIN' && payload.role !== 'PORTARIA') {
@@ -24,6 +24,7 @@ export function verifyAccessToken(token) {
             sub: payload.sub,
             email: payload.email,
             role: payload.role,
+            condominiumId: payload.condominiumId,
         };
     }
     catch (error) {

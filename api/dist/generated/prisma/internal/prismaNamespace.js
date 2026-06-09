@@ -68,6 +68,7 @@ export const JsonNull = runtime.JsonNull;
 export const AnyNull = runtime.AnyNull;
 export const ModelName = {
     User: 'User',
+    Condominium: 'Condominium',
     Resident: 'Resident',
     Visitor: 'Visitor',
     Vehicle: 'Vehicle'
@@ -83,6 +84,7 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 });
 export const UserScalarFieldEnum = {
     id: 'id',
+    condominiumId: 'condominiumId',
     name: 'name',
     email: 'email',
     passwordHash: 'passwordHash',
@@ -90,8 +92,16 @@ export const UserScalarFieldEnum = {
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
 };
+export const CondominiumScalarFieldEnum = {
+    id: 'id',
+    name: 'name',
+    slug: 'slug',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
 export const ResidentScalarFieldEnum = {
     id: 'id',
+    condominiumId: 'condominiumId',
     fullName: 'fullName',
     unit: 'unit',
     relation: 'relation',

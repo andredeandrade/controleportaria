@@ -14,10 +14,14 @@ function extractBearerToken(authorizationHeader) {
 export async function authenticate(req, _res, next) {
     const token = extractBearerToken(req.headers.authorization);
     const payload = verifyAccessToken(token);
-    const user = await prisma.user.findUnique({
-        where: { id: payload.sub },
+    const user = await prisma.user.findFirst({
+        where: {
+            id: payload.sub,
+            condominiumId: payload.condominiumId,
+        },
         select: {
             id: true,
+            condominiumId: true,
             email: true,
             role: true,
             name: true,

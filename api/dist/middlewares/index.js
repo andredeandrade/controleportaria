@@ -9,3 +9,4 @@
  */
 export { authenticate } from './authenticate.js';
 export { authorizeRoles } from './authorize.js';
+export { resolveTenantFromSubdomain } from './resolve-tenant-from-subdomain.js';
