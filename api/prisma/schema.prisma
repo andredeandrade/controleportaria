@@ -39,6 +39,7 @@ model User {
   role             UserRole    @default(PORTARIA)
   residentsCreated Resident[]
   visitorsCreated  Visitor[]
+  serviceProvidersCreated ServiceProvider[]
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 
@@ -53,6 +54,7 @@ model Condominium {
   users     User[]
   residents Resident[]
   visitors  Visitor[]
+  serviceProviders ServiceProvider[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
@@ -100,6 +102,29 @@ model Visitor {
 
   @@index([condominiumId, fullName])
   @@index([condominiumId, unit])
+  @@index([createdByUserId])
+  @@index([createdAt])
+}
+
+model ServiceProvider {
+  id                   String      @id @default(uuid())
+  condominiumId        String
+  condominium          Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  companyName          String
+  responsibleName      String
+  serviceType          String
+  unit                 String?
+  emailEncrypted       String?
+  phoneEncrypted       String?
+  documentEncrypted    String
+  observationsEncrypted String?
+  createdByUserId      String?
+  createdByUser        User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@index([condominiumId, companyName])
+  @@index([condominiumId, serviceType])
   @@index([createdByUserId])
   @@index([createdAt])
 }
