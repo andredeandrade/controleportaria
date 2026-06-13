@@ -18,6 +18,7 @@ export interface ResidentVehicleResponse {
 }
 
 export interface CreateResidentInput {
+  condominiumId: string
   fullName: string
   unit: string
   relation: ResidentRelation
@@ -41,6 +42,7 @@ export interface UpdateResidentInput {
 }
 
 export interface ListResidentsInput {
+  condominiumId: string
   page: number
   pageSize: number
   search?: string

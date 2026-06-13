@@ -8,6 +8,7 @@ export interface AuthTokenPayload {
   sub: string
   email: string
   role: UserRole
+  condominiumId: string
 }
 
 export function signAccessToken(payload: AuthTokenPayload): string {
@@ -28,7 +29,7 @@ export function verifyAccessToken(token: string): AuthTokenPayload {
 
     const payload = decoded as Partial<AuthTokenPayload>
 
-    if (!payload.sub || !payload.email || !payload.role) {
+    if (!payload.sub || !payload.email || !payload.role || !payload.condominiumId) {
       throw new HttpError(401, 'Token inválido.')
     }
 
@@ -40,6 +41,7 @@ export function verifyAccessToken(token: string): AuthTokenPayload {
       sub: payload.sub,
       email: payload.email,
       role: payload.role,
+      condominiumId: payload.condominiumId,
     }
   } catch (error) {
     if (error instanceof HttpError) {
