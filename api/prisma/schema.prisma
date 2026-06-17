@@ -39,6 +39,7 @@ model User {
   role             UserRole    @default(PORTARIA)
   residentsCreated Resident[]
   visitorsCreated  Visitor[]
+  eventsCreated    Event[]
   serviceProvidersCreated ServiceProvider[]
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
@@ -54,6 +55,7 @@ model Condominium {
   users     User[]
   residents Resident[]
   visitors  Visitor[]
+  events    Event[]
   serviceProviders ServiceProvider[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -127,6 +129,42 @@ model ServiceProvider {
   @@index([condominiumId, serviceType])
   @@index([createdByUserId])
   @@index([createdAt])
+}
+
+model Event {
+  id                    String      @id @default(uuid())
+  condominiumId         String
+  condominium           Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  title                 String
+  date                  String
+  startTime             String
+  endTime               String?
+  unit                  String
+  responsibleName       String
+  observationsEncrypted String?
+  createdByUserId       String?
+  createdByUser         User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  guests                EventGuest[]
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([condominiumId, date])
+  @@index([condominiumId, title])
+  @@index([condominiumId, unit])
+  @@index([createdByUserId])
+  @@index([createdAt])
+}
+
+model EventGuest {
+  id                String   @id @default(uuid())
+  eventId           String
+  event             Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name              String
+  documentEncrypted String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([eventId])
 }
 
 model Vehicle {
