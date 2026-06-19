@@ -42,6 +42,7 @@ model User {
   eventsCreated    Event[]
   incidentsCreated Incident[]
   serviceProvidersCreated ServiceProvider[]
+  authorizationsCreated Authorization[]
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 
@@ -59,6 +60,7 @@ model Condominium {
   events    Event[]
   incidents Incident[]
   serviceProviders ServiceProvider[]
+  authorizations Authorization[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
@@ -129,6 +131,35 @@ model ServiceProvider {
 
   @@index([condominiumId, companyName])
   @@index([condominiumId, serviceType])
+  @@index([createdByUserId])
+  @@index([createdAt])
+}
+
+model Authorization {
+  id                   String      @id @default(uuid())
+  condominiumId        String
+  condominium          Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  authorizedName       String
+  personType           String
+  documentEncrypted    String
+  phoneEncrypted       String?
+  company              String?
+  unit                 String
+  authorizedBy         String
+  validFromDate        String
+  validFromTime        String
+  validToDate          String
+  validToTime          String
+  observationsEncrypted String?
+  createdByUserId      String?
+  createdByUser        User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@index([condominiumId, authorizedName])
+  @@index([condominiumId, validFromDate])
+  @@index([condominiumId, validToDate])
+  @@index([condominiumId, unit])
   @@index([createdByUserId])
   @@index([createdAt])
 }
