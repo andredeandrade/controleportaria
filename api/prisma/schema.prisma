@@ -43,6 +43,8 @@ model User {
   incidentsCreated Incident[]
   serviceProvidersCreated ServiceProvider[]
   authorizationsCreated Authorization[]
+  accessRecordsCheckIn AccessRecord[] @relation("AccessRecordCheckInUser")
+  accessRecordsCheckOut AccessRecord[] @relation("AccessRecordCheckOutUser")
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 
@@ -61,6 +63,7 @@ model Condominium {
   incidents Incident[]
   serviceProviders ServiceProvider[]
   authorizations Authorization[]
+  accessRecords AccessRecord[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
@@ -162,6 +165,49 @@ model Authorization {
   @@index([condominiumId, unit])
   @@index([createdByUserId])
   @@index([createdAt])
+}
+
+model AccessRecord {
+  id                         String      @id @default(uuid())
+  condominiumId              String
+  condominium                Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  company                    String?
+  locomotion                 String?
+  color                      String?
+  plateEncrypted             String?
+  brandModel                 String?
+  observationsEncrypted      String?
+  checkOutObservationsEncrypted String?
+  checkInAt                  DateTime    @default(now())
+  checkOutAt                 DateTime?
+  checkedInByUserId          String?
+  checkedInByUser            User?       @relation("AccessRecordCheckInUser", fields: [checkedInByUserId], references: [id], onDelete: SetNull)
+  checkedOutByUserId         String?
+  checkedOutByUser           User?       @relation("AccessRecordCheckOutUser", fields: [checkedOutByUserId], references: [id], onDelete: SetNull)
+  people                     AccessRecordPerson[]
+  createdAt                  DateTime    @default(now())
+  updatedAt                  DateTime    @updatedAt
+
+  @@index([condominiumId, checkInAt])
+  @@index([condominiumId, checkOutAt])
+  @@index([checkedInByUserId])
+  @@index([checkedOutByUserId])
+  @@index([createdAt])
+}
+
+model AccessRecordPerson {
+  id                String       @id @default(uuid())
+  accessRecordId    String
+  accessRecord      AccessRecord @relation(fields: [accessRecordId], references: [id], onDelete: Cascade)
+  category          String
+  name              String
+  documentEncrypted String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([accessRecordId])
+  @@index([category])
+  @@index([name])
 }
 
 model Event {

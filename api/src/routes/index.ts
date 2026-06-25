@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { accessRecordsRouter } from '../modules/access-records/index.js'
 import { authorizationsRouter } from '../modules/authorizations/index.js'
 import { authRouter } from '../modules/auth/index.js'
 import { condominiumsRouter } from '../modules/condominiums/index.js'
@@ -12,6 +13,7 @@ export const router = Router()
 
 router.use('/condominiums', condominiumsRouter)
 router.use('/auth', authRouter)
+router.use('/access-records', accessRecordsRouter)
 router.use('/authorizations', authorizationsRouter)
 router.use('/events', eventsRouter)
 router.use('/incidents', incidentsRouter)
