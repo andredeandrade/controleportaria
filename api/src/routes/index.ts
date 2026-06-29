@@ -5,6 +5,7 @@ import { authRouter } from '../modules/auth/index.js'
 import { condominiumsRouter } from '../modules/condominiums/index.js'
 import { eventsRouter } from '../modules/events/index.js'
 import { incidentsRouter } from '../modules/incidents/index.js'
+import { reportsRouter } from '../modules/reports/index.js'
 import { residentsRouter } from '../modules/residents/index.js'
 import { serviceProvidersRouter } from '../modules/service-providers/index.js'
 import { visitorsRouter } from '../modules/visitors/index.js'
@@ -17,6 +18,7 @@ router.use('/access-records', accessRecordsRouter)
 router.use('/authorizations', authorizationsRouter)
 router.use('/events', eventsRouter)
 router.use('/incidents', incidentsRouter)
+router.use('/reports', reportsRouter)
 router.use('/residents', residentsRouter)
 router.use('/visitors', visitorsRouter)
 router.use('/service-providers', serviceProvidersRouter)
