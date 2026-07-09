@@ -9,22 +9,22 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Snackbar from '@mui/material/Snackbar'
 import { useState } from 'react'
 
-import {
-  ConfirmExitButton,
-  ExitDialogActions,
-} from '@/components/movimentacoes/styles/ExitRegistration.styles'
+import { ConfirmExitButton, ExitDialogActions } from '@/components/acessos/styles/AccessStyles'
 
 type ExitRegistrationTarget = {
   name: string
   entryAt: string
 } | null
 
-type ExitRegistrationFeedbackProps = {
+type AccessExitRegistrationFeedbackProps = {
   target: ExitRegistrationTarget
   onClose: () => void
 }
 
-export function ExitRegistrationFeedback({ target, onClose }: ExitRegistrationFeedbackProps) {
+export function AccessExitRegistrationFeedback({
+  target,
+  onClose,
+}: AccessExitRegistrationFeedbackProps) {
   const [isSuccessOpen, setIsSuccessOpen] = useState(false)
 
   const handleConfirm = () => {

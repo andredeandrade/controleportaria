@@ -27,7 +27,7 @@ type PersonFormValues = {
   document: string
 }
 
-type RegisterEntryFormValues = {
+type AccessRegisterFormValues = {
   people: PersonFormValues[]
   company: string
   locomotion: LocomotionValue | ''
@@ -37,13 +37,13 @@ type RegisterEntryFormValues = {
   observations: string
 }
 
-export function RegisterEntryForm() {
+export function AccessRegisterForm() {
   const {
     control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterEntryFormValues>({
+  } = useForm<AccessRegisterFormValues>({
     defaultValues: {
       people: [{ category: '', name: '', document: '' }],
       company: '',
@@ -68,7 +68,7 @@ export function RegisterEntryForm() {
     remove(index)
   }
 
-  const onSubmit = (data: RegisterEntryFormValues) => {
+  const onSubmit = (data: AccessRegisterFormValues) => {
     void data
   }
 

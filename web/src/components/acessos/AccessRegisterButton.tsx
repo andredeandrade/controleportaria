@@ -3,15 +3,15 @@
 import Button from '@mui/material/Button'
 import { useRouter } from 'next/navigation'
 
-type RegisterExitButtonProps = {
+type AccessRegisterButtonProps = {
   fullWidth?: boolean
 }
 
-export function RegisterExitButton({ fullWidth = false }: RegisterExitButtonProps) {
+export function AccessRegisterButton({ fullWidth = false }: AccessRegisterButtonProps) {
   const router = useRouter()
 
   const handleNavigateToRegister = () => {
-    router.push('/movimentacoes/saida/registrar')
+    router.push('/acessos/registrar')
   }
 
   return (

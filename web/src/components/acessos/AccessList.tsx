@@ -3,16 +3,21 @@
 import Stack from '@mui/material/Stack'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
+import { useSearchParams } from 'next/navigation'
 
-import { ExitRegistrationFeedback } from '@/components/movimentacoes/entrada/ExitRegistrationFeedback'
-import { EntryMovementsMobileList } from '@/components/movimentacoes/entrada/EntryMovementsMobileList'
-import { EntryMovementsTable } from '@/components/movimentacoes/entrada/EntryMovementsTable'
-import { useEntryMovements } from '@/components/movimentacoes/entrada/hooks/useEntryMovements'
+import { AccessExitRegistrationFeedback } from '@/components/acessos/AccessExitRegistrationFeedback'
+import { useAccessList } from '@/components/acessos/hooks/useAccessList'
 import { ListSearchField } from '@/components/table/ListSearchField'
+import { AccessListTable } from './AccessListTable'
+import { AccessListTableMobile } from './AccessListTableMobile'
 
-export function EntryMovementsList() {
+export function AccessList() {
   const theme = useTheme()
+  const searchParams = useSearchParams()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const statusParam = searchParams.get('status')
+  const viewMode = statusParam === 'history' ? 'history' : 'active'
+
   const {
     records,
     selectedRecord,
@@ -20,7 +25,7 @@ export function EntryMovementsList() {
     handleSearchChange,
     handleOpenExitConfirmation,
     handleCloseExitConfirmation,
-  } = useEntryMovements()
+  } = useAccessList({ viewMode })
 
   return (
     <>
@@ -38,13 +43,16 @@ export function EntryMovementsList() {
         </Stack>
 
         {isMobile ? (
-          <EntryMovementsMobileList records={records} onRegisterExit={handleOpenExitConfirmation} />
+          <AccessListTableMobile records={records} onRegisterExit={handleOpenExitConfirmation} />
         ) : (
-          <EntryMovementsTable records={records} onRegisterExit={handleOpenExitConfirmation} />
+          <AccessListTable records={records} onRegisterExit={handleOpenExitConfirmation} />
         )}
       </Stack>
 
-      <ExitRegistrationFeedback target={selectedRecord} onClose={handleCloseExitConfirmation} />
+      <AccessExitRegistrationFeedback
+        target={selectedRecord}
+        onClose={handleCloseExitConfirmation}
+      />
     </>
   )
 }

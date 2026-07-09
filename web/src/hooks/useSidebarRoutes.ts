@@ -31,11 +31,12 @@ const sidebarRoutesConfig: SidebarRoute[] = [
     IconComponent: DashboardRoundedIcon,
   },
   {
-    label: 'Movimentações',
+    label: 'Acessos',
     IconComponent: SwapHorizRoundedIcon,
     children: [
-      { label: 'Entrada', href: '/movimentacoes/entrada' },
-      { label: 'Saída', href: '/movimentacoes/saida' },
+      { label: 'Registrar Entrada', href: '/acessos/registrar' },
+      { label: 'Acessos Ativos', href: '/acessos?status=active' },
+      { label: 'Histórico de Acessos', href: '/acessos?status=history' },
     ],
   },
   {
