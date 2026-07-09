@@ -2,16 +2,23 @@
 
 import { useState } from 'react'
 
-export type EntryMovementRecord = {
+export type AccessRecord = {
   id: string
   name: string
   category: string
   locomotion: string
   plate: string
   entryAt: string
+  hasExited: boolean
 }
 
-const entryMovementRecords: EntryMovementRecord[] = [
+export type AccessListViewMode = 'active' | 'history'
+
+type UseAccessListParams = {
+  viewMode: AccessListViewMode
+}
+
+const accessRecords: AccessRecord[] = [
   {
     id: '1',
     name: 'Maria Souza',
@@ -19,6 +26,7 @@ const entryMovementRecords: EntryMovementRecord[] = [
     locomotion: 'Carro',
     plate: 'ABC-1D23',
     entryAt: '15/04/2026 08:15',
+    hasExited: false,
   },
   {
     id: '2',
@@ -27,6 +35,7 @@ const entryMovementRecords: EntryMovementRecord[] = [
     locomotion: 'A pe',
     plate: '-',
     entryAt: '15/04/2026 09:40',
+    hasExited: true,
   },
   {
     id: '3',
@@ -35,17 +44,26 @@ const entryMovementRecords: EntryMovementRecord[] = [
     locomotion: 'Moto',
     plate: 'FGH-4J56',
     entryAt: '15/04/2026 10:05',
+    hasExited: false,
   },
 ]
 
-export function useEntryMovements() {
-  const [selectedRecord, setSelectedRecord] = useState<EntryMovementRecord | null>(null)
+export function useAccessList({ viewMode }: UseAccessListParams) {
+  const [selectedRecord, setSelectedRecord] = useState<AccessRecord | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
   const normalizedSearchTerm = searchTerm.trim().toLowerCase()
 
+  const recordsByStatus = accessRecords.filter((record) => {
+    if (viewMode === 'history') {
+      return record.hasExited
+    }
+
+    return !record.hasExited
+  })
+
   const filteredRecords = normalizedSearchTerm
-    ? entryMovementRecords.filter((record) => {
+    ? recordsByStatus.filter((record) => {
         const searchableValue = [
           record.name,
           record.category,
@@ -58,9 +76,9 @@ export function useEntryMovements() {
 
         return searchableValue.includes(normalizedSearchTerm)
       })
-    : entryMovementRecords
+    : recordsByStatus
 
-  const handleOpenExitConfirmation = (record: EntryMovementRecord) => {
+  const handleOpenExitConfirmation = (record: AccessRecord) => {
     setSelectedRecord(record)
   }
 

@@ -2,15 +2,17 @@
 
 import type { ColumnDef } from '@tanstack/react-table'
 
-import type { ExitMovementRecord } from '@/components/movimentacoes/saida/hooks/useExitMovements'
+import { AccessRegisterButton } from '@/components/acessos/styles/AccessStyles'
 import { DataTable } from '@/components/table/DataTable'
+import type { AccessRecord } from '@/components/acessos/hooks/useAccessList'
 
-type ExitMovementsTableProps = {
-  records: ExitMovementRecord[]
+type AccessListTableProps = {
+  records: AccessRecord[]
+  onRegisterExit: (record: AccessRecord) => void
 }
 
-export function ExitMovementsTable({ records }: ExitMovementsTableProps) {
-  const columns: ColumnDef<ExitMovementRecord>[] = [
+export function AccessListTable({ records, onRegisterExit }: AccessListTableProps) {
+  const columns: ColumnDef<AccessRecord>[] = [
     {
       accessorKey: 'name',
       header: 'Nome',
@@ -28,8 +30,21 @@ export function ExitMovementsTable({ records }: ExitMovementsTableProps) {
       header: 'Placa',
     },
     {
-      accessorKey: 'exitAt',
-      header: 'Saída em',
+      accessorKey: 'entryAt',
+      header: 'Entrada em',
+    },
+    {
+      id: 'actions',
+      header: 'Ação',
+      cell: ({ row }) => (
+        <AccessRegisterButton
+          variant="contained"
+          size="small"
+          onClick={() => onRegisterExit(row.original)}
+        >
+          Registrar saída
+        </AccessRegisterButton>
+      ),
     },
   ]
 
@@ -37,7 +52,7 @@ export function ExitMovementsTable({ records }: ExitMovementsTableProps) {
     <DataTable
       data={records}
       columns={columns}
-      emptyMessage="Nenhuma movimentação de saída encontrada."
+      emptyMessage="Nenhuma movimentação de entrada encontrada."
       containerSx={{
         bgcolor: '#F8FAFC',
         borderColor: 'rgba(203, 213, 225, 0.9)',

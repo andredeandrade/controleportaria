@@ -3,19 +3,16 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { MobileRegisterExitButton } from '@/components/movimentacoes/styles/ExitRegistration.styles'
+import { MobileRegisterExitButton } from '@/components/acessos/styles/AccessStyles'
 import { MobileListCard, MobileFieldLabel } from '@/styles/MobileList.styles'
-import type { EntryMovementRecord } from '@/components/movimentacoes/entrada/hooks/useEntryMovements'
+import type { AccessRecord } from '@/components/acessos/hooks/useAccessList'
 
-type EntryMovementsMobileListProps = {
-  records: EntryMovementRecord[]
-  onRegisterExit: (record: EntryMovementRecord) => void
+type AccessListTableMobileProps = {
+  records: AccessRecord[]
+  onRegisterExit: (record: AccessRecord) => void
 }
 
-export function EntryMovementsMobileList({
-  records,
-  onRegisterExit,
-}: EntryMovementsMobileListProps) {
+export function AccessListTableMobile({ records, onRegisterExit }: AccessListTableMobileProps) {
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (

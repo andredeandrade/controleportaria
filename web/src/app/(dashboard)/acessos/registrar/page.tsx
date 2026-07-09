@@ -2,14 +2,14 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { RegisterEntryForm } from '@/components/movimentacoes/entrada/RegisterEntryForm'
+import { AccessRegisterForm } from '@/components/acessos/AccessRegisterForm'
 import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
   title: 'Registrar Entrada',
 }
 
-export default function RegistrarEntradaPage() {
+export default function AcessoRegistrarPage() {
   return (
     <Stack spacing={2}>
       <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'grey.900' }}>
@@ -20,7 +20,7 @@ export default function RegistrarEntradaPage() {
         </Typography>
       </Stack>
 
-      <RegisterEntryForm />
+      <AccessRegisterForm />
     </Stack>
   )
 }
