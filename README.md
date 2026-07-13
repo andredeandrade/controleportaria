@@ -121,3 +121,31 @@ Arquivos de exemplo disponíveis:
 - `api/.env.example`: variáveis para rodar a API localmente fora do Docker
 
 > Observação: defina um valor forte para `JWT_SECRET` no seu `.env` antes de usar fora de desenvolvimento.
+
+### Docker (Desenvolvimento com Hot Reload)
+
+Para desenvolvimento com atualização automática (hot reload) no frontend e backend, use o arquivo de override `docker-compose.dev.yml`.
+
+Subir ambiente dev:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+```
+
+Acompanhar logs do web e api:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f web api
+```
+
+Parar ambiente dev:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml down
+```
+
+Com esse modo:
+
+- `web` roda com `next dev` (Turbopack)
+- `api` roda com `tsx watch`
+- alterações em `web/` e `api/` são refletidas automaticamente sem rebuild completo da imagem

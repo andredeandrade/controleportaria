@@ -6,14 +6,17 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
+import Alert from '@mui/material/Alert'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useLogin } from './hooks/useLogin'
 import AuthTextField from './components/AuthTextField'
 
 type LoginFormData = {
+  condominiumSlug: string
   email: string
   password: string
 }
@@ -21,12 +24,14 @@ type LoginFormData = {
 export function LoginForm() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
+  const loginMutation = useLogin()
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     defaultValues: {
+      condominiumSlug: 'quinta-do-sol',
       email: '',
       password: '',
     },
@@ -36,7 +41,14 @@ export function LoginForm() {
     setShowPassword((previousValue) => !previousValue)
   }
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: LoginFormData) => {
+    await loginMutation.mutateAsync({
+      condominiumSlug: data.condominiumSlug,
+      email: data.email,
+      password: data.password,
+    })
+
+    router.refresh()
     router.push('/dashboard')
   }
 
@@ -61,6 +73,10 @@ export function LoginForm() {
       </Stack>
 
       <Stack spacing={2.25} component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
+        {loginMutation.isError ? (
+          <Alert severity="error">{loginMutation.error.message}</Alert>
+        ) : null}
+
         <AuthTextField
           label="E-mail"
           type="email"
@@ -91,8 +107,8 @@ export function LoginForm() {
           {...register('password', {
             required: 'Informe sua senha.',
             minLength: {
-              value: 6,
-              message: 'A senha deve ter pelo menos 6 caracteres.',
+              value: 8,
+              message: 'A senha deve ter pelo menos 8 caracteres.',
             },
           })}
           InputProps={{
@@ -117,7 +133,7 @@ export function LoginForm() {
           variant="contained"
           size="large"
           fullWidth
-          disabled={isSubmitting}
+          disabled={isSubmitting || loginMutation.isPending}
           sx={{
             alignSelf: 'center',
             maxWidth: 230,
@@ -139,7 +155,7 @@ export function LoginForm() {
             },
           }}
         >
-          {isSubmitting ? 'Entrando...' : 'Entrar'}
+          {isSubmitting || loginMutation.isPending ? 'Entrando...' : 'Entrar'}
         </Button>
       </Stack>
     </Stack>
