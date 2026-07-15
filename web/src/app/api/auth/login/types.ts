@@ -1,3 +1,5 @@
+import type { UserRole } from '@/app/api/auth/me/types'
+
 export type LoginRequestBody = {
   email?: unknown
   password?: unknown
@@ -11,7 +13,7 @@ export type LoginApiResponse = {
     condominiumId: string
     name: string
     email: string
-    role: 'ADMIN' | 'PORTARIA'
+    role: UserRole
   }
 }
 

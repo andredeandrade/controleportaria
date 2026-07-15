@@ -1,9 +1,14 @@
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  PORTARIA = 'PORTARIA',
+}
+
 export type AuthenticatedUser = {
   id: string
   condominiumId: string
   email: string
   name: string
-  role: 'ADMIN' | 'PORTARIA'
+  role: UserRole
 }
 
 export type AuthMeResponse = {

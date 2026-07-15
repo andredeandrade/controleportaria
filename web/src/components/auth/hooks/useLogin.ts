@@ -1,14 +1,7 @@
 'use client'
 
+import type { AuthenticatedUser } from '@/app/api/auth/me/types'
 import { useMutation } from '@tanstack/react-query'
-
-export type AuthenticatedUser = {
-  id: string
-  condominiumId: string
-  name: string
-  email: string
-  role: 'ADMIN' | 'PORTARIA'
-}
 
 type LoginPayload = {
   email: string
