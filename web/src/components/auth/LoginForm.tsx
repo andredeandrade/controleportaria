@@ -14,9 +14,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLogin } from './hooks/useLogin'
 import AuthTextField from './components/AuthTextField'
+import { extractTenantSlugFromHost } from '@/lib/auth/session'
 
 type LoginFormData = {
-  condominiumSlug: string
   email: string
   password: string
 }
@@ -31,7 +31,6 @@ export function LoginForm() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     defaultValues: {
-      condominiumSlug: 'quinta-do-sol',
       email: '',
       password: '',
     },
@@ -42,8 +41,12 @@ export function LoginForm() {
   }
 
   const onSubmit = async (data: LoginFormData) => {
+    const condominiumSlug = extractTenantSlugFromHost(
+      typeof window === 'undefined' ? null : window.location.host,
+    )
+
     await loginMutation.mutateAsync({
-      condominiumSlug: data.condominiumSlug,
+      condominiumSlug: condominiumSlug ?? undefined,
       email: data.email,
       password: data.password,
     })

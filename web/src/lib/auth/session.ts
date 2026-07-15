@@ -27,6 +27,16 @@ export function extractTenantSlugFromHost(hostHeader: string | null): string | n
 
   const hostParts = host.split('.').filter(Boolean)
 
+  if (host.endsWith('.localhost') && hostParts.length >= 2) {
+    const tenantSlug = hostParts[0]
+
+    if (!tenantSlug || tenantSlug === 'www') {
+      return null
+    }
+
+    return tenantSlug
+  }
+
   if (hostParts.length < 3) {
     return null
   }
