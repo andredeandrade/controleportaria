@@ -1,71 +1,76 @@
 'use client'
 
-import { useState } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
-export type VisitorRecord = {
-  id: string
-  name: string
-  document: string
-  unit: string
-  authorizedBy: string
-  phone: string
-}
-
-const visitorRecords: VisitorRecord[] = [
-  {
-    id: '1',
-    name: 'Maria Souza',
-    document: '123.456.789-00',
-    unit: 'Bloco A - 101',
-    authorizedBy: 'Carlos Souza',
-    phone: '(11) 99876-1234',
-  },
-  {
-    id: '2',
-    name: 'João Oliveira',
-    document: '987.654.321-00',
-    unit: 'Torre 2 - 403',
-    authorizedBy: 'Fernanda Lima',
-    phone: '(11) 97654-8877',
-  },
-  {
-    id: '3',
-    name: 'Patrícia Gomes',
-    document: 'MG-12.345.678',
-    unit: 'Bloco C - 204',
-    authorizedBy: 'Rafael Gomes',
-    phone: '(11) 96543-2211',
-  },
-]
+import { listVisitors, VisitorsServiceError } from '@/services/visitantes/service'
+import type { VisitorRecord, VisitorsPaginationState } from '@/types/visitantes'
 
 export function useVisitors() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const normalizedSearchTerm = searchTerm.trim().toLowerCase()
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim())
+    }, 350)
 
-  const filteredRecords = normalizedSearchTerm
-    ? visitorRecords.filter((record) => {
-        const searchableValue = [
-          record.name,
-          record.document,
-          record.unit,
-          record.authorizedBy,
-          record.phone,
-        ]
-          .join(' ')
-          .toLowerCase()
+    return () => {
+      window.clearTimeout(timeout)
+    }
+  }, [searchTerm])
 
-        return searchableValue.includes(normalizedSearchTerm)
-      })
-    : visitorRecords
+  const visitorsQuery = useQuery({
+    queryKey: ['visitors', page, pageSize, debouncedSearchTerm],
+    queryFn: () => listVisitors(page, pageSize, debouncedSearchTerm),
+    placeholderData: keepPreviousData,
+  })
+
+  const records: VisitorRecord[] = (visitorsQuery.data?.items ?? []).map((item) => ({
+    id: item.id,
+    name: item.fullName,
+    document: item.document,
+    unit: item.unit,
+    authorizedBy: item.authorizedBy,
+    phone: item.phone ?? '-',
+  }))
+
+  const pagination: VisitorsPaginationState = visitorsQuery.data?.pagination ?? {
+    page,
+    pageSize,
+    total: 0,
+    totalPages: 1,
+  }
 
   const handleSearchChange = (value: string) => {
+    setPage(1)
     setSearchTerm(value)
   }
 
+  const handlePageChange = (value: number) => {
+    setPage(value)
+  }
+
+  const handlePageSizeChange = (value: number) => {
+    setPage(1)
+    setPageSize(value)
+  }
+
   return {
-    records: filteredRecords,
+    records,
+    pagination,
     searchTerm,
     handleSearchChange,
+    handlePageChange,
+    handlePageSizeChange,
+    isLoading: visitorsQuery.isPending,
+    isFetching: visitorsQuery.isFetching,
+    isError: visitorsQuery.isError,
+    errorMessage:
+      (visitorsQuery.error as VisitorsServiceError | null)?.message ??
+      'Erro ao carregar visitantes.',
+    refetch: visitorsQuery.refetch,
   }
 }

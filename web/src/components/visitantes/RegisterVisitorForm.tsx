@@ -1,11 +1,14 @@
 'use client'
 
+import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
 import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
+import { useCreateVisitor } from '@/components/visitantes/hooks/useCreateVisitor'
 
 type RegisterVisitorFormValues = {
   fullName: string
@@ -18,6 +21,9 @@ type RegisterVisitorFormValues = {
 }
 
 export function RegisterVisitorForm() {
+  const router = useRouter()
+  const createVisitorMutation = useCreateVisitor()
+
   const {
     register,
     handleSubmit,
@@ -34,13 +40,28 @@ export function RegisterVisitorForm() {
     },
   })
 
-  const onSubmit = (data: RegisterVisitorFormValues) => {
-    void data
+  const onSubmit = async (data: RegisterVisitorFormValues) => {
+    await createVisitorMutation.mutateAsync({
+      fullName: data.fullName.trim(),
+      document: data.document.trim(),
+      phone: data.phone.trim() || undefined,
+      email: data.email.trim() || undefined,
+      unit: data.unit.trim(),
+      authorizedBy: data.authorizedBy.trim(),
+      observations: data.observations.trim() || undefined,
+    })
+
+    router.push('/visitantes')
+    router.refresh()
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
+        {createVisitorMutation.isError ? (
+          <Alert severity="error">{createVisitorMutation.error.message}</Alert>
+        ) : null}
+
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>
@@ -51,6 +72,10 @@ export function RegisterVisitorForm() {
                 helperText={errors.fullName?.message}
                 {...register('fullName', {
                   required: 'Informe o nome completo',
+                  minLength: {
+                    value: 3,
+                    message: 'Nome deve ter ao menos 3 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -65,6 +90,10 @@ export function RegisterVisitorForm() {
                 helperText={errors.document?.message}
                 {...register('document', {
                   required: 'Informe o documento',
+                  minLength: {
+                    value: 5,
+                    message: 'Documento deve ter ao menos 5 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -82,7 +111,17 @@ export function RegisterVisitorForm() {
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>
               <TextFieldLabel>E-mail</TextFieldLabel>
-              <TextField type="email" {...register('email')} />
+              <TextField
+                type="email"
+                error={Boolean(errors.email)}
+                helperText={errors.email?.message}
+                {...register('email', {
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Informe um e-mail valido',
+                  },
+                })}
+              />
             </TextFieldStack>
           </Grid>
 
@@ -127,7 +166,7 @@ export function RegisterVisitorForm() {
         <Stack direction="row" justifyContent="flex-end">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || createVisitorMutation.isPending}
             variant="contained"
             sx={{
               bgcolor: '#16A34A',
@@ -137,7 +176,7 @@ export function RegisterVisitorForm() {
               fontWeight: 700,
             }}
           >
-            Salvar registro
+            {isSubmitting || createVisitorMutation.isPending ? 'Salvando...' : 'Salvar registro'}
           </Button>
         </Stack>
       </Stack>

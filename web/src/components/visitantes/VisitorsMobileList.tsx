@@ -4,13 +4,21 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
-import type { VisitorRecord } from '@/components/visitantes/hooks/useVisitors'
+import type { VisitorRecord } from '@/types/visitantes'
 
 type VisitorsMobileListProps = {
   records: VisitorRecord[]
 }
 
 export function VisitorsMobileList({ records }: VisitorsMobileListProps) {
+  if (records.length === 0) {
+    return (
+      <Typography variant="body2" color="text.secondary" sx={{ px: 1 }}>
+        Nenhum visitante encontrado.
+      </Typography>
+    )
+  }
+
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (
