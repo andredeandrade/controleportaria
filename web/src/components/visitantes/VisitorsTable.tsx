@@ -3,7 +3,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 
 import { DataTable } from '@/components/table/DataTable'
-import type { VisitorRecord } from '@/components/visitantes/hooks/useVisitors'
+import type { VisitorRecord } from '@/types/visitantes'
 
 type VisitorsTableProps = {
   records: VisitorRecord[]
