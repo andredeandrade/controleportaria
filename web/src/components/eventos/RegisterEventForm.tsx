@@ -2,13 +2,16 @@
 
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
+import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
+import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
+import { useCreateEvent } from '@/components/eventos/hooks/useCreateEvent'
 
 type GuestFormValues = {
   name: string
@@ -27,6 +30,9 @@ type RegisterEventFormValues = {
 }
 
 export function RegisterEventForm() {
+  const router = useRouter()
+  const createEventMutation = useCreateEvent()
+
   const {
     register,
     control,
@@ -58,13 +64,32 @@ export function RegisterEventForm() {
     remove(index)
   }
 
-  const onSubmit = (data: RegisterEventFormValues) => {
-    void data
+  const onSubmit = async (data: RegisterEventFormValues) => {
+    await createEventMutation.mutateAsync({
+      title: data.title.trim(),
+      date: data.date,
+      startTime: data.startTime,
+      endTime: data.endTime.trim() || undefined,
+      unit: data.unit.trim(),
+      responsibleName: data.responsibleName.trim(),
+      guests: data.guests.map((guest) => ({
+        name: guest.name.trim(),
+        document: guest.document.trim() || undefined,
+      })),
+      observations: data.observations.trim() || undefined,
+    })
+
+    router.push('/eventos')
+    router.refresh()
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
+        {createEventMutation.isError ? (
+          <Alert severity="error">{createEventMutation.error.message}</Alert>
+        ) : null}
+
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>
@@ -75,6 +100,10 @@ export function RegisterEventForm() {
                 helperText={errors.title?.message}
                 {...register('title', {
                   required: 'Informe o nome do evento',
+                  minLength: {
+                    value: 3,
+                    message: 'Nome do evento deve ter ao menos 3 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -148,6 +177,10 @@ export function RegisterEventForm() {
                 helperText={errors.responsibleName?.message}
                 {...register('responsibleName', {
                   required: 'Informe o responsável pelo evento',
+                  minLength: {
+                    value: 3,
+                    message: 'Responsável deve ter ao menos 3 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -169,6 +202,10 @@ export function RegisterEventForm() {
                     helperText={errors.guests?.[index]?.name?.message}
                     {...register(`guests.${index}.name`, {
                       required: 'Informe o nome do convidado',
+                      minLength: {
+                        value: 3,
+                        message: 'Nome do convidado deve ter ao menos 3 caracteres',
+                      },
                     })}
                   />
                 </TextFieldStack>
@@ -241,7 +278,7 @@ export function RegisterEventForm() {
         <Stack direction="row" justifyContent="flex-end">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || createEventMutation.isPending}
             variant="contained"
             sx={{
               bgcolor: '#16A34A',
@@ -251,7 +288,7 @@ export function RegisterEventForm() {
               fontWeight: 700,
             }}
           >
-            Salvar registro
+            {isSubmitting || createEventMutation.isPending ? 'Salvando...' : 'Salvar registro'}
           </Button>
         </Stack>
       </Stack>
