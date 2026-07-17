@@ -2,8 +2,8 @@
 
 import type { ColumnDef } from '@tanstack/react-table'
 
-import type { ResidentRecord } from '@/components/moradores/hooks/useResidents'
 import { DataTable } from '@/components/table/DataTable'
+import type { ResidentRecord } from '@/types/moradores'
 
 type ResidentsTableProps = {
   records: ResidentRecord[]

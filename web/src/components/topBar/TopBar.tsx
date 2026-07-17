@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { logout } from '@/services/auth/service'
 
 type TopBarProps = {
   drawerWidth: number
@@ -25,7 +26,7 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
     setIsLoggingOut(true)
 
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      await logout()
     } finally {
       router.replace('/')
       router.refresh()
