@@ -6,8 +6,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
-import type { AuthorizationRecord } from './hooks/useAuthorizations'
 import { MobileListCard, MobileFieldLabel } from '@/styles/MobileList.styles'
+import type { AuthorizationRecord } from '@/types/autorizacoes'
 
 type AuthorizationsMobileListProps = {
   records: AuthorizationRecord[]
@@ -15,6 +15,14 @@ type AuthorizationsMobileListProps = {
 
 export function AuthorizationsMobileList({ records }: AuthorizationsMobileListProps) {
   const router = useRouter()
+
+  if (records.length === 0) {
+    return (
+      <Typography variant="body2" color="text.secondary" sx={{ px: 1 }}>
+        Nenhuma autorizacao encontrada.
+      </Typography>
+    )
+  }
 
   return (
     <Stack spacing={1.5}>
@@ -25,6 +33,12 @@ export function AuthorizationsMobileList({ records }: AuthorizationsMobileListPr
               <MobileFieldLabel variant="caption">Autorizado</MobileFieldLabel>
               <Typography variant="body2" color="#0F172A">
                 {record.authorizedName}
+              </Typography>
+            </Stack>
+            <Stack spacing={0.25}>
+              <MobileFieldLabel variant="caption">Tipo</MobileFieldLabel>
+              <Typography variant="body2" color="#0F172A">
+                {record.personTypeLabel}
               </Typography>
             </Stack>
             <Stack spacing={0.25}>
