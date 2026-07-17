@@ -1,71 +1,84 @@
 'use client'
 
-import { useState } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
-export type ServiceProviderRecord = {
-  id: string
-  companyName: string
-  responsibleName: string
-  document: string
-  serviceType: string
-  phone: string
-}
-
-const serviceProviderRecords: ServiceProviderRecord[] = [
-  {
-    id: '1',
-    companyName: 'Alpha Manutenção Predial',
-    responsibleName: 'Roberto Almeida',
-    document: '12.345.678/0001-90',
-    serviceType: 'Manutenção elétrica',
-    phone: '(11) 99887-6655',
-  },
-  {
-    id: '2',
-    companyName: 'LimpaMax Serviços',
-    responsibleName: 'Juliana Costa',
-    document: '98.765.432/0001-10',
-    serviceType: 'Limpeza técnica',
-    phone: '(11) 97766-5544',
-  },
-  {
-    id: '3',
-    companyName: 'Refrigeração Central',
-    responsibleName: 'Marcelo Nunes',
-    document: '45.678.123/0001-55',
-    serviceType: 'Climatização',
-    phone: '(11) 96655-4433',
-  },
-]
+import {
+  listServiceProviders,
+  ServiceProvidersServiceError,
+} from '@/services/prestadores-servicos/service'
+import type {
+  ServiceProviderRecord,
+  ServiceProvidersPaginationState,
+} from '@/types/prestadores-servicos'
 
 export function useServiceProviders() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const normalizedSearchTerm = searchTerm.trim().toLowerCase()
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim())
+    }, 350)
 
-  const filteredRecords = normalizedSearchTerm
-    ? serviceProviderRecords.filter((record) => {
-        const searchableValue = [
-          record.companyName,
-          record.responsibleName,
-          record.document,
-          record.serviceType,
-          record.phone,
-        ]
-          .join(' ')
-          .toLowerCase()
+    return () => {
+      window.clearTimeout(timeout)
+    }
+  }, [searchTerm])
 
-        return searchableValue.includes(normalizedSearchTerm)
-      })
-    : serviceProviderRecords
+  const serviceProvidersQuery = useQuery({
+    queryKey: ['service-providers', page, pageSize, debouncedSearchTerm],
+    queryFn: () => listServiceProviders(page, pageSize, debouncedSearchTerm),
+    placeholderData: keepPreviousData,
+  })
+
+  const records: ServiceProviderRecord[] = (serviceProvidersQuery.data?.items ?? []).map(
+    (item) => ({
+      id: item.id,
+      companyName: item.companyName,
+      responsibleName: item.responsibleName,
+      document: item.document,
+      serviceType: item.serviceType,
+      phone: item.phone ?? '-',
+    }),
+  )
+
+  const pagination: ServiceProvidersPaginationState = serviceProvidersQuery.data?.pagination ?? {
+    page,
+    pageSize,
+    total: 0,
+    totalPages: 1,
+  }
 
   const handleSearchChange = (value: string) => {
+    setPage(1)
     setSearchTerm(value)
   }
 
+  const handlePageChange = (value: number) => {
+    setPage(value)
+  }
+
+  const handlePageSizeChange = (value: number) => {
+    setPage(1)
+    setPageSize(value)
+  }
+
   return {
-    records: filteredRecords,
+    records,
+    pagination,
     searchTerm,
     handleSearchChange,
+    handlePageChange,
+    handlePageSizeChange,
+    isLoading: serviceProvidersQuery.isPending,
+    isFetching: serviceProvidersQuery.isFetching,
+    isError: serviceProvidersQuery.isError,
+    errorMessage:
+      (serviceProvidersQuery.error as ServiceProvidersServiceError | null)?.message ??
+      'Erro ao carregar prestadores.',
+    refetch: serviceProvidersQuery.refetch,
   }
 }

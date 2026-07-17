@@ -3,7 +3,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 
 import { DataTable } from '@/components/table/DataTable'
-import type { ServiceProviderRecord } from '@/components/prestadores-servicos/hooks/useServiceProviders'
+import type { ServiceProviderRecord } from '@/types/prestadores-servicos'
 
 type ServiceProvidersTableProps = {
   records: ServiceProviderRecord[]

@@ -1,11 +1,14 @@
 'use client'
 
+import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
 import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
+import { useCreateServiceProvider } from '@/components/prestadores-servicos/hooks/useCreateServiceProvider'
 
 type RegisterServiceProviderFormValues = {
   companyName: string
@@ -19,6 +22,9 @@ type RegisterServiceProviderFormValues = {
 }
 
 export function RegisterServiceProviderForm() {
+  const router = useRouter()
+  const createServiceProviderMutation = useCreateServiceProvider()
+
   const {
     register,
     handleSubmit,
@@ -36,13 +42,29 @@ export function RegisterServiceProviderForm() {
     },
   })
 
-  const onSubmit = (data: RegisterServiceProviderFormValues) => {
-    void data
+  const onSubmit = async (data: RegisterServiceProviderFormValues) => {
+    await createServiceProviderMutation.mutateAsync({
+      companyName: data.companyName.trim(),
+      responsibleName: data.responsibleName.trim(),
+      document: data.document.trim(),
+      phone: data.phone.trim() || undefined,
+      email: data.email.trim() || undefined,
+      serviceType: data.serviceType.trim(),
+      unit: data.unit.trim() || undefined,
+      observations: data.observations.trim() || undefined,
+    })
+
+    router.push('/prestadores-servicos')
+    router.refresh()
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
+        {createServiceProviderMutation.isError ? (
+          <Alert severity="error">{createServiceProviderMutation.error.message}</Alert>
+        ) : null}
+
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>
@@ -53,6 +75,10 @@ export function RegisterServiceProviderForm() {
                 helperText={errors.companyName?.message}
                 {...register('companyName', {
                   required: 'Informe o nome da empresa',
+                  minLength: {
+                    value: 3,
+                    message: 'Nome da empresa deve ter ao menos 3 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -67,6 +93,10 @@ export function RegisterServiceProviderForm() {
                 helperText={errors.responsibleName?.message}
                 {...register('responsibleName', {
                   required: 'Informe o responsável',
+                  minLength: {
+                    value: 3,
+                    message: 'Nome do responsável deve ter ao menos 3 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -81,6 +111,10 @@ export function RegisterServiceProviderForm() {
                 helperText={errors.document?.message}
                 {...register('document', {
                   required: 'Informe o documento',
+                  minLength: {
+                    value: 5,
+                    message: 'Documento deve ter ao menos 5 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -98,7 +132,17 @@ export function RegisterServiceProviderForm() {
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>
               <TextFieldLabel>E-mail</TextFieldLabel>
-              <TextField type="email" {...register('email')} />
+              <TextField
+                type="email"
+                error={Boolean(errors.email)}
+                helperText={errors.email?.message}
+                {...register('email', {
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Informe um e-mail valido',
+                  },
+                })}
+              />
             </TextFieldStack>
           </Grid>
 
@@ -138,7 +182,7 @@ export function RegisterServiceProviderForm() {
         <Stack direction="row" justifyContent="flex-end">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || createServiceProviderMutation.isPending}
             variant="contained"
             sx={{
               bgcolor: '#16A34A',
@@ -148,7 +192,9 @@ export function RegisterServiceProviderForm() {
               fontWeight: 700,
             }}
           >
-            Salvar registro
+            {isSubmitting || createServiceProviderMutation.isPending
+              ? 'Salvando...'
+              : 'Salvar registro'}
           </Button>
         </Stack>
       </Stack>
