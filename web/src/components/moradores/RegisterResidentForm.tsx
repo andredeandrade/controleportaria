@@ -2,11 +2,13 @@
 
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
+import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
+import { useRouter } from 'next/navigation'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 
 import {
@@ -17,6 +19,7 @@ import {
   TextFieldLabel,
   TextFieldStack,
 } from '@/components/form'
+import { useCreateResident } from '@/components/moradores/hooks/useCreateResident'
 
 const RESIDENT_RELATION_OPTIONS = [
   { label: 'Proprietário', value: 'proprietario' },
@@ -52,9 +55,13 @@ type RegisterResidentFormValues = {
 }
 
 export function RegisterResidentForm() {
+  const router = useRouter()
+  const createResidentMutation = useCreateResident()
+
   const {
     control,
     register,
+    getValues,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<RegisterResidentFormValues>({
@@ -83,13 +90,34 @@ export function RegisterResidentForm() {
     remove(index)
   }
 
-  const onSubmit = (data: RegisterResidentFormValues) => {
-    void data
+  const onSubmit = async (data: RegisterResidentFormValues) => {
+    await createResidentMutation.mutateAsync({
+      fullName: data.fullName.trim(),
+      document: data.document.trim(),
+      phone: data.phone.trim() || undefined,
+      email: data.email.trim() || undefined,
+      unit: data.unit.trim(),
+      relation: data.relation as ResidentRelationValue,
+      observations: data.observations.trim() || undefined,
+      vehicles: data.vehicles.map((vehicle) => ({
+        type: vehicle.type,
+        color: vehicle.color || undefined,
+        plate: vehicle.plate.trim() || undefined,
+        brandModel: vehicle.brandModel.trim() || undefined,
+      })),
+    })
+
+    router.push('/moradores')
+    router.refresh()
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
+        {createResidentMutation.isError ? (
+          <Alert severity="error">{createResidentMutation.error.message}</Alert>
+        ) : null}
+
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>
@@ -100,6 +128,10 @@ export function RegisterResidentForm() {
                 helperText={errors.fullName?.message}
                 {...register('fullName', {
                   required: 'Informe o nome completo',
+                  minLength: {
+                    value: 3,
+                    message: 'Nome deve ter ao menos 3 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -114,6 +146,10 @@ export function RegisterResidentForm() {
                 helperText={errors.document?.message}
                 {...register('document', {
                   required: 'Informe o documento',
+                  minLength: {
+                    value: 5,
+                    message: 'Documento deve ter ao menos 5 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -131,7 +167,17 @@ export function RegisterResidentForm() {
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>
               <TextFieldLabel>E-mail</TextFieldLabel>
-              <TextField type="email" {...register('email')} />
+              <TextField
+                type="email"
+                error={Boolean(errors.email)}
+                helperText={errors.email?.message}
+                {...register('email', {
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Informe um e-mail valido',
+                  },
+                })}
+              />
             </TextFieldStack>
           </Grid>
 
@@ -195,9 +241,27 @@ export function RegisterResidentForm() {
                       <Controller
                         control={control}
                         name={`vehicles.${index}.type`}
+                        rules={{
+                          validate: (value) => {
+                            const vehicleData = getValues(`vehicles.${index}`)
+                            const hasVehicleDetails = Boolean(
+                              vehicleData.color ||
+                              vehicleData.plate.trim() ||
+                              vehicleData.brandModel.trim(),
+                            )
+
+                            if (hasVehicleDetails && !value) {
+                              return 'Selecione o tipo do veiculo'
+                            }
+
+                            return true
+                          },
+                        }}
                         render={({ field }) => (
                           <TextField
                             select
+                            error={Boolean(errors.vehicles?.[index]?.type)}
+                            helperText={errors.vehicles?.[index]?.type?.message}
                             {...field}
                             value={field.value ?? ''}
                             SelectProps={{ displayEmpty: true }}
@@ -303,7 +367,7 @@ export function RegisterResidentForm() {
         <Stack direction="row" justifyContent="flex-end">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || createResidentMutation.isPending}
             variant="contained"
             sx={{
               bgcolor: '#16A34A',
@@ -313,7 +377,7 @@ export function RegisterResidentForm() {
               fontWeight: 700,
             }}
           >
-            Salvar registro
+            {isSubmitting || createResidentMutation.isPending ? 'Salvando...' : 'Salvar registro'}
           </Button>
         </Stack>
       </Stack>
