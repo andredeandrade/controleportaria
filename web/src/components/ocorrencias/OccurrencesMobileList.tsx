@@ -4,14 +4,22 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import type { OccurrenceRecord } from './hooks/useOccurrences'
 import { MobileListCard, MobileFieldLabel } from '@/styles/MobileList.styles'
+import type { OccurrenceRecord } from '@/types/ocorrencias'
 
 type OccurrencesMobileListProps = {
   records: OccurrenceRecord[]
 }
 
 export function OccurrencesMobileList({ records }: OccurrencesMobileListProps) {
+  if (records.length === 0) {
+    return (
+      <Typography variant="body2" color="text.secondary" sx={{ px: 1 }}>
+        Nenhuma ocorrencia encontrada.
+      </Typography>
+    )
+  }
+
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (
@@ -20,7 +28,7 @@ export function OccurrencesMobileList({ records }: OccurrencesMobileListProps) {
             <Stack spacing={0.25}>
               <MobileFieldLabel variant="caption">Tipo</MobileFieldLabel>
               <Typography variant="body2" color="#0F172A">
-                {record.occurrenceType}
+                {record.occurrenceTypeLabel}
               </Typography>
             </Stack>
             <Stack direction="row" spacing={2}>
