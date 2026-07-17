@@ -1,76 +1,94 @@
 'use client'
 
-import { useState } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
-export type EventRecord = {
-  id: string
-  title: string
-  date: string
-  time: string
-  unit: string
-  responsibleName: string
-  guestsCount: number
+import { listEvents, EventsServiceError } from '@/services/eventos/service'
+import type { EventRecord, EventsPaginationState } from '@/types/eventos'
+
+function formatDate(value: string): string {
+  const date = new Date(`${value}T00:00:00`)
+
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return new Intl.DateTimeFormat('pt-BR').format(date)
 }
 
-const eventRecords: EventRecord[] = [
-  {
-    id: '1',
-    title: 'Aniversário no salão',
-    date: '18/04/2026',
-    time: '19:00 às 23:00',
-    unit: 'Bloco A - 101',
-    responsibleName: 'Carlos Souza',
-    guestsCount: 35,
-  },
-  {
-    id: '2',
-    title: 'Mudança programada',
-    date: '19/04/2026',
-    time: '08:00 às 12:00',
-    unit: 'Torre 2 - 403',
-    responsibleName: 'Fernanda Lima',
-    guestsCount: 6,
-  },
-  {
-    id: '3',
-    title: 'Reunião familiar',
-    date: '20/04/2026',
-    time: '16:00 às 21:00',
-    unit: 'Bloco C - 204',
-    responsibleName: 'Patrícia Gomes',
-    guestsCount: 12,
-  },
-]
+function formatTimeRange(startTime: string, endTime: string | null): string {
+  if (!endTime) {
+    return startTime
+  }
+
+  return `${startTime} às ${endTime}`
+}
 
 export function useEvents() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const normalizedSearchTerm = searchTerm.trim().toLowerCase()
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim())
+    }, 350)
 
-  const filteredRecords = normalizedSearchTerm
-    ? eventRecords.filter((record) => {
-        const searchableValue = [
-          record.title,
-          record.date,
-          record.time,
-          record.unit,
-          record.responsibleName,
-          String(record.guestsCount),
-        ]
-          .join(' ')
-          .toLowerCase()
+    return () => {
+      window.clearTimeout(timeout)
+    }
+  }, [searchTerm])
 
-        return searchableValue.includes(normalizedSearchTerm)
-      })
-    : eventRecords
+  const eventsQuery = useQuery({
+    queryKey: ['events', page, pageSize, debouncedSearchTerm],
+    queryFn: () => listEvents(page, pageSize, debouncedSearchTerm),
+    placeholderData: keepPreviousData,
+  })
+
+  const records: EventRecord[] = (eventsQuery.data?.items ?? []).map((item) => ({
+    id: item.id,
+    title: item.title,
+    date: formatDate(item.date),
+    time: formatTimeRange(item.startTime, item.endTime),
+    unit: item.unit,
+    responsibleName: item.responsibleName,
+    guestsCount: item.guests.length,
+  }))
+
+  const pagination: EventsPaginationState = eventsQuery.data?.pagination ?? {
+    page,
+    pageSize,
+    total: 0,
+    totalPages: 1,
+  }
 
   const handleSearchChange = (value: string) => {
+    setPage(1)
     setSearchTerm(value)
   }
 
+  const handlePageChange = (value: number) => {
+    setPage(value)
+  }
+
+  const handlePageSizeChange = (value: number) => {
+    setPage(1)
+    setPageSize(value)
+  }
+
   return {
-    records: filteredRecords,
+    records,
+    pagination,
     searchTerm,
     handleSearchChange,
+    handlePageChange,
+    handlePageSizeChange,
+    isLoading: eventsQuery.isPending,
+    isFetching: eventsQuery.isFetching,
+    isError: eventsQuery.isError,
+    errorMessage:
+      (eventsQuery.error as EventsServiceError | null)?.message ?? 'Erro ao carregar eventos.',
+    refetch: eventsQuery.refetch,
   }
 }

@@ -3,14 +3,22 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import type { EventRecord } from '@/components/eventos/hooks/useEvents'
 import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
+import type { EventRecord } from '@/types/eventos'
 
 type EventsMobileListProps = {
   records: EventRecord[]
 }
 
 export function EventsMobileList({ records }: EventsMobileListProps) {
+  if (records.length === 0) {
+    return (
+      <Typography variant="body2" color="text.secondary" sx={{ px: 1 }}>
+        Nenhum evento encontrado.
+      </Typography>
+    )
+  }
+
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (
