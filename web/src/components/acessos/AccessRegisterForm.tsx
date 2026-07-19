@@ -205,11 +205,20 @@ export function AccessRegisterForm() {
 
           <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
             <TextFieldStack>
-              <TextFieldLabel>Locomoção</TextFieldLabel>
+              <TextFieldLabel required>Locomoção</TextFieldLabel>
               <Controller
                 control={control}
                 name="locomotion"
-                render={({ field }) => <LocomotionSelect {...field} value={field.value ?? ''} />}
+                rules={{ required: 'Selecione uma locomoção' }}
+                render={({ field }) => (
+                  <LocomotionSelect
+                    required
+                    error={Boolean(errors.locomotion)}
+                    helperText={errors.locomotion?.message}
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                )}
               />
             </TextFieldStack>
           </Grid>
