@@ -200,6 +200,45 @@ function toResponse(accessRecord: {
   }
 }
 
+function matchesSearch(
+  accessRecord: {
+    company: string | null
+    locomotion: string | null
+    color: string | null
+    plateEncrypted: string | null
+    brandModel: string | null
+    people: Array<{
+      category: string
+      name: string
+      documentEncrypted: string | null
+    }>
+  },
+  search: string,
+): boolean {
+  const normalizedSearch = search.trim().toLowerCase()
+
+  if (!normalizedSearch) {
+    return true
+  }
+
+  const searchableValues = [
+    accessRecord.company,
+    accessRecord.locomotion,
+    accessRecord.color,
+    accessRecord.plateEncrypted ? decryptText(accessRecord.plateEncrypted) : null,
+    accessRecord.brandModel,
+    ...accessRecord.people.flatMap((person) => [
+      person.name,
+      person.category,
+      person.documentEncrypted ? decryptText(person.documentEncrypted) : null,
+    ]),
+  ]
+
+  return searchableValues
+    .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+    .some((value) => value.toLowerCase().includes(normalizedSearch))
+}
+
 export const accessRecordsService = {
   async checkIn(input: CheckInAccessRecordInput): Promise<AccessRecordResponse> {
     const people = validatePeople(input.people)
@@ -289,35 +328,37 @@ export const accessRecordsService = {
   async list(input: ListAccessRecordsInput) {
     const { page, pageSize, skip, search, status } = parsePagination(input)
 
-    const where = {
+    const baseWhere = {
       condominiumId: input.condominiumId,
       ...(status === 'open' ? { checkOutAt: null } : {}),
       ...(status === 'closed' ? { checkOutAt: { not: null } } : {}),
-      ...(search
-        ? {
-            OR: [
-              { company: { contains: search, mode: 'insensitive' as const } },
-              { locomotion: { contains: search, mode: 'insensitive' as const } },
-              { color: { contains: search, mode: 'insensitive' as const } },
-              { brandModel: { contains: search, mode: 'insensitive' as const } },
-              {
-                people: {
-                  some: {
-                    OR: [
-                      { name: { contains: search, mode: 'insensitive' as const } },
-                      { category: { contains: search, mode: 'insensitive' as const } },
-                    ],
-                  },
-                },
-              },
-            ],
-          }
-        : {}),
+    }
+
+    if (search) {
+      const items = await prisma.accessRecord.findMany({
+        where: baseWhere,
+        include: {
+          people: true,
+        },
+        orderBy: [{ checkInAt: 'desc' }, { createdAt: 'desc' }],
+      })
+
+      const filteredItems = items.filter((item) => matchesSearch(item, search))
+
+      return {
+        items: filteredItems.slice(skip, skip + pageSize).map((item) => toResponse(item)),
+        pagination: {
+          page,
+          pageSize,
+          total: filteredItems.length,
+          totalPages: Math.max(1, Math.ceil(filteredItems.length / pageSize)),
+        },
+      }
     }
 
     const [items, total] = await prisma.$transaction([
       prisma.accessRecord.findMany({
-        where,
+        where: baseWhere,
         include: {
           people: true,
         },
@@ -325,7 +366,7 @@ export const accessRecordsService = {
         take: pageSize,
         orderBy: [{ checkInAt: 'desc' }, { createdAt: 'desc' }],
       }),
-      prisma.accessRecord.count({ where }),
+      prisma.accessRecord.count({ where: baseWhere }),
     ])
 
     return {
