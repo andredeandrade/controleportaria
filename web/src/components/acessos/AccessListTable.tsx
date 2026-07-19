@@ -8,10 +8,11 @@ import type { AccessRecord } from '@/components/acessos/hooks/useAccessList'
 
 type AccessListTableProps = {
   records: AccessRecord[]
+  showActions: boolean
   onRegisterExit: (record: AccessRecord) => void
 }
 
-export function AccessListTable({ records, onRegisterExit }: AccessListTableProps) {
+export function AccessListTable({ records, showActions, onRegisterExit }: AccessListTableProps) {
   const columns: ColumnDef<AccessRecord>[] = [
     {
       accessorKey: 'name',
@@ -33,7 +34,10 @@ export function AccessListTable({ records, onRegisterExit }: AccessListTableProp
       accessorKey: 'entryAt',
       header: 'Entrada em',
     },
-    {
+  ]
+
+  if (showActions) {
+    columns.push({
       id: 'actions',
       header: 'Ação',
       cell: ({ row }) => (
@@ -42,11 +46,11 @@ export function AccessListTable({ records, onRegisterExit }: AccessListTableProp
           size="small"
           onClick={() => onRegisterExit(row.original)}
         >
-          Registrar saída
+          Registrar saida
         </AccessRegisterButton>
       ),
-    },
-  ]
+    })
+  }
 
   return (
     <DataTable

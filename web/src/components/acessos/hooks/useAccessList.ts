@@ -1,82 +1,55 @@
 'use client'
 
-import { useState } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
-export type AccessRecord = {
-  id: string
-  name: string
-  category: string
-  locomotion: string
-  plate: string
-  entryAt: string
-  hasExited: boolean
-}
-
-export type AccessListViewMode = 'active' | 'history'
+import { AccessRecordsServiceError, listAccessRecords } from '@/services/acessos/service'
+import {
+  type AccessListViewMode,
+  type AccessRecordListItem,
+  type AccessRecordsPaginationState,
+  formatAccessRecord,
+} from '@/types/acessos'
 
 type UseAccessListParams = {
   viewMode: AccessListViewMode
 }
 
-const accessRecords: AccessRecord[] = [
-  {
-    id: '1',
-    name: 'Maria Souza',
-    category: 'Prestador de servico',
-    locomotion: 'Carro',
-    plate: 'ABC-1D23',
-    entryAt: '15/04/2026 08:15',
-    hasExited: false,
-  },
-  {
-    id: '2',
-    name: 'Carlos Lima',
-    category: 'Visitante',
-    locomotion: 'A pe',
-    plate: '-',
-    entryAt: '15/04/2026 09:40',
-    hasExited: true,
-  },
-  {
-    id: '3',
-    name: 'Juliana Rocha',
-    category: 'Colaborador',
-    locomotion: 'Moto',
-    plate: 'FGH-4J56',
-    entryAt: '15/04/2026 10:05',
-    hasExited: false,
-  },
-]
+export type AccessRecord = AccessRecordListItem
 
 export function useAccessList({ viewMode }: UseAccessListParams) {
   const [selectedRecord, setSelectedRecord] = useState<AccessRecord | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const normalizedSearchTerm = searchTerm.trim().toLowerCase()
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim())
+    }, 350)
 
-  const recordsByStatus = accessRecords.filter((record) => {
-    if (viewMode === 'history') {
-      return record.hasExited
+    return () => {
+      window.clearTimeout(timeout)
     }
+  }, [searchTerm])
 
-    return !record.hasExited
+  const apiStatus = viewMode === 'history' ? 'closed' : 'open'
+
+  const accessRecordsQuery = useQuery({
+    queryKey: ['access-records', page, pageSize, debouncedSearchTerm, apiStatus],
+    queryFn: () => listAccessRecords(page, pageSize, debouncedSearchTerm, apiStatus),
+    placeholderData: keepPreviousData,
   })
 
-  const filteredRecords = normalizedSearchTerm
-    ? recordsByStatus.filter((record) => {
-        const searchableValue = [
-          record.name,
-          record.category,
-          record.locomotion,
-          record.plate,
-          record.entryAt,
-        ]
-          .join(' ')
-          .toLowerCase()
+  const records: AccessRecord[] = (accessRecordsQuery.data?.items ?? []).map(formatAccessRecord)
 
-        return searchableValue.includes(normalizedSearchTerm)
-      })
-    : recordsByStatus
+  const pagination: AccessRecordsPaginationState = accessRecordsQuery.data?.pagination ?? {
+    page,
+    pageSize,
+    total: 0,
+    totalPages: 1,
+  }
 
   const handleOpenExitConfirmation = (record: AccessRecord) => {
     setSelectedRecord(record)
@@ -87,15 +60,35 @@ export function useAccessList({ viewMode }: UseAccessListParams) {
   }
 
   const handleSearchChange = (value: string) => {
+    setPage(1)
     setSearchTerm(value)
   }
 
+  const handlePageChange = (value: number) => {
+    setPage(value)
+  }
+
+  const handlePageSizeChange = (value: number) => {
+    setPage(1)
+    setPageSize(value)
+  }
+
   return {
-    records: filteredRecords,
+    records,
+    pagination,
     selectedRecord,
     searchTerm,
     handleSearchChange,
+    handlePageChange,
+    handlePageSizeChange,
     handleOpenExitConfirmation,
     handleCloseExitConfirmation,
+    isLoading: accessRecordsQuery.isPending,
+    isFetching: accessRecordsQuery.isFetching,
+    isError: accessRecordsQuery.isError,
+    errorMessage:
+      (accessRecordsQuery.error as AccessRecordsServiceError | null)?.message ??
+      'Erro ao carregar registros de acesso.',
+    refetch: accessRecordsQuery.refetch,
   }
 }

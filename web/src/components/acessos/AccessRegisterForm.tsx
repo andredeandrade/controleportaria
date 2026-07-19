@@ -2,12 +2,15 @@
 
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
+import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
+import { useRouter } from 'next/navigation'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 
+import { useCreateAccessRecord } from '@/components/acessos/hooks/useCreateAccessRecord'
 import {
   type ColorValue,
   ColorSelect,
@@ -38,6 +41,9 @@ type AccessRegisterFormValues = {
 }
 
 export function AccessRegisterForm() {
+  const router = useRouter()
+  const createAccessRecordMutation = useCreateAccessRecord()
+
   const {
     control,
     register,
@@ -68,13 +74,32 @@ export function AccessRegisterForm() {
     remove(index)
   }
 
-  const onSubmit = (data: AccessRegisterFormValues) => {
-    void data
+  const onSubmit = async (data: AccessRegisterFormValues) => {
+    await createAccessRecordMutation.mutateAsync({
+      people: data.people.map((person) => ({
+        category: person.category,
+        name: person.name.trim(),
+        document: person.document.trim() || undefined,
+      })),
+      company: data.company.trim() || undefined,
+      locomotion: data.locomotion || undefined,
+      color: data.color || undefined,
+      plate: data.plate.trim() || undefined,
+      brandModel: data.brandModel.trim() || undefined,
+      observations: data.observations.trim() || undefined,
+    })
+
+    router.push('/acessos?status=active')
+    router.refresh()
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
+        {createAccessRecordMutation.isError ? (
+          <Alert severity="error">{createAccessRecordMutation.error.message}</Alert>
+        ) : null}
+
         {fields.map((personField, index) => {
           const isLastPersonRow = index === fields.length - 1
           const canRemovePerson = fields.length > 1 && index > 0
@@ -227,7 +252,7 @@ export function AccessRegisterForm() {
         <Stack direction="row" justifyContent="flex-end">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || createAccessRecordMutation.isPending}
             variant="contained"
             sx={{
               bgcolor: '#16A34A',
@@ -237,7 +262,9 @@ export function AccessRegisterForm() {
               fontWeight: 700,
             }}
           >
-            Salvar registro
+            {isSubmitting || createAccessRecordMutation.isPending
+              ? 'Salvando...'
+              : 'Salvar registro'}
           </Button>
         </Stack>
       </Stack>
