@@ -18,22 +18,33 @@ type ExitRegistrationTarget = {
 
 type AccessExitRegistrationFeedbackProps = {
   target: ExitRegistrationTarget
+  onConfirm: () => Promise<void>
+  isPending: boolean
+  errorMessage: string | null
   onClose: () => void
 }
 
 export function AccessExitRegistrationFeedback({
   target,
+  onConfirm,
+  isPending,
+  errorMessage,
   onClose,
 }: AccessExitRegistrationFeedbackProps) {
   const [isSuccessOpen, setIsSuccessOpen] = useState(false)
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!target) {
       return
     }
 
-    onClose()
-    setIsSuccessOpen(true)
+    try {
+      await onConfirm()
+      onClose()
+      setIsSuccessOpen(true)
+    } catch {
+      // O erro e exibido no proprio dialogo.
+    }
   }
 
   const handleSuccessClose = () => {
@@ -50,13 +61,23 @@ export function AccessExitRegistrationFeedback({
               ? `Deseja confirmar a saída de ${target.name}, registrado em ${target.entryAt}?`
               : ''}
           </DialogContentText>
+
+          {errorMessage ? (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {errorMessage}
+            </Alert>
+          ) : null}
         </DialogContent>
         <ExitDialogActions>
-          <Button onClick={onClose} color="inherit">
+          <Button onClick={onClose} color="inherit" disabled={isPending}>
             Cancelar
           </Button>
-          <ConfirmExitButton onClick={handleConfirm} variant="contained">
-            Confirmar saída
+          <ConfirmExitButton
+            onClick={() => void handleConfirm()}
+            variant="contained"
+            disabled={isPending}
+          >
+            {isPending ? 'Confirmando...' : 'Confirmar saida'}
           </ConfirmExitButton>
         </ExitDialogActions>
       </Dialog>

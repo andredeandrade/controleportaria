@@ -9,10 +9,15 @@ import type { AccessRecord } from '@/components/acessos/hooks/useAccessList'
 
 type AccessListTableMobileProps = {
   records: AccessRecord[]
+  showActions: boolean
   onRegisterExit: (record: AccessRecord) => void
 }
 
-export function AccessListTableMobile({ records, onRegisterExit }: AccessListTableMobileProps) {
+export function AccessListTableMobile({
+  records,
+  showActions,
+  onRegisterExit,
+}: AccessListTableMobileProps) {
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (
@@ -53,13 +58,15 @@ export function AccessListTableMobile({ records, onRegisterExit }: AccessListTab
               </Typography>
             </Stack>
 
-            <MobileRegisterExitButton
-              variant="contained"
-              size="small"
-              onClick={() => onRegisterExit(record)}
-            >
-              Registrar saída
-            </MobileRegisterExitButton>
+            {showActions ? (
+              <MobileRegisterExitButton
+                variant="contained"
+                size="small"
+                onClick={() => onRegisterExit(record)}
+              >
+                Registrar saida
+              </MobileRegisterExitButton>
+            ) : null}
           </Stack>
         </MobileListCard>
       ))}
