@@ -19,13 +19,9 @@ export default function EventosPage() {
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'grey.900' }}>
-          <BackToPreviousPageButton ariaLabel="Voltar para a pagina anterior" />
-
-          <Typography variant="h6" fontWeight={700} color="inherit">
-            Eventos
-          </Typography>
-        </Stack>
+        <Typography variant="h6" fontWeight={700} sx={{ color: 'grey.900' }}>
+          Eventos
+        </Typography>
 
         <Stack
           direction="row"

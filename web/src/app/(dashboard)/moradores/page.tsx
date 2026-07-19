@@ -19,13 +19,9 @@ export default function MoradoresPage() {
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'grey.900' }}>
-          <BackToPreviousPageButton ariaLabel="Voltar para a pagina anterior" />
-
-          <Typography variant="h6" fontWeight={700} color="inherit">
-            Moradores
-          </Typography>
-        </Stack>
+        <Typography variant="h6" fontWeight={700} sx={{ color: 'grey.900' }}>
+          Moradores
+        </Typography>
 
         <Stack
           direction="row"
