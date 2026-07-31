@@ -55,6 +55,18 @@ function parseStatus(value: unknown): AccessRecordListStatus | undefined {
   return String(value) as AccessRecordListStatus
 }
 
+function parsePersonIds(value: unknown): string[] | undefined {
+  if (value === undefined) {
+    return undefined
+  }
+
+  if (!Array.isArray(value)) {
+    throw new HttpError(400, 'personIds deve ser um array de identificadores.')
+  }
+
+  return value.map((personId) => String(personId ?? '').trim())
+}
+
 export const accessRecordsController = {
   async checkIn(req: Request, res: Response) {
     if (!req.authUser) {
@@ -89,6 +101,7 @@ export const accessRecordsController = {
       String(req.params['id'] ?? ''),
       {
         observations: readOptionalString(body['observations']) ?? null,
+        personIds: parsePersonIds(body['personIds']),
         checkedOutByUserId: req.authUser.id,
       },
       req.authUser.condominiumId,
