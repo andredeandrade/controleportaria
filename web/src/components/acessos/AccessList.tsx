@@ -25,7 +25,7 @@ export function AccessList() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const statusParam = searchParams.get('status')
   const viewMode = statusParam === 'history' ? 'history' : 'active'
-  const showExitActions = viewMode === 'active'
+  const showExitActions = viewMode === 'active' || viewMode === 'history'
   const checkOutMutation = useCheckOutAccessRecord()
 
   const {
@@ -45,13 +45,15 @@ export function AccessList() {
     refetch,
   } = useAccessList({ viewMode })
 
-  const handleConfirmExit = async () => {
+  const handleConfirmExit = async (personIds?: string[], observations?: string) => {
     if (!selectedRecord) {
       return
     }
 
     await checkOutMutation.mutateAsync({
       id: selectedRecord.id,
+      personIds,
+      observations,
     })
   }
 

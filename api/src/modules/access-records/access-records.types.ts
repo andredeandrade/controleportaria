@@ -18,6 +18,7 @@ export interface CheckInAccessRecordInput {
 
 export interface CheckOutAccessRecordInput {
   observations?: string | null
+  personIds?: string[]
   checkedOutByUserId: string
 }
 
@@ -36,6 +37,10 @@ export interface AccessRecordPersonResponse {
   category: string
   name: string
   document: string | null
+  checkOutAt: Date | null
+  checkedOutByUserId: string | null
+  checkOutObservations: string | null
+  isOpen: boolean
 }
 
 export interface AccessRecordResponse {

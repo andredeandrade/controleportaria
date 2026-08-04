@@ -119,6 +119,16 @@ function validateStatus(status: AccessRecordListStatus | undefined): AccessRecor
   return status
 }
 
+function normalizePersonIds(personIds: string[] | undefined): string[] | undefined {
+  if (!personIds) {
+    return undefined
+  }
+
+  const normalized = [...new Set(personIds.map((personId) => personId.trim()).filter(Boolean))]
+
+  return normalized.length > 0 ? normalized : undefined
+}
+
 function parsePagination(input: ListAccessRecordsInput): {
   page: number
   pageSize: number
@@ -169,6 +179,9 @@ function toResponse(accessRecord: {
     category: string
     name: string
     documentEncrypted: string | null
+    checkOutAt: Date | null
+    checkedOutByUserId: string | null
+    checkOutObservationsEncrypted: string | null
   }>
 }): AccessRecordResponse {
   return {
@@ -178,6 +191,12 @@ function toResponse(accessRecord: {
       category: person.category,
       name: person.name,
       document: person.documentEncrypted ? decryptText(person.documentEncrypted) : null,
+      checkOutAt: person.checkOutAt,
+      checkedOutByUserId: person.checkedOutByUserId,
+      checkOutObservations: person.checkOutObservationsEncrypted
+        ? decryptText(person.checkOutObservationsEncrypted)
+        : null,
+      isOpen: person.checkOutAt === null,
     })),
     company: accessRecord.company,
     locomotion: accessRecord.locomotion,
@@ -304,23 +323,86 @@ export const accessRecordsService = {
       throw new HttpError(400, 'Este registro já possui saída registrada.')
     }
 
-    const checkOutObservations = normalizeOptionalText(input.observations)
+    const targetPersonIds = normalizePersonIds(input.personIds)
+    const availablePeople = existing.people.filter((person) => person.checkOutAt === null)
 
-    const accessRecord = await prisma.accessRecord.update({
+    if (availablePeople.length === 0) {
+      throw new HttpError(400, 'Todas as pessoas deste registro já possuem saída.')
+    }
+
+    const peopleToCheckOut = targetPersonIds
+      ? availablePeople.filter((person) => targetPersonIds.includes(person.id))
+      : availablePeople
+
+    if (targetPersonIds && peopleToCheckOut.length !== targetPersonIds.length) {
+      throw new HttpError(
+        400,
+        'Um ou mais personIds não pertencem ao registro ou já possuem saída.',
+      )
+    }
+
+    if (peopleToCheckOut.length === 0) {
+      throw new HttpError(400, 'Nenhuma pessoa válida informada para registrar saída.')
+    }
+
+    const checkOutObservations = normalizeOptionalText(input.observations)
+    const checkOutAt = new Date()
+
+    const transactionResult = await prisma.$transaction([
+      prisma.accessRecordPerson.updateMany({
+        where: {
+          id: {
+            in: peopleToCheckOut.map((person) => person.id),
+          },
+          accessRecordId: accessRecordId,
+          checkOutAt: null,
+        },
+        data: {
+          checkOutAt,
+          checkedOutByUserId: input.checkedOutByUserId,
+          checkOutObservationsEncrypted: checkOutObservations
+            ? encryptText(checkOutObservations)
+            : null,
+        },
+      }),
+      prisma.accessRecordPerson.count({
+        where: {
+          accessRecordId: accessRecordId,
+          checkOutAt: null,
+        },
+      }),
+    ])
+
+    const remainingOpenPeopleCount = transactionResult[1]
+
+    if (remainingOpenPeopleCount === 0) {
+      await prisma.accessRecord.update({
+        where: {
+          id: accessRecordId,
+        },
+        data: {
+          checkOutAt,
+          checkedOutByUserId: input.checkedOutByUserId,
+          checkOutObservationsEncrypted: checkOutObservations
+            ? encryptText(checkOutObservations)
+            : null,
+        },
+      })
+    }
+
+    const accessRecord = await prisma.accessRecord.findFirst({
       where: {
         id: accessRecordId,
-      },
-      data: {
-        checkOutAt: new Date(),
-        checkedOutByUserId: input.checkedOutByUserId,
-        checkOutObservationsEncrypted: checkOutObservations
-          ? encryptText(checkOutObservations)
-          : null,
+        condominiumId,
       },
       include: {
         people: true,
       },
     })
+
+    if (!accessRecord) {
+      throw new HttpError(404, 'Registro de acesso não encontrado.')
+    }
 
     return toResponse(accessRecord)
   },

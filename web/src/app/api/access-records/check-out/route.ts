@@ -19,6 +19,9 @@ function parseCheckOutBody(body: unknown): CheckOutAccessRecordRequest {
   return {
     id: String(payload['id'] ?? ''),
     observations: typeof payload['observations'] === 'string' ? payload['observations'] : undefined,
+    personIds: Array.isArray(payload['personIds'])
+      ? payload['personIds'].map((personId) => String(personId ?? '').trim())
+      : undefined,
   }
 }
 
@@ -53,7 +56,7 @@ export async function POST(request: Request) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ observations: body.observations }),
+      body: JSON.stringify({ observations: body.observations, personIds: body.personIds }),
     })
 
     return NextResponse.json(payload, { status: 200 })

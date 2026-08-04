@@ -58,7 +58,14 @@ export function AccessListTableMobile({
               </Typography>
             </Stack>
 
-            {showActions ? (
+            <Stack spacing={0.25}>
+              <MobileFieldLabel variant="caption">Saída em</MobileFieldLabel>
+              <Typography variant="body2" color="#0F172A">
+                {record.exitAt}
+              </Typography>
+            </Stack>
+
+            {showActions && !record.hasExited ? (
               <MobileRegisterExitButton
                 variant="contained"
                 size="small"

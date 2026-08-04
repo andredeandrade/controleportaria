@@ -5,7 +5,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/generated/prisma-client"
 }
 
 datasource db {
@@ -45,6 +45,7 @@ model User {
   authorizationsCreated Authorization[]
   accessRecordsCheckIn AccessRecord[] @relation("AccessRecordCheckInUser")
   accessRecordsCheckOut AccessRecord[] @relation("AccessRecordCheckOutUser")
+  accessRecordPeopleCheckOut AccessRecordPerson[] @relation("AccessRecordPersonCheckOutUser")
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 
@@ -202,12 +203,18 @@ model AccessRecordPerson {
   category          String
   name              String
   documentEncrypted String?
+  checkOutObservationsEncrypted String?
+  checkOutAt        DateTime?
+  checkedOutByUserId String?
+  checkedOutByUser  User?        @relation("AccessRecordPersonCheckOutUser", fields: [checkedOutByUserId], references: [id], onDelete: SetNull)
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 
   @@index([accessRecordId])
   @@index([category])
   @@index([name])
+  @@index([checkOutAt])
+  @@index([checkedOutByUserId])
 }
 
 model Event {

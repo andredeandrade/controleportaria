@@ -3,6 +3,10 @@ export type AccessRecordPerson = {
   category: string
   name: string
   document: string | null
+  checkOutAt: string | null
+  checkedOutByUserId: string | null
+  checkOutObservations: string | null
+  isOpen: boolean
 }
 
 export type AccessRecord = {
@@ -51,4 +55,5 @@ export type CreateAccessRecordRequest = {
 export type CheckOutAccessRecordRequest = {
   id: string
   observations?: string
+  personIds?: string[]
 }

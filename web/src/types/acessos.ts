@@ -9,7 +9,13 @@ export type AccessRecordListItem = {
   locomotion: string
   plate: string
   entryAt: string
+  exitAt: string
   hasExited: boolean
+  people: Array<{
+    id: string
+    name: string
+    isOpen: boolean
+  }>
 }
 
 export type AccessRecordsPaginationState = {
@@ -36,12 +42,18 @@ export const ACCESS_LOCOMOTION_LABEL: Record<string, string> = {
 }
 
 export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
-  const firstPerson = item.people[0]
-  const extraPeopleCount = Math.max(0, item.people.length - 1)
+  const peopleToDisplay = item.isOpen ? item.people.filter((person) => person.isOpen) : item.people
+  const firstPerson = peopleToDisplay[0] ?? item.people[0]
   const name =
-    extraPeopleCount > 0 && firstPerson
-      ? `${firstPerson.name} +${extraPeopleCount}`
-      : (firstPerson?.name ?? '-')
+    peopleToDisplay
+      .map((person) => person.name.trim())
+      .filter((personName) => personName.length > 0)
+      .join(', ') ||
+    item.people
+      .map((person) => person.name.trim())
+      .filter((personName) => personName.length > 0)
+      .join(', ') ||
+    '-'
 
   const categoryRaw = firstPerson?.category ?? ''
   const category = (ACCESS_PERSON_CATEGORY_LABEL[categoryRaw] ?? categoryRaw) || '-'
@@ -57,6 +69,15 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
         timeStyle: 'short',
       }).format(checkInDate)
 
+  const checkOutDate = item.checkOutAt ? new Date(item.checkOutAt) : null
+  const exitAt =
+    !checkOutDate || Number.isNaN(checkOutDate.getTime())
+      ? 'Em aberto'
+      : new Intl.DateTimeFormat('pt-BR', {
+          dateStyle: 'short',
+          timeStyle: 'short',
+        }).format(checkOutDate)
+
   return {
     id: item.id,
     name,
@@ -64,6 +85,12 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
     locomotion,
     plate: item.plate?.trim() ? item.plate : '-',
     entryAt,
+    exitAt,
     hasExited: !item.isOpen,
+    people: item.people.map((person) => ({
+      id: person.id,
+      name: person.name,
+      isOpen: person.isOpen,
+    })),
   }
 }
