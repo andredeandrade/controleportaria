@@ -34,21 +34,31 @@ export function AccessListTable({ records, showActions, onRegisterExit }: Access
       accessorKey: 'entryAt',
       header: 'Entrada em',
     },
+    {
+      accessorKey: 'exitAt',
+      header: 'Saída em',
+    },
   ]
 
   if (showActions) {
     columns.push({
       id: 'actions',
       header: 'Ação',
-      cell: ({ row }) => (
-        <AccessRegisterButton
-          variant="contained"
-          size="small"
-          onClick={() => onRegisterExit(row.original)}
-        >
-          Registrar saida
-        </AccessRegisterButton>
-      ),
+      cell: ({ row }) => {
+        if (row.original.hasExited) {
+          return null
+        }
+
+        return (
+          <AccessRegisterButton
+            variant="contained"
+            size="small"
+            onClick={() => onRegisterExit(row.original)}
+          >
+            Registrar saida
+          </AccessRegisterButton>
+        )
+      },
     })
   }
 

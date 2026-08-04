@@ -9,6 +9,7 @@ export type AccessRecordListItem = {
   locomotion: string
   plate: string
   entryAt: string
+  exitAt: string
   hasExited: boolean
   people: Array<{
     id: string
@@ -68,6 +69,15 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
         timeStyle: 'short',
       }).format(checkInDate)
 
+  const checkOutDate = item.checkOutAt ? new Date(item.checkOutAt) : null
+  const exitAt =
+    !checkOutDate || Number.isNaN(checkOutDate.getTime())
+      ? 'Em aberto'
+      : new Intl.DateTimeFormat('pt-BR', {
+          dateStyle: 'short',
+          timeStyle: 'short',
+        }).format(checkOutDate)
+
   return {
     id: item.id,
     name,
@@ -75,6 +85,7 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
     locomotion,
     plate: item.plate?.trim() ? item.plate : '-',
     entryAt,
+    exitAt,
     hasExited: !item.isOpen,
     people: item.people.map((person) => ({
       id: person.id,
