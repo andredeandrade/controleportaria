@@ -10,6 +10,11 @@ export type AccessRecordListItem = {
   plate: string
   entryAt: string
   hasExited: boolean
+  people: Array<{
+    id: string
+    name: string
+    isOpen: boolean
+  }>
 }
 
 export type AccessRecordsPaginationState = {
@@ -71,5 +76,10 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
     plate: item.plate?.trim() ? item.plate : '-',
     entryAt,
     hasExited: !item.isOpen,
+    people: item.people.map((person) => ({
+      id: person.id,
+      name: person.name,
+      isOpen: person.isOpen,
+    })),
   }
 }

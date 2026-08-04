@@ -45,13 +45,15 @@ export function AccessList() {
     refetch,
   } = useAccessList({ viewMode })
 
-  const handleConfirmExit = async () => {
+  const handleConfirmExit = async (personIds?: string[], observations?: string) => {
     if (!selectedRecord) {
       return
     }
 
     await checkOutMutation.mutateAsync({
       id: selectedRecord.id,
+      personIds,
+      observations,
     })
   }
 
