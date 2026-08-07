@@ -6,7 +6,6 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
-import Alert from '@mui/material/Alert'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
@@ -15,6 +14,7 @@ import { useForm } from 'react-hook-form'
 import { useLogin } from './hooks/useLogin'
 import AuthTextField from './components/AuthTextField'
 import { extractTenantSlugFromHost } from '@/lib/auth/session'
+import { useAppSnackbar } from '@/providers'
 
 type LoginFormData = {
   email: string
@@ -25,6 +25,7 @@ export function LoginForm() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const loginMutation = useLogin()
+  const { showError } = useAppSnackbar()
   const {
     register,
     handleSubmit,
@@ -45,14 +46,18 @@ export function LoginForm() {
       typeof window === 'undefined' ? null : window.location.host,
     )
 
-    await loginMutation.mutateAsync({
-      condominiumSlug: condominiumSlug ?? undefined,
-      email: data.email,
-      password: data.password,
-    })
+    try {
+      await loginMutation.mutateAsync({
+        condominiumSlug: condominiumSlug ?? undefined,
+        email: data.email,
+        password: data.password,
+      })
 
-    router.refresh()
-    router.push('/dashboard')
+      router.refresh()
+      router.push('/dashboard')
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Nao foi possivel realizar o login.')
+    }
   }
 
   return (
@@ -76,10 +81,6 @@ export function LoginForm() {
       </Stack>
 
       <Stack spacing={2.25} component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
-        {loginMutation.isError ? (
-          <Alert severity="error">{loginMutation.error.message}</Alert>
-        ) : null}
-
         <AuthTextField
           label="E-mail"
           type="email"

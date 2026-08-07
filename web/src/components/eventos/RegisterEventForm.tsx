@@ -2,7 +2,6 @@
 
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
-import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
@@ -12,6 +11,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 
 import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
 import { useCreateEvent } from '@/components/eventos/hooks/useCreateEvent'
+import { useAppSnackbar } from '@/providers'
 
 type GuestFormValues = {
   name: string
@@ -32,6 +32,7 @@ type RegisterEventFormValues = {
 export function RegisterEventForm() {
   const router = useRouter()
   const createEventMutation = useCreateEvent()
+  const { showError, showSuccess } = useAppSnackbar()
 
   const {
     register,
@@ -65,31 +66,32 @@ export function RegisterEventForm() {
   }
 
   const onSubmit = async (data: RegisterEventFormValues) => {
-    await createEventMutation.mutateAsync({
-      title: data.title.trim(),
-      date: data.date,
-      startTime: data.startTime,
-      endTime: data.endTime.trim() || undefined,
-      unit: data.unit.trim(),
-      responsibleName: data.responsibleName.trim(),
-      guests: data.guests.map((guest) => ({
-        name: guest.name.trim(),
-        document: guest.document.trim() || undefined,
-      })),
-      observations: data.observations.trim() || undefined,
-    })
+    try {
+      await createEventMutation.mutateAsync({
+        title: data.title.trim(),
+        date: data.date,
+        startTime: data.startTime,
+        endTime: data.endTime.trim() || undefined,
+        unit: data.unit.trim(),
+        responsibleName: data.responsibleName.trim(),
+        guests: data.guests.map((guest) => ({
+          name: guest.name.trim(),
+          document: guest.document.trim() || undefined,
+        })),
+        observations: data.observations.trim() || undefined,
+      })
 
-    router.push('/eventos')
-    router.refresh()
+      showSuccess('Evento registrado com sucesso.')
+      router.push('/eventos')
+      router.refresh()
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Nao foi possivel registrar o evento.')
+    }
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
-        {createEventMutation.isError ? (
-          <Alert severity="error">{createEventMutation.error.message}</Alert>
-        ) : null}
-
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>

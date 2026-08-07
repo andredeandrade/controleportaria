@@ -1,6 +1,5 @@
 'use client'
 
-import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
@@ -8,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
 import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
+import { useAppSnackbar } from '@/providers'
 import { useCreateVisitor } from '@/components/visitantes/hooks/useCreateVisitor'
 
 type RegisterVisitorFormValues = {
@@ -23,6 +23,7 @@ type RegisterVisitorFormValues = {
 export function RegisterVisitorForm() {
   const router = useRouter()
   const createVisitorMutation = useCreateVisitor()
+  const { showError, showSuccess } = useAppSnackbar()
 
   const {
     register,
@@ -41,27 +42,28 @@ export function RegisterVisitorForm() {
   })
 
   const onSubmit = async (data: RegisterVisitorFormValues) => {
-    await createVisitorMutation.mutateAsync({
-      fullName: data.fullName.trim(),
-      document: data.document.trim(),
-      phone: data.phone.trim() || undefined,
-      email: data.email.trim() || undefined,
-      unit: data.unit.trim(),
-      authorizedBy: data.authorizedBy.trim(),
-      observations: data.observations.trim() || undefined,
-    })
+    try {
+      await createVisitorMutation.mutateAsync({
+        fullName: data.fullName.trim(),
+        document: data.document.trim(),
+        phone: data.phone.trim() || undefined,
+        email: data.email.trim() || undefined,
+        unit: data.unit.trim(),
+        authorizedBy: data.authorizedBy.trim(),
+        observations: data.observations.trim() || undefined,
+      })
 
-    router.push('/visitantes')
-    router.refresh()
+      showSuccess('Visitante registrado com sucesso.')
+      router.push('/visitantes')
+      router.refresh()
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Nao foi possivel registrar o visitante.')
+    }
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
-        {createVisitorMutation.isError ? (
-          <Alert severity="error">{createVisitorMutation.error.message}</Alert>
-        ) : null}
-
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>

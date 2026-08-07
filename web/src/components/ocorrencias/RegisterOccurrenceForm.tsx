@@ -1,6 +1,5 @@
 'use client'
 
-import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
@@ -10,6 +9,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { useCreateOccurrence } from '@/components/ocorrencias/hooks/useCreateOccurrence'
 import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
+import { useAppSnackbar } from '@/providers'
 import { OCCURRENCE_TYPE_OPTIONS, type OccurrenceTypeEnum } from '@/types/ocorrencias'
 
 type RegisterOccurrenceFormValues = {
@@ -22,6 +22,7 @@ type RegisterOccurrenceFormValues = {
 export function RegisterOccurrenceForm() {
   const router = useRouter()
   const createOccurrenceMutation = useCreateOccurrence()
+  const { showError, showSuccess } = useAppSnackbar()
 
   const {
     control,
@@ -38,24 +39,25 @@ export function RegisterOccurrenceForm() {
   })
 
   const onSubmit = async (data: RegisterOccurrenceFormValues) => {
-    await createOccurrenceMutation.mutateAsync({
-      occurrenceType: data.occurrenceType,
-      date: data.date,
-      time: data.time,
-      report: data.report.trim(),
-    })
+    try {
+      await createOccurrenceMutation.mutateAsync({
+        occurrenceType: data.occurrenceType,
+        date: data.date,
+        time: data.time,
+        report: data.report.trim(),
+      })
 
-    router.push('/ocorrencias')
-    router.refresh()
+      showSuccess('Ocorrencia registrada com sucesso.')
+      router.push('/ocorrencias')
+      router.refresh()
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Nao foi possivel registrar a ocorrencia.')
+    }
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
-        {createOccurrenceMutation.isError ? (
-          <Alert severity="error">{createOccurrenceMutation.error.message}</Alert>
-        ) : null}
-
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 6 }}>
             <TextFieldStack>
