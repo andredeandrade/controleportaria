@@ -7,11 +7,11 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import MenuItem from '@mui/material/MenuItem'
-import Snackbar from '@mui/material/Snackbar'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { ConfirmExitButton, ExitDialogActions } from '@/components/acessos/styles/AccessStyles'
 import { TextField } from '@/components/form'
+import { useAppSnackbar } from '@/providers'
 
 type ExitRegistrationTarget = {
   id: string
@@ -23,6 +23,8 @@ type ExitRegistrationTarget = {
     isOpen: boolean
   }>
 } | null
+
+type ExitRegistrationDialogTarget = NonNullable<ExitRegistrationTarget>
 
 type AccessExitRegistrationFeedbackProps = {
   target: ExitRegistrationTarget
@@ -39,7 +41,44 @@ export function AccessExitRegistrationFeedback({
   errorMessage,
   onClose,
 }: AccessExitRegistrationFeedbackProps) {
-  const [isSuccessOpen, setIsSuccessOpen] = useState(false)
+  const { showSuccess } = useAppSnackbar()
+
+  if (!target) {
+    return null
+  }
+
+  return (
+    <AccessExitRegistrationDialog
+      key={target.id}
+      target={target}
+      onConfirm={onConfirm}
+      isPending={isPending}
+      errorMessage={errorMessage}
+      onClose={onClose}
+      onSuccess={() => {
+        showSuccess('Saida registrada com sucesso.')
+      }}
+    />
+  )
+}
+
+type AccessExitRegistrationDialogProps = {
+  target: ExitRegistrationDialogTarget
+  onConfirm: (personIds?: string[], observations?: string) => Promise<void>
+  isPending: boolean
+  errorMessage: string | null
+  onClose: () => void
+  onSuccess: () => void
+}
+
+function AccessExitRegistrationDialog({
+  target,
+  onConfirm,
+  isPending,
+  errorMessage,
+  onClose,
+  onSuccess,
+}: AccessExitRegistrationDialogProps) {
   const [selectedPersonId, setSelectedPersonId] = useState<'all' | string>('all')
   const [observations, setObservations] = useState('')
 
@@ -67,16 +106,7 @@ export function AccessExitRegistrationFeedback({
     return `Deseja confirmar a saída de ${target.name}, registrado em ${target.entryAt}?`
   }, [selectedPerson, selectedPersonId, shouldShowPersonSelection, target])
 
-  useEffect(() => {
-    setSelectedPersonId('all')
-    setObservations('')
-  }, [target?.id])
-
   const handleConfirm = async () => {
-    if (!target) {
-      return
-    }
-
     const isSelectedPersonOpen = openPeople.some((person) => person.id === selectedPersonId)
     const selectedPersonIds =
       selectedPersonId === 'all' || !isSelectedPersonOpen ? undefined : [selectedPersonId]
@@ -86,14 +116,10 @@ export function AccessExitRegistrationFeedback({
     try {
       await onConfirm(selectedPersonIds, checkOutObservations)
       onClose()
-      setIsSuccessOpen(true)
+      onSuccess()
     } catch {
       // O erro e exibido no proprio dialogo.
     }
-  }
-
-  const handleSuccessClose = () => {
-    setIsSuccessOpen(false)
   }
 
   return (
@@ -154,17 +180,6 @@ export function AccessExitRegistrationFeedback({
           </ConfirmExitButton>
         </ExitDialogActions>
       </Dialog>
-
-      <Snackbar
-        open={isSuccessOpen}
-        autoHideDuration={3000}
-        onClose={handleSuccessClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert onClose={handleSuccessClose} severity="success" variant="filled">
-          Saída registrada com sucesso.
-        </Alert>
-      </Snackbar>
     </>
   )
 }

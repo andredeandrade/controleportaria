@@ -1,8 +1,8 @@
 'use client'
 
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
+import CircularProgress from '@mui/material/CircularProgress'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
-import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Grid from '@mui/material/Grid'
@@ -23,6 +23,7 @@ import {
   TextFieldLabel,
   TextFieldStack,
 } from '@/components/form'
+import { useAppSnackbar } from '@/providers'
 
 type PersonFormValues = {
   category: PersonTypeValue | ''
@@ -43,6 +44,7 @@ type AccessRegisterFormValues = {
 export function AccessRegisterForm() {
   const router = useRouter()
   const createAccessRecordMutation = useCreateAccessRecord()
+  const { showError, showSuccess } = useAppSnackbar()
 
   const {
     control,
@@ -75,31 +77,32 @@ export function AccessRegisterForm() {
   }
 
   const onSubmit = async (data: AccessRegisterFormValues) => {
-    await createAccessRecordMutation.mutateAsync({
-      people: data.people.map((person) => ({
-        category: person.category,
-        name: person.name.trim(),
-        document: person.document.trim() || undefined,
-      })),
-      company: data.company.trim() || undefined,
-      locomotion: data.locomotion || undefined,
-      color: data.color || undefined,
-      plate: data.plate.trim() || undefined,
-      brandModel: data.brandModel.trim() || undefined,
-      observations: data.observations.trim() || undefined,
-    })
+    try {
+      await createAccessRecordMutation.mutateAsync({
+        people: data.people.map((person) => ({
+          category: person.category,
+          name: person.name.trim(),
+          document: person.document.trim() || undefined,
+        })),
+        company: data.company.trim() || undefined,
+        locomotion: data.locomotion || undefined,
+        color: data.color || undefined,
+        plate: data.plate.trim() || undefined,
+        brandModel: data.brandModel.trim() || undefined,
+        observations: data.observations.trim() || undefined,
+      })
 
-    router.push('/acessos?status=active')
-    router.refresh()
+      showSuccess('Acesso registrado com sucesso.')
+      router.push('/acessos?status=active')
+      router.refresh()
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Nao foi possivel registrar o acesso.')
+    }
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
-        {createAccessRecordMutation.isError ? (
-          <Alert severity="error">{createAccessRecordMutation.error.message}</Alert>
-        ) : null}
-
         {fields.map((personField, index) => {
           const isLastPersonRow = index === fields.length - 1
           const canRemovePerson = fields.length > 1 && index > 0
@@ -271,9 +274,14 @@ export function AccessRegisterForm() {
               fontWeight: 700,
             }}
           >
-            {isSubmitting || createAccessRecordMutation.isPending
-              ? 'Salvando...'
-              : 'Salvar registro'}
+            {isSubmitting || createAccessRecordMutation.isPending ? (
+              <Stack direction="row" spacing={1} alignItems="center">
+                <CircularProgress size={18} color="inherit" />
+                <span>Salvando...</span>
+              </Stack>
+            ) : (
+              'Salvar registro'
+            )}
           </Button>
         </Stack>
       </Stack>

@@ -1,6 +1,5 @@
 'use client'
 
-import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
@@ -16,6 +15,7 @@ import {
   PersonTypeSelect,
 } from '@/components/form'
 import { useCreateAuthorization } from '@/components/autorizacoes/hooks/useCreateAuthorization'
+import { useAppSnackbar } from '@/providers'
 
 export type RegisterAuthorizationFormValues = {
   authorizedName: string
@@ -35,6 +35,7 @@ export type RegisterAuthorizationFormValues = {
 export function RegisterAuthorizationForm() {
   const router = useRouter()
   const createAuthorizationMutation = useCreateAuthorization()
+  const { showError, showSuccess } = useAppSnackbar()
 
   const {
     register,
@@ -59,32 +60,35 @@ export function RegisterAuthorizationForm() {
   })
 
   const onSubmit = async (data: RegisterAuthorizationFormValues) => {
-    await createAuthorizationMutation.mutateAsync({
-      authorizedName: data.authorizedName.trim(),
-      personType: data.personType,
-      document: data.document.trim(),
-      phone: data.phone.trim() || undefined,
-      company: data.company?.trim() || undefined,
-      unit: data.unit.trim(),
-      authorizedBy: data.authorizedBy.trim(),
-      validFromDate: data.validFromDate,
-      validFromTime: data.validFromTime,
-      validToDate: data.validToDate,
-      validToTime: data.validToTime,
-      observations: data.observations.trim() || undefined,
-    })
+    try {
+      await createAuthorizationMutation.mutateAsync({
+        authorizedName: data.authorizedName.trim(),
+        personType: data.personType,
+        document: data.document.trim(),
+        phone: data.phone.trim() || undefined,
+        company: data.company?.trim() || undefined,
+        unit: data.unit.trim(),
+        authorizedBy: data.authorizedBy.trim(),
+        validFromDate: data.validFromDate,
+        validFromTime: data.validFromTime,
+        validToDate: data.validToDate,
+        validToTime: data.validToTime,
+        observations: data.observations.trim() || undefined,
+      })
 
-    router.push('/autorizacoes')
-    router.refresh()
+      showSuccess('Autorizacao registrada com sucesso.')
+      router.push('/autorizacoes')
+      router.refresh()
+    } catch (error) {
+      showError(
+        error instanceof Error ? error.message : 'Nao foi possivel registrar a autorizacao.',
+      )
+    }
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
-        {createAuthorizationMutation.isError ? (
-          <Alert severity="error">{createAuthorizationMutation.error.message}</Alert>
-        ) : null}
-
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>

@@ -1,6 +1,5 @@
 'use client'
 
-import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
@@ -9,6 +8,7 @@ import { useForm } from 'react-hook-form'
 
 import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
 import { useCreateServiceProvider } from '@/components/prestadores-servicos/hooks/useCreateServiceProvider'
+import { useAppSnackbar } from '@/providers'
 
 type RegisterServiceProviderFormValues = {
   companyName: string
@@ -24,6 +24,7 @@ type RegisterServiceProviderFormValues = {
 export function RegisterServiceProviderForm() {
   const router = useRouter()
   const createServiceProviderMutation = useCreateServiceProvider()
+  const { showError, showSuccess } = useAppSnackbar()
 
   const {
     register,
@@ -43,28 +44,33 @@ export function RegisterServiceProviderForm() {
   })
 
   const onSubmit = async (data: RegisterServiceProviderFormValues) => {
-    await createServiceProviderMutation.mutateAsync({
-      companyName: data.companyName.trim(),
-      responsibleName: data.responsibleName.trim(),
-      document: data.document.trim(),
-      phone: data.phone.trim() || undefined,
-      email: data.email.trim() || undefined,
-      serviceType: data.serviceType.trim(),
-      unit: data.unit.trim() || undefined,
-      observations: data.observations.trim() || undefined,
-    })
+    try {
+      await createServiceProviderMutation.mutateAsync({
+        companyName: data.companyName.trim(),
+        responsibleName: data.responsibleName.trim(),
+        document: data.document.trim(),
+        phone: data.phone.trim() || undefined,
+        email: data.email.trim() || undefined,
+        serviceType: data.serviceType.trim(),
+        unit: data.unit.trim() || undefined,
+        observations: data.observations.trim() || undefined,
+      })
 
-    router.push('/prestadores-servicos')
-    router.refresh()
+      showSuccess('Prestador de servico registrado com sucesso.')
+      router.push('/prestadores-servicos')
+      router.refresh()
+    } catch (error) {
+      showError(
+        error instanceof Error
+          ? error.message
+          : 'Nao foi possivel registrar o prestador de servico.',
+      )
+    }
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
-        {createServiceProviderMutation.isError ? (
-          <Alert severity="error">{createServiceProviderMutation.error.message}</Alert>
-        ) : null}
-
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>

@@ -2,7 +2,6 @@
 
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
-import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
@@ -20,6 +19,7 @@ import {
   TextFieldStack,
 } from '@/components/form'
 import { useCreateResident } from '@/components/moradores/hooks/useCreateResident'
+import { useAppSnackbar } from '@/providers'
 
 const RESIDENT_RELATION_OPTIONS = [
   { label: 'Proprietário', value: 'proprietario' },
@@ -57,6 +57,7 @@ type RegisterResidentFormValues = {
 export function RegisterResidentForm() {
   const router = useRouter()
   const createResidentMutation = useCreateResident()
+  const { showError, showSuccess } = useAppSnackbar()
 
   const {
     control,
@@ -91,33 +92,34 @@ export function RegisterResidentForm() {
   }
 
   const onSubmit = async (data: RegisterResidentFormValues) => {
-    await createResidentMutation.mutateAsync({
-      fullName: data.fullName.trim(),
-      document: data.document.trim(),
-      phone: data.phone.trim() || undefined,
-      email: data.email.trim() || undefined,
-      unit: data.unit.trim(),
-      relation: data.relation as ResidentRelationValue,
-      observations: data.observations.trim() || undefined,
-      vehicles: data.vehicles.map((vehicle) => ({
-        type: vehicle.type,
-        color: vehicle.color || undefined,
-        plate: vehicle.plate.trim() || undefined,
-        brandModel: vehicle.brandModel.trim() || undefined,
-      })),
-    })
+    try {
+      await createResidentMutation.mutateAsync({
+        fullName: data.fullName.trim(),
+        document: data.document.trim(),
+        phone: data.phone.trim() || undefined,
+        email: data.email.trim() || undefined,
+        unit: data.unit.trim(),
+        relation: data.relation as ResidentRelationValue,
+        observations: data.observations.trim() || undefined,
+        vehicles: data.vehicles.map((vehicle) => ({
+          type: vehicle.type,
+          color: vehicle.color || undefined,
+          plate: vehicle.plate.trim() || undefined,
+          brandModel: vehicle.brandModel.trim() || undefined,
+        })),
+      })
 
-    router.push('/moradores')
-    router.refresh()
+      showSuccess('Morador registrado com sucesso.')
+      router.push('/moradores')
+      router.refresh()
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Nao foi possivel registrar o morador.')
+    }
   }
 
   return (
     <FormPaper>
       <Stack component="form" spacing={2.5} onSubmit={handleSubmit(onSubmit)}>
-        {createResidentMutation.isError ? (
-          <Alert severity="error">{createResidentMutation.error.message}</Alert>
-        ) : null}
-
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TextFieldStack>
