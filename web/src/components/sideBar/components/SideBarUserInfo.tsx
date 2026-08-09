@@ -1,6 +1,6 @@
 'use client'
 
-import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
@@ -20,26 +20,42 @@ function getRoleLabel(role: UserRole): string {
 export default function SideBarUserInfo() {
   const { data: user, isPending, isError } = useAuthenticatedUser()
 
-  const userName = user?.name || (isPending ? 'Carregando usuário...' : 'Usuário')
+  const userName = user?.name || (isPending ? 'Carregando...' : 'Usuário')
   const roleLabel = user ? getRoleLabel(user.role) : isError ? 'Perfil indisponível' : 'Segurança'
 
   return (
-    <Box sx={{ px: 2.5, py: 3 }}>
-      <Stack direction="row" spacing={1.5} alignItems="center">
+    <Box sx={{ px: '16px', py: '20px' }}>
+      <Stack direction="row" spacing="12px" alignItems="center">
         <Avatar
           sx={{
-            bgcolor: 'rgba(148, 163, 184, 0.22)',
-            color: '#E2E8F0',
+            width: 36,
+            height: 36,
+            bgcolor: 'rgba(173, 198, 255, 0.14)',
+            color: '#adc6ff',
+            border: '1px solid rgba(173, 198, 255, 0.24)',
           }}
         >
-          <PersonOutlineRoundedIcon />
+          <PersonRoundedIcon sx={{ fontSize: 20 }} />
         </Avatar>
 
         <Box sx={{ minWidth: 0 }}>
-          <Typography fontWeight={700} noWrap>
+          <Typography
+            variant="subtitle2"
+            noWrap
+            sx={{
+              color: '#dae2fd',
+              letterSpacing: 'normal',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+            }}
+          >
             {userName}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'rgba(226, 232, 240, 0.72)' }} noWrap>
+          <Typography
+            variant="caption"
+            noWrap
+            sx={{ color: '#8c909f', fontWeight: 400, lineHeight: 1.4 }}
+          >
             {roleLabel}
           </Typography>
         </Box>

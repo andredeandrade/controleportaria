@@ -1,17 +1,14 @@
 'use client'
 
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
+import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded'
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 import AppBar from '@mui/material/AppBar'
+import Badge from '@mui/material/Badge'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { logout } from '@/services/auth/service'
 
 type TopBarProps = {
   drawerWidth: number
@@ -19,21 +16,6 @@ type TopBarProps = {
 }
 
 export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
-  const router = useRouter()
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true)
-
-    try {
-      await logout()
-    } finally {
-      router.replace('/')
-      router.refresh()
-      setIsLoggingOut(false)
-    }
-  }
-
   return (
     <AppBar
       position="fixed"
@@ -41,75 +23,59 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
       sx={{
         ml: { md: `${drawerWidth}px` },
         width: { md: `calc(100% - ${drawerWidth}px)` },
-        backgroundColor: 'rgba(15, 23, 42, 0.94)',
-        color: '#F8FAFC',
-        borderBottom: '1px solid',
-        borderColor: 'rgba(148, 163, 184, 0.16)',
+        backgroundColor: 'rgba(6, 14, 32, 0.92)',
         backdropFilter: 'blur(8px)',
+        borderBottom: '1px solid #424754',
       }}
     >
-      <Toolbar sx={{ minHeight: 72, display: 'flex', alignItems: 'center', position: 'relative' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, minWidth: 0 }}>
+      <Toolbar sx={{ minHeight: 56, px: { xs: '12px', md: '24px' } }}>
+        <IconButton
+          edge="start"
+          color="inherit"
+          onClick={onOpenMenu}
+          sx={{ display: { md: 'none' }, mr: 1, color: '#dae2fd' }}
+        >
+          <MenuRoundedIcon />
+        </IconButton>
+
+        {/* Empurra os ícones para a direita */}
+        <Box sx={{ flexGrow: 1 }} />
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <IconButton
-            edge="start"
             color="inherit"
-            onClick={onOpenMenu}
-            sx={{ display: { md: 'none' }, mr: 1, alignSelf: 'center' }}
+            aria-label="Notificações"
+            sx={{
+              color: '#c2c6d6',
+              '&:hover': { color: '#dae2fd', backgroundColor: 'rgba(173, 198, 255, 0.08)' },
+            }}
           >
-            <MenuRoundedIcon />
+            <Badge
+              variant="dot"
+              sx={{
+                '& .MuiBadge-dot': {
+                  backgroundColor: '#4edea3',
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                },
+              }}
+            >
+              <NotificationsNoneRoundedIcon fontSize="small" />
+            </Badge>
           </IconButton>
 
-          <Typography
+          <IconButton
             component={Link}
-            href="/dashboard"
-            variant="h6"
-            fontWeight={700}
-            noWrap
+            href="/configuracoes"
+            aria-label="Configurações"
             sx={{
-              color: 'inherit',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              lineHeight: 1,
-              position: { xs: 'absolute', md: 'static' },
-              left: { xs: '50%', md: 'auto' },
-              transform: { xs: 'translateX(-50%)', md: 'none' },
-              '&:hover': {
-                opacity: 0.88,
-              },
+              color: '#c2c6d6',
+              '&:hover': { color: '#dae2fd', backgroundColor: 'rgba(173, 198, 255, 0.08)' },
             }}
           >
-            Controle Portaria
-          </Typography>
-        </Box>
-
-        <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
-          <IconButton
-            color="inherit"
-            aria-label="Sair"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            sx={{ display: { xs: 'inline-flex', md: 'none' } }}
-          >
-            <LogoutRoundedIcon />
+            <SettingsRoundedIcon fontSize="small" />
           </IconButton>
-
-          <Button
-            color="inherit"
-            startIcon={<LogoutRoundedIcon />}
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            sx={{
-              display: { xs: 'none', md: 'inline-flex' },
-              textTransform: 'none',
-              borderColor: 'rgba(148, 163, 184, 0.28)',
-              '&:hover': {
-                backgroundColor: 'rgba(30, 41, 59, 0.72)',
-              },
-            }}
-          >
-            {isLoggingOut ? 'Saindo...' : 'Sair'}
-          </Button>
         </Box>
       </Toolbar>
     </AppBar>
