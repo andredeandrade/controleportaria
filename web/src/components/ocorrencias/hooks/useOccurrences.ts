@@ -1,63 +1,98 @@
 // Hook para buscar e filtrar ocorrências
 'use client'
 
-import { useState, useMemo } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
-export type OccurrenceRecord = {
-  id: string
-  occurrenceType: string
-  date: string
-  time: string
-  report: string
-  responsible: string
+import { IncidentsServiceError, listIncidents } from '@/services/ocorrencias/service'
+import {
+  OCCURRENCE_TYPE_LABEL,
+  OccurrenceTypeEnum,
+  type OccurrenceRecord,
+  type OccurrencesPaginationState,
+} from '@/types/ocorrencias'
+
+function formatDate(value: string): string {
+  const date = new Date(`${value}T00:00:00`)
+
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return new Intl.DateTimeFormat('pt-BR').format(date)
 }
-
-const MOCK_OCCURRENCES: OccurrenceRecord[] = [
-  {
-    id: '1',
-    occurrenceType: 'Falta de energia',
-    date: '16/04/2026',
-    time: '14:30',
-    report: 'Faltou energia em todo o bloco A.',
-    responsible: 'João Silva',
-  },
-  {
-    id: '2',
-    occurrenceType: 'Vandalismo',
-    date: '15/04/2026',
-    time: '22:10',
-    report: 'Pichação no muro externo.',
-    responsible: 'Maria Souza',
-  },
-  {
-    id: '3',
-    occurrenceType: 'Emergencia medica',
-    date: '14/04/2026',
-    time: '09:45',
-    report: 'Morador passou mal na academia.',
-    responsible: 'Carlos Lima',
-  },
-]
 
 export function useOccurrences() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const records = useMemo(() => {
-    if (!searchTerm) return MOCK_OCCURRENCES
-    const lower = searchTerm.toLowerCase()
-    return MOCK_OCCURRENCES.filter(
-      (o) =>
-        o.occurrenceType.toLowerCase().includes(lower) ||
-        o.date.includes(lower) ||
-        o.time.includes(lower) ||
-        o.report.toLowerCase().includes(lower) ||
-        o.responsible.toLowerCase().includes(lower),
-    )
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim())
+    }, 350)
+
+    return () => {
+      window.clearTimeout(timeout)
+    }
   }, [searchTerm])
 
-  function handleSearchChange(value: string) {
+  const incidentsQuery = useQuery({
+    queryKey: ['incidents', page, pageSize, debouncedSearchTerm],
+    queryFn: () => listIncidents(page, pageSize, debouncedSearchTerm),
+    placeholderData: keepPreviousData,
+  })
+
+  const records: OccurrenceRecord[] = (incidentsQuery.data?.items ?? []).map((item) => {
+    const type = item.occurrenceType as OccurrenceTypeEnum
+    const occurrenceTypeLabel = OCCURRENCE_TYPE_LABEL[type] ?? item.occurrenceType
+
+    return {
+      id: item.id,
+      occurrenceType: item.occurrenceType,
+      occurrenceTypeLabel,
+      date: formatDate(item.date),
+      time: item.time,
+      report: item.report,
+      responsible: item.createdByUserId ?? '-',
+    }
+  })
+
+  const pagination: OccurrencesPaginationState = incidentsQuery.data?.pagination ?? {
+    page,
+    pageSize,
+    total: 0,
+    totalPages: 1,
+  }
+
+  const handleSearchChange = (value: string) => {
+    setPage(1)
     setSearchTerm(value)
   }
 
-  return { records, searchTerm, handleSearchChange }
+  const handlePageChange = (value: number) => {
+    setPage(value)
+  }
+
+  const handlePageSizeChange = (value: number) => {
+    setPage(1)
+    setPageSize(value)
+  }
+
+  return {
+    records,
+    pagination,
+    searchTerm,
+    handleSearchChange,
+    handlePageChange,
+    handlePageSizeChange,
+    isLoading: incidentsQuery.isPending,
+    isFetching: incidentsQuery.isFetching,
+    isError: incidentsQuery.isError,
+    errorMessage:
+      (incidentsQuery.error as IncidentsServiceError | null)?.message ??
+      'Erro ao carregar ocorrencias.',
+    refetch: incidentsQuery.refetch,
+  }
 }

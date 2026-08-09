@@ -3,19 +3,23 @@
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
-import { useForm, Controller } from 'react-hook-form'
+import { useRouter } from 'next/navigation'
+import { Controller, useForm } from 'react-hook-form'
 
 import {
   FormPaper,
+  type PersonTypeValue,
   TextField,
   TextFieldLabel,
   TextFieldStack,
   PersonTypeSelect,
 } from '@/components/form'
+import { useCreateAuthorization } from '@/components/autorizacoes/hooks/useCreateAuthorization'
+import { useAppSnackbar } from '@/providers'
 
 export type RegisterAuthorizationFormValues = {
   authorizedName: string
-  personType: string
+  personType: PersonTypeValue | ''
   document: string
   phone: string
   company?: string
@@ -29,6 +33,10 @@ export type RegisterAuthorizationFormValues = {
 }
 
 export function RegisterAuthorizationForm() {
+  const router = useRouter()
+  const createAuthorizationMutation = useCreateAuthorization()
+  const { showError, showSuccess } = useAppSnackbar()
+
   const {
     register,
     handleSubmit,
@@ -51,8 +59,31 @@ export function RegisterAuthorizationForm() {
     },
   })
 
-  const onSubmit = (data: RegisterAuthorizationFormValues) => {
-    void data
+  const onSubmit = async (data: RegisterAuthorizationFormValues) => {
+    try {
+      await createAuthorizationMutation.mutateAsync({
+        authorizedName: data.authorizedName.trim(),
+        personType: data.personType,
+        document: data.document.trim(),
+        phone: data.phone.trim() || undefined,
+        company: data.company?.trim() || undefined,
+        unit: data.unit.trim(),
+        authorizedBy: data.authorizedBy.trim(),
+        validFromDate: data.validFromDate,
+        validFromTime: data.validFromTime,
+        validToDate: data.validToDate,
+        validToTime: data.validToTime,
+        observations: data.observations.trim() || undefined,
+      })
+
+      showSuccess('Autorizacao registrada com sucesso.')
+      router.push('/autorizacoes')
+      router.refresh()
+    } catch (error) {
+      showError(
+        error instanceof Error ? error.message : 'Nao foi possivel registrar a autorizacao.',
+      )
+    }
   }
 
   return (
@@ -66,7 +97,13 @@ export function RegisterAuthorizationForm() {
                 required
                 error={Boolean(errors.authorizedName)}
                 helperText={errors.authorizedName?.message}
-                {...register('authorizedName', { required: 'Informe o nome do autorizado' })}
+                {...register('authorizedName', {
+                  required: 'Informe o nome do autorizado',
+                  minLength: {
+                    value: 3,
+                    message: 'Nome deve ter ao menos 3 caracteres',
+                  },
+                })}
               />
             </TextFieldStack>
           </Grid>
@@ -92,7 +129,13 @@ export function RegisterAuthorizationForm() {
                 required
                 error={Boolean(errors.document)}
                 helperText={errors.document?.message}
-                {...register('document', { required: 'Informe o documento' })}
+                {...register('document', {
+                  required: 'Informe o documento',
+                  minLength: {
+                    value: 5,
+                    message: 'Documento deve ter ao menos 5 caracteres',
+                  },
+                })}
               />
             </TextFieldStack>
           </Grid>
@@ -134,7 +177,13 @@ export function RegisterAuthorizationForm() {
                 required
                 error={Boolean(errors.authorizedBy)}
                 helperText={errors.authorizedBy?.message}
-                {...register('authorizedBy', { required: 'Informe quem autorizou' })}
+                {...register('authorizedBy', {
+                  required: 'Informe quem autorizou',
+                  minLength: {
+                    value: 3,
+                    message: 'Autorizado por deve ter ao menos 3 caracteres',
+                  },
+                })}
               />
             </TextFieldStack>
           </Grid>
@@ -176,7 +225,19 @@ export function RegisterAuthorizationForm() {
                 error={Boolean(errors.validToDate)}
                 helperText={errors.validToDate?.message}
                 slotProps={{ inputLabel: { shrink: true } }}
-                {...register('validToDate', { required: 'Informe a data final' })}
+                {...register('validToDate', {
+                  required: 'Informe a data final',
+                  validate: (value, formValues) => {
+                    if (!formValues.validFromDate) {
+                      return true
+                    }
+
+                    return (
+                      value >= formValues.validFromDate ||
+                      'Data final deve ser maior ou igual a data inicial'
+                    )
+                  },
+                })}
               />
             </TextFieldStack>
           </Grid>
@@ -190,7 +251,27 @@ export function RegisterAuthorizationForm() {
                 error={Boolean(errors.validToTime)}
                 helperText={errors.validToTime?.message}
                 slotProps={{ inputLabel: { shrink: true } }}
-                {...register('validToTime', { required: 'Informe a hora final' })}
+                {...register('validToTime', {
+                  required: 'Informe a hora final',
+                  validate: (value, formValues) => {
+                    if (!formValues.validFromDate || !formValues.validFromTime) {
+                      return true
+                    }
+
+                    if (formValues.validToDate > formValues.validFromDate) {
+                      return true
+                    }
+
+                    if (formValues.validToDate < formValues.validFromDate) {
+                      return 'Periodo final deve ser maior ou igual ao periodo inicial'
+                    }
+
+                    return (
+                      value >= formValues.validFromTime ||
+                      'Periodo final deve ser maior ou igual ao periodo inicial'
+                    )
+                  },
+                })}
               />
             </TextFieldStack>
           </Grid>
@@ -208,7 +289,7 @@ export function RegisterAuthorizationForm() {
         <Stack direction="row" justifyContent="flex-end">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || createAuthorizationMutation.isPending}
             variant="contained"
             sx={{
               bgcolor: '#16A34A',
@@ -216,7 +297,9 @@ export function RegisterAuthorizationForm() {
               fontWeight: 700,
             }}
           >
-            Salvar autorização
+            {isSubmitting || createAuthorizationMutation.isPending
+              ? 'Salvando...'
+              : 'Salvar autorizacao'}
           </Button>
         </Stack>
       </Stack>

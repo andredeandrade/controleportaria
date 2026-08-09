@@ -5,7 +5,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/generated/prisma-client"
 }
 
 datasource db {
@@ -38,6 +38,14 @@ model User {
   passwordHash     String
   role             UserRole    @default(PORTARIA)
   residentsCreated Resident[]
+  visitorsCreated  Visitor[]
+  eventsCreated    Event[]
+  incidentsCreated Incident[]
+  serviceProvidersCreated ServiceProvider[]
+  authorizationsCreated Authorization[]
+  accessRecordsCheckIn AccessRecord[] @relation("AccessRecordCheckInUser")
+  accessRecordsCheckOut AccessRecord[] @relation("AccessRecordCheckOutUser")
+  accessRecordPeopleCheckOut AccessRecordPerson[] @relation("AccessRecordPersonCheckOutUser")
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 
@@ -51,6 +59,12 @@ model Condominium {
   slug      String     @unique
   users     User[]
   residents Resident[]
+  visitors  Visitor[]
+  events    Event[]
+  incidents Incident[]
+  serviceProviders ServiceProvider[]
+  authorizations Authorization[]
+  accessRecords AccessRecord[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
@@ -70,7 +84,6 @@ model Resident {
   observationsEncrypted String?
   createdByUserId   String?
   createdByUser     User?     @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
-  visitors          Visitor[]
   vehicles          Vehicle[]
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -82,13 +95,181 @@ model Resident {
 }
 
 model Visitor {
-  id         String   @id @default(uuid())
-  residentId String
-  resident   Resident @relation(fields: [residentId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                   String      @id @default(uuid())
+  condominiumId        String
+  condominium          Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  fullName             String
+  unit                 String
+  authorizedBy         String
+  emailEncrypted       String?
+  phoneEncrypted       String?
+  documentEncrypted    String
+  observationsEncrypted String?
+  createdByUserId      String?
+  createdByUser        User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
 
-  @@index([residentId])
+  @@index([condominiumId, fullName])
+  @@index([condominiumId, unit])
+  @@index([createdByUserId])
+  @@index([createdAt])
+}
+
+model ServiceProvider {
+  id                   String      @id @default(uuid())
+  condominiumId        String
+  condominium          Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  companyName          String
+  responsibleName      String
+  serviceType          String
+  unit                 String?
+  emailEncrypted       String?
+  phoneEncrypted       String?
+  documentEncrypted    String
+  observationsEncrypted String?
+  createdByUserId      String?
+  createdByUser        User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@index([condominiumId, companyName])
+  @@index([condominiumId, serviceType])
+  @@index([createdByUserId])
+  @@index([createdAt])
+}
+
+model Authorization {
+  id                   String      @id @default(uuid())
+  condominiumId        String
+  condominium          Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  authorizedName       String
+  personType           String
+  documentEncrypted    String
+  phoneEncrypted       String?
+  company              String?
+  unit                 String
+  authorizedBy         String
+  validFromDate        String
+  validFromTime        String
+  validToDate          String
+  validToTime          String
+  observationsEncrypted String?
+  createdByUserId      String?
+  createdByUser        User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@index([condominiumId, authorizedName])
+  @@index([condominiumId, validFromDate])
+  @@index([condominiumId, validToDate])
+  @@index([condominiumId, unit])
+  @@index([createdByUserId])
+  @@index([createdAt])
+}
+
+model AccessRecord {
+  id                         String      @id @default(uuid())
+  condominiumId              String
+  condominium                Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  company                    String?
+  locomotion                 String?
+  color                      String?
+  plateEncrypted             String?
+  brandModel                 String?
+  observationsEncrypted      String?
+  checkOutObservationsEncrypted String?
+  checkInAt                  DateTime    @default(now())
+  checkOutAt                 DateTime?
+  checkedInByUserId          String?
+  checkedInByUser            User?       @relation("AccessRecordCheckInUser", fields: [checkedInByUserId], references: [id], onDelete: SetNull)
+  checkedOutByUserId         String?
+  checkedOutByUser           User?       @relation("AccessRecordCheckOutUser", fields: [checkedOutByUserId], references: [id], onDelete: SetNull)
+  people                     AccessRecordPerson[]
+  createdAt                  DateTime    @default(now())
+  updatedAt                  DateTime    @updatedAt
+
+  @@index([condominiumId, checkInAt])
+  @@index([condominiumId, checkOutAt])
+  @@index([checkedInByUserId])
+  @@index([checkedOutByUserId])
+  @@index([createdAt])
+}
+
+model AccessRecordPerson {
+  id                String       @id @default(uuid())
+  accessRecordId    String
+  accessRecord      AccessRecord @relation(fields: [accessRecordId], references: [id], onDelete: Cascade)
+  category          String
+  name              String
+  documentEncrypted String?
+  checkOutObservationsEncrypted String?
+  checkOutAt        DateTime?
+  checkedOutByUserId String?
+  checkedOutByUser  User?        @relation("AccessRecordPersonCheckOutUser", fields: [checkedOutByUserId], references: [id], onDelete: SetNull)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([accessRecordId])
+  @@index([category])
+  @@index([name])
+  @@index([checkOutAt])
+  @@index([checkedOutByUserId])
+}
+
+model Event {
+  id                    String      @id @default(uuid())
+  condominiumId         String
+  condominium           Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  title                 String
+  date                  String
+  startTime             String
+  endTime               String?
+  unit                  String
+  responsibleName       String
+  observationsEncrypted String?
+  createdByUserId       String?
+  createdByUser         User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  guests                EventGuest[]
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([condominiumId, date])
+  @@index([condominiumId, title])
+  @@index([condominiumId, unit])
+  @@index([createdByUserId])
+  @@index([createdAt])
+}
+
+model EventGuest {
+  id                String   @id @default(uuid())
+  eventId           String
+  event             Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name              String
+  documentEncrypted String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([eventId])
+}
+
+model Incident {
+  id              String      @id @default(uuid())
+  condominiumId   String
+  condominium     Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
+  occurrenceType  String
+  date            String
+  time            String
+  reportEncrypted String
+  createdByUserId String?
+  createdByUser   User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([condominiumId, date])
+  @@index([condominiumId, occurrenceType])
+  @@index([createdByUserId])
+  @@index([createdAt])
 }
 
 model Vehicle {

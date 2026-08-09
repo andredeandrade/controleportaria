@@ -1,83 +1,85 @@
 'use client'
 
-import { useState } from 'react'
-
-type ResidentVehicle = {
-  type: string
-  plate: string
-}
-
-export type ResidentRecord = {
-  id: string
-  name: string
-  unit: string
-  relation: string
-  phone: string
-  vehicles: ResidentVehicle[]
-}
-
-const residentRecords: ResidentRecord[] = [
-  {
-    id: '1',
-    name: 'Andressa Martins',
-    unit: 'Bloco A - 101',
-    relation: 'Proprietário',
-    phone: '(11) 99876-1234',
-    vehicles: [
-      { type: 'Carro', plate: 'BRA-2E19' },
-      { type: 'Moto', plate: 'QWE-4R56' },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Fábio Almeida',
-    unit: 'Bloco C - 304',
-    relation: 'Inquilino',
-    phone: '(11) 98765-4321',
-    vehicles: [{ type: 'Carro', plate: 'XYZ-9K87' }],
-  },
-  {
-    id: '3',
-    name: 'Camila Rocha',
-    unit: 'Torre 2 - 1203',
-    relation: 'Dependente',
-    phone: '(11) 97654-8899',
-    vehicles: [],
-  },
-]
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
+import { listResidents, ResidentsServiceError } from '@/services/moradores/service'
+import {
+  RESIDENT_RELATION_LABEL,
+  type ResidentRecord,
+  ResidentRelationEnum,
+  type ResidentsPaginationState,
+  VEHICLE_TYPE_LABEL,
+  VehicleTypeEnum,
+} from '@/types/moradores'
 
 export function useResidents() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const normalizedSearchTerm = searchTerm.trim().toLowerCase()
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim())
+    }, 350)
 
-  const filteredRecords = normalizedSearchTerm
-    ? residentRecords.filter((record) => {
-        const vehiclesSummary = record.vehicles
-          .map((vehicle) => `${vehicle.type} ${vehicle.plate}`)
-          .join(' ')
+    return () => {
+      window.clearTimeout(timeout)
+    }
+  }, [searchTerm])
 
-        const searchableValue = [
-          record.name,
-          record.unit,
-          record.relation,
-          record.phone,
-          vehiclesSummary,
-        ]
-          .join(' ')
-          .toLowerCase()
+  const residentsQuery = useQuery({
+    queryKey: ['residents', page, pageSize, debouncedSearchTerm],
+    queryFn: () => listResidents(page, pageSize, debouncedSearchTerm),
+    placeholderData: keepPreviousData,
+  })
 
-        return searchableValue.includes(normalizedSearchTerm)
-      })
-    : residentRecords
+  const records: ResidentRecord[] = (residentsQuery.data?.items ?? []).map((item) => ({
+    id: item.id,
+    name: item.fullName,
+    unit: item.unit,
+    relation: RESIDENT_RELATION_LABEL[item.relation as ResidentRelationEnum] ?? item.relation,
+    phone: item.phone ?? '-',
+    vehicles: item.vehicles.map((vehicle) => ({
+      type: VEHICLE_TYPE_LABEL[vehicle.type as VehicleTypeEnum] ?? vehicle.type,
+      plate: vehicle.plate ?? '-',
+    })),
+  }))
+
+  const pagination: ResidentsPaginationState = residentsQuery.data?.pagination ?? {
+    page,
+    pageSize,
+    total: 0,
+    totalPages: 1,
+  }
 
   const handleSearchChange = (value: string) => {
+    setPage(1)
     setSearchTerm(value)
   }
 
+  const handlePageChange = (value: number) => {
+    setPage(value)
+  }
+
+  const handlePageSizeChange = (value: number) => {
+    setPage(1)
+    setPageSize(value)
+  }
+
   return {
-    records: filteredRecords,
+    records,
+    pagination,
     searchTerm,
     handleSearchChange,
+    handlePageChange,
+    handlePageSizeChange,
+    isLoading: residentsQuery.isPending,
+    isFetching: residentsQuery.isFetching,
+    isError: residentsQuery.isError,
+    errorMessage:
+      (residentsQuery.error as ResidentsServiceError | null)?.message ??
+      'Erro ao carregar moradores.',
+    refetch: residentsQuery.refetch,
   }
 }

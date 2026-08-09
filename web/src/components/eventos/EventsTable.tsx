@@ -3,7 +3,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 
 import { DataTable } from '@/components/table/DataTable'
-import type { EventRecord } from '@/components/eventos/hooks/useEvents'
+import type { EventRecord } from '@/types/eventos'
 
 type EventsTableProps = {
   records: EventRecord[]

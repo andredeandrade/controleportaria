@@ -1,23 +1,24 @@
-/**
- * Centraliza todas as rotas da API.
- * Cada módulo futuro (auth, moradores, visitantes, etc.)
- * terá seu router registrado aqui.
- */
-
 import { Router } from 'express'
-import { healthRouter } from './health.route.js'
+import { accessRecordsRouter } from '../modules/access-records/index.js'
+import { authorizationsRouter } from '../modules/authorizations/index.js'
 import { authRouter } from '../modules/auth/index.js'
 import { condominiumsRouter } from '../modules/condominiums/index.js'
+import { eventsRouter } from '../modules/events/index.js'
+import { incidentsRouter } from '../modules/incidents/index.js'
+import { reportsRouter } from '../modules/reports/index.js'
 import { residentsRouter } from '../modules/residents/index.js'
+import { serviceProvidersRouter } from '../modules/service-providers/index.js'
+import { visitorsRouter } from '../modules/visitors/index.js'
 
 export const router = Router()
 
-router.use('/health', healthRouter)
 router.use('/condominiums', condominiumsRouter)
 router.use('/auth', authRouter)
+router.use('/access-records', accessRecordsRouter)
+router.use('/authorizations', authorizationsRouter)
+router.use('/events', eventsRouter)
+router.use('/incidents', incidentsRouter)
+router.use('/reports', reportsRouter)
 router.use('/residents', residentsRouter)
-
-// Futuros módulos serão registrados aqui:
-// router.use('/auth', authRouter);
-// router.use('/moradores', moradoresRouter);
-// router.use('/visitantes', visitantesRouter);
+router.use('/visitors', visitorsRouter)
+router.use('/service-providers', serviceProvidersRouter)

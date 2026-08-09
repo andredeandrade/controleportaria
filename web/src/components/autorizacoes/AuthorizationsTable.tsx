@@ -6,7 +6,7 @@ import Button from '@mui/material/Button'
 import { useRouter } from 'next/navigation'
 
 import { DataTable } from '@/components/table/DataTable'
-import type { AuthorizationRecord } from './hooks/useAuthorizations'
+import type { AuthorizationRecord } from '@/types/autorizacoes'
 
 export type AuthorizationsTableProps = {
   records: AuthorizationRecord[]
@@ -17,6 +17,7 @@ export function AuthorizationsTable({ records }: AuthorizationsTableProps) {
 
   const columns: ColumnDef<AuthorizationRecord>[] = [
     { accessorKey: 'authorizedName', header: 'Autorizado' },
+    { accessorKey: 'personTypeLabel', header: 'Tipo' },
     { accessorKey: 'document', header: 'Documento' },
     { accessorKey: 'validFromDate', header: 'Válido de' },
     { accessorKey: 'validToDate', header: 'Válido até' },

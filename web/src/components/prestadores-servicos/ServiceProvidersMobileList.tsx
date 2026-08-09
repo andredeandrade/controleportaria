@@ -3,14 +3,22 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import type { ServiceProviderRecord } from '@/components/prestadores-servicos/hooks/useServiceProviders'
 import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
+import type { ServiceProviderRecord } from '@/types/prestadores-servicos'
 
 type ServiceProvidersMobileListProps = {
   records: ServiceProviderRecord[]
 }
 
 export function ServiceProvidersMobileList({ records }: ServiceProvidersMobileListProps) {
+  if (records.length === 0) {
+    return (
+      <Typography variant="body2" color="text.secondary" sx={{ px: 1 }}>
+        Nenhum prestador de serviço encontrado.
+      </Typography>
+    )
+  }
+
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (

@@ -1,54 +1,99 @@
 // Hook para buscar e filtrar autorizações
 'use client'
 
-import { useState, useMemo } from 'react'
+import type { PersonTypeValue } from '@/components/form/PersonTypeSelect'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
-export type AuthorizationRecord = {
-  id: string
-  authorizedName: string
-  document: string
-  validFromDate: string
-  validToDate: string
+import { AuthorizationsServiceError, listAuthorizations } from '@/services/autorizacoes/service'
+import {
+  PERSON_TYPE_LABEL,
+  type AuthorizationRecord,
+  type AuthorizationsPaginationState,
+} from '@/types/autorizacoes'
+
+function formatDate(value: string): string {
+  const date = new Date(`${value}T00:00:00`)
+
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return new Intl.DateTimeFormat('pt-BR').format(date)
 }
-
-const MOCK_AUTHORIZATIONS: AuthorizationRecord[] = [
-  {
-    id: '1',
-    authorizedName: 'João da Silva',
-    document: '123.456.789-00',
-    validFromDate: '01/04/2026',
-    validToDate: '30/06/2026',
-  },
-  {
-    id: '2',
-    authorizedName: 'Carlos Limpeza Pro',
-    document: '12.345.678/0001-90',
-    validFromDate: '15/03/2026',
-    validToDate: '15/03/2027',
-  },
-  {
-    id: '3',
-    authorizedName: 'Ana Pedrosa',
-    document: '987.654.321-11',
-    validFromDate: '10/02/2026',
-    validToDate: '10/05/2026',
-  },
-]
 
 export function useAuthorizations() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const records = useMemo(() => {
-    if (!searchTerm) return MOCK_AUTHORIZATIONS
-    const lower = searchTerm.toLowerCase()
-    return MOCK_AUTHORIZATIONS.filter(
-      (a) => a.authorizedName.toLowerCase().includes(lower) || a.document.includes(lower),
-    )
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim())
+    }, 350)
+
+    return () => {
+      window.clearTimeout(timeout)
+    }
   }, [searchTerm])
 
-  function handleSearchChange(value: string) {
+  const authorizationsQuery = useQuery({
+    queryKey: ['authorizations', page, pageSize, debouncedSearchTerm],
+    queryFn: () => listAuthorizations(page, pageSize, debouncedSearchTerm),
+    placeholderData: keepPreviousData,
+  })
+
+  const records: AuthorizationRecord[] = (authorizationsQuery.data?.items ?? []).map((item) => {
+    const personType = item.personType as PersonTypeValue
+
+    return {
+      id: item.id,
+      authorizedName: item.authorizedName,
+      personType: item.personType,
+      personTypeLabel: PERSON_TYPE_LABEL[personType] ?? item.personType,
+      document: item.document,
+      validFromDate: formatDate(item.validFromDate),
+      validToDate: formatDate(item.validToDate),
+      unit: item.unit,
+      authorizedBy: item.authorizedBy,
+    }
+  })
+
+  const pagination: AuthorizationsPaginationState = authorizationsQuery.data?.pagination ?? {
+    page,
+    pageSize,
+    total: 0,
+    totalPages: 1,
+  }
+
+  const handleSearchChange = (value: string) => {
+    setPage(1)
     setSearchTerm(value)
   }
 
-  return { records, searchTerm, handleSearchChange }
+  const handlePageChange = (value: number) => {
+    setPage(value)
+  }
+
+  const handlePageSizeChange = (value: number) => {
+    setPage(1)
+    setPageSize(value)
+  }
+
+  return {
+    records,
+    pagination,
+    searchTerm,
+    handleSearchChange,
+    handlePageChange,
+    handlePageSizeChange,
+    isLoading: authorizationsQuery.isPending,
+    isFetching: authorizationsQuery.isFetching,
+    isError: authorizationsQuery.isError,
+    errorMessage:
+      (authorizationsQuery.error as AuthorizationsServiceError | null)?.message ??
+      'Erro ao carregar autorizacoes.',
+    refetch: authorizationsQuery.refetch,
+  }
 }

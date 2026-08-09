@@ -3,7 +3,7 @@
 
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTable } from '@/components/table/DataTable'
-import type { OccurrenceRecord } from './hooks/useOccurrences'
+import type { OccurrenceRecord } from '@/types/ocorrencias'
 
 export type OccurrencesTableProps = {
   records: OccurrenceRecord[]
@@ -11,7 +11,7 @@ export type OccurrencesTableProps = {
 
 export function OccurrencesTable({ records }: OccurrencesTableProps) {
   const columns: ColumnDef<OccurrenceRecord>[] = [
-    { accessorKey: 'occurrenceType', header: 'Tipo' },
+    { accessorKey: 'occurrenceTypeLabel', header: 'Tipo' },
     { accessorKey: 'date', header: 'Data' },
     { accessorKey: 'time', header: 'Hora' },
     { accessorKey: 'responsible', header: 'Responsável' },

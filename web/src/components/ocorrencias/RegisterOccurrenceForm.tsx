@@ -4,40 +4,26 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
+import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 
+import { useCreateOccurrence } from '@/components/ocorrencias/hooks/useCreateOccurrence'
 import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
-
-const OCCURRENCE_TYPE_OPTIONS = [
-  { label: 'Orientação', value: 'orientacao' },
-  { label: 'Averiguação atitude suspeita', value: 'averiguacao_atitude_suspeita' },
-  { label: 'Acesso não autorizado', value: 'acesso_nao_autorizado' },
-  { label: 'Veiculo atitude suspeita', value: 'veiculo_atitude_suspeita' },
-  { label: 'Discussão conflito', value: 'discussao_conflito' },
-  { label: 'Falha tecnica', value: 'falha_tecnica' },
-  { label: 'Falta de energia', value: 'falta_energia' },
-  { label: 'Falta de agua', value: 'falta_agua' },
-  { label: 'Pertubação do sossego', value: 'pertubacao_sossego' },
-  { label: 'Incendio', value: 'incendio' },
-  { label: 'Emergencia medica', value: 'emergencia_medica' },
-  { label: 'Descarte irregular de lixo', value: 'descarte_irregular_lixo' },
-  { label: 'Resgate ou invasão animal', value: 'resgate_ou_invasao_animal' },
-  { label: 'Furto', value: 'furto' },
-  { label: 'Roubo', value: 'roubo' },
-  { label: 'Vandalismo', value: 'vandalismo' },
-  { label: 'Outro', value: 'outro' },
-] as const
-
-type OccurrenceTypeValue = (typeof OCCURRENCE_TYPE_OPTIONS)[number]['value']
+import { useAppSnackbar } from '@/providers'
+import { OCCURRENCE_TYPE_OPTIONS, type OccurrenceTypeEnum } from '@/types/ocorrencias'
 
 type RegisterOccurrenceFormValues = {
-  occurrenceType: OccurrenceTypeValue | ''
+  occurrenceType: OccurrenceTypeEnum | ''
   date: string
   time: string
   report: string
 }
 
 export function RegisterOccurrenceForm() {
+  const router = useRouter()
+  const createOccurrenceMutation = useCreateOccurrence()
+  const { showError, showSuccess } = useAppSnackbar()
+
   const {
     control,
     register,
@@ -52,8 +38,21 @@ export function RegisterOccurrenceForm() {
     },
   })
 
-  const onSubmit = (data: RegisterOccurrenceFormValues) => {
-    void data
+  const onSubmit = async (data: RegisterOccurrenceFormValues) => {
+    try {
+      await createOccurrenceMutation.mutateAsync({
+        occurrenceType: data.occurrenceType,
+        date: data.date,
+        time: data.time,
+        report: data.report.trim(),
+      })
+
+      showSuccess('Ocorrencia registrada com sucesso.')
+      router.push('/ocorrencias')
+      router.refresh()
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Nao foi possivel registrar a ocorrencia.')
+    }
   }
 
   return (
@@ -136,6 +135,10 @@ export function RegisterOccurrenceForm() {
                 helperText={errors.report?.message}
                 {...register('report', {
                   required: 'Informe o relato da ocorrência',
+                  minLength: {
+                    value: 5,
+                    message: 'Relato deve ter ao menos 5 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -145,7 +148,7 @@ export function RegisterOccurrenceForm() {
         <Stack direction="row" justifyContent="flex-end">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || createOccurrenceMutation.isPending}
             variant="contained"
             sx={{
               bgcolor: '#16A34A',
@@ -155,7 +158,7 @@ export function RegisterOccurrenceForm() {
               fontWeight: 700,
             }}
           >
-            Salvar registro
+            {isSubmitting || createOccurrenceMutation.isPending ? 'Salvando...' : 'Salvar registro'}
           </Button>
         </Stack>
       </Stack>

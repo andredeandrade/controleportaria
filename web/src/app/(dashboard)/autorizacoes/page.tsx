@@ -18,12 +18,10 @@ export default function AutorizacoesPage() {
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'grey.900' }}>
-          <BackToPreviousPageButton ariaLabel="Voltar para a página anterior" />
-          <Typography variant="h6" fontWeight={700} color="inherit">
-            Autorizações
-          </Typography>
-        </Stack>
+        <Typography variant="h6" fontWeight={700} sx={{ color: 'grey.900' }}>
+          Autorizações
+        </Typography>
+
         <Stack
           direction="row"
           justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}

@@ -6,9 +6,12 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
+import { useRouter } from 'next/navigation'
 import { useFieldArray, useForm } from 'react-hook-form'
 
 import { FormPaper, TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
+import { useCreateEvent } from '@/components/eventos/hooks/useCreateEvent'
+import { useAppSnackbar } from '@/providers'
 
 type GuestFormValues = {
   name: string
@@ -27,6 +30,10 @@ type RegisterEventFormValues = {
 }
 
 export function RegisterEventForm() {
+  const router = useRouter()
+  const createEventMutation = useCreateEvent()
+  const { showError, showSuccess } = useAppSnackbar()
+
   const {
     register,
     control,
@@ -58,8 +65,28 @@ export function RegisterEventForm() {
     remove(index)
   }
 
-  const onSubmit = (data: RegisterEventFormValues) => {
-    void data
+  const onSubmit = async (data: RegisterEventFormValues) => {
+    try {
+      await createEventMutation.mutateAsync({
+        title: data.title.trim(),
+        date: data.date,
+        startTime: data.startTime,
+        endTime: data.endTime.trim() || undefined,
+        unit: data.unit.trim(),
+        responsibleName: data.responsibleName.trim(),
+        guests: data.guests.map((guest) => ({
+          name: guest.name.trim(),
+          document: guest.document.trim() || undefined,
+        })),
+        observations: data.observations.trim() || undefined,
+      })
+
+      showSuccess('Evento registrado com sucesso.')
+      router.push('/eventos')
+      router.refresh()
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'Nao foi possivel registrar o evento.')
+    }
   }
 
   return (
@@ -75,6 +102,10 @@ export function RegisterEventForm() {
                 helperText={errors.title?.message}
                 {...register('title', {
                   required: 'Informe o nome do evento',
+                  minLength: {
+                    value: 3,
+                    message: 'Nome do evento deve ter ao menos 3 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -148,6 +179,10 @@ export function RegisterEventForm() {
                 helperText={errors.responsibleName?.message}
                 {...register('responsibleName', {
                   required: 'Informe o responsável pelo evento',
+                  minLength: {
+                    value: 3,
+                    message: 'Responsável deve ter ao menos 3 caracteres',
+                  },
                 })}
               />
             </TextFieldStack>
@@ -169,6 +204,10 @@ export function RegisterEventForm() {
                     helperText={errors.guests?.[index]?.name?.message}
                     {...register(`guests.${index}.name`, {
                       required: 'Informe o nome do convidado',
+                      minLength: {
+                        value: 3,
+                        message: 'Nome do convidado deve ter ao menos 3 caracteres',
+                      },
                     })}
                   />
                 </TextFieldStack>
@@ -241,7 +280,7 @@ export function RegisterEventForm() {
         <Stack direction="row" justifyContent="flex-end">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || createEventMutation.isPending}
             variant="contained"
             sx={{
               bgcolor: '#16A34A',
@@ -251,7 +290,7 @@ export function RegisterEventForm() {
               fontWeight: 700,
             }}
           >
-            Salvar registro
+            {isSubmitting || createEventMutation.isPending ? 'Salvando...' : 'Salvar registro'}
           </Button>
         </Stack>
       </Stack>

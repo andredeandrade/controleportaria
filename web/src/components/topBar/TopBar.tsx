@@ -9,6 +9,9 @@ import IconButton from '@mui/material/IconButton'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { logout } from '@/services/auth/service'
 
 type TopBarProps = {
   drawerWidth: number
@@ -16,6 +19,21 @@ type TopBarProps = {
 }
 
 export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
+  const router = useRouter()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+
+    try {
+      await logout()
+    } finally {
+      router.replace('/')
+      router.refresh()
+      setIsLoggingOut(false)
+    }
+  }
+
   return (
     <AppBar
       position="fixed"
@@ -66,15 +84,21 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
         </Box>
 
         <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
-          <IconButton component={Link} href="/" color="inherit" aria-label="Sair" sx={{ display: { xs: 'inline-flex', md: 'none' } }}>
+          <IconButton
+            color="inherit"
+            aria-label="Sair"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            sx={{ display: { xs: 'inline-flex', md: 'none' } }}
+          >
             <LogoutRoundedIcon />
           </IconButton>
 
           <Button
-            component={Link}
-            href="/"
             color="inherit"
             startIcon={<LogoutRoundedIcon />}
+            onClick={handleLogout}
+            disabled={isLoggingOut}
             sx={{
               display: { xs: 'none', md: 'inline-flex' },
               textTransform: 'none',
@@ -84,7 +108,7 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
               },
             }}
           >
-            Sair
+            {isLoggingOut ? 'Saindo...' : 'Sair'}
           </Button>
         </Box>
       </Toolbar>
