@@ -35,13 +35,10 @@ export function ListSearchField({
       sx={[
         {
           '& .MuiInputBase-input': {
-            color: '#0F172A',
-            WebkitTextFillColor: '#0F172A',
-            opacity: 1,
+            color: 'text.primary',
           },
           '& .MuiInputBase-input::placeholder': {
-            color: '#9CA3AF',
-            WebkitTextFillColor: '#9CA3AF',
+            color: 'text.disabled',
             opacity: 1,
           },
         },

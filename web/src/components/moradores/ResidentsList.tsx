@@ -1,19 +1,18 @@
 'use client'
 
+import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded'
 import Alert from '@mui/material/Alert'
+import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import MenuItem from '@mui/material/MenuItem'
 import Pagination from '@mui/material/Pagination'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import Button from '@mui/material/Button'
 import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 
 import { ResidentsMobileList } from '@/components/moradores/ResidentsMobileList'
 import { ResidentsTable } from '@/components/moradores/ResidentsTable'
 import { useResidents } from '@/components/moradores/hooks/useResidents'
-import { TextField } from '@/components/form'
 import { ListSearchField } from '@/components/table/ListSearchField'
 
 export function ResidentsList() {
@@ -25,7 +24,6 @@ export function ResidentsList() {
     handleSearchChange,
     pagination,
     handlePageChange,
-    handlePageSizeChange,
     isLoading,
     isFetching,
     isError,
@@ -33,18 +31,46 @@ export function ResidentsList() {
     refetch,
   } = useResidents()
 
+  const rangeStart = pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.pageSize + 1
+  const rangeEnd = Math.min(pagination.page * pagination.pageSize, pagination.total)
+
   return (
-    <Stack spacing={2}>
-      <Stack spacing={1} sx={{ px: { xs: 0.5, sm: 1 } }}>
+    <Stack spacing={3}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={1}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+      >
         <ListSearchField
           value={searchTerm}
           onChange={handleSearchChange}
-          placeholder="Buscar por nome"
+          placeholder="Buscar por nome, unidade ou documento..."
           fullWidth
           sx={{
-            maxWidth: { xs: '100%', sm: 420 },
+            maxWidth: { xs: '100%', sm: 400 },
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: '#131b2e',
+              '& input': { color: '#dae2fd' },
+              '& input::placeholder': { color: '#8c909f', opacity: 1 },
+              '& .MuiInputAdornment-root svg': { color: '#8c909f' },
+              '& fieldset': { borderColor: '#424754' },
+              '&:hover fieldset': { borderColor: '#8c909f' },
+              '&.Mui-focused fieldset': { borderColor: '#adc6ff', borderWidth: 2 },
+            },
           }}
         />
+        <Button
+          variant="outlined"
+          startIcon={<FilterListRoundedIcon />}
+          sx={{
+            borderColor: '#424754',
+            color: '#c2c6d6',
+            flexShrink: 0,
+            '&:hover': { borderColor: '#8c909f', backgroundColor: 'rgba(173, 198, 255, 0.06)' },
+          }}
+        >
+          Filtros
+        </Button>
       </Stack>
 
       {isError ? (
@@ -72,47 +98,24 @@ export function ResidentsList() {
 
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        spacing={1.5}
-        alignItems={{ xs: 'stretch', sm: 'center' }}
+        alignItems={{ xs: 'flex-start', sm: 'center' }}
         justifyContent="space-between"
-        sx={{ px: { xs: 0.5, sm: 1 } }}
+        spacing={1}
       >
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Typography variant="body2" color="text.secondary">
-            Itens por pagina
-          </Typography>
+        <Typography variant="body2" sx={{ color: '#8c909f' }}>
+          Mostrando {rangeStart} a {rangeEnd} de {pagination.total} registros
+        </Typography>
 
-          <TextField
-            select
-            value={String(pagination.pageSize)}
-            onChange={(event) => handlePageSizeChange(Number(event.target.value))}
-            size="small"
-            sx={{ width: 90 }}
-          >
-            {[10, 20, 50].map((size) => (
-              <MenuItem key={size} value={String(size)}>
-                {size}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Stack>
-
-        <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-          <Typography variant="body2" color="text.secondary">
-            Total: {pagination.total}
-          </Typography>
-
-          <Pagination
-            color="primary"
-            page={pagination.page}
-            count={pagination.totalPages}
-            onChange={(_, value) => handlePageChange(value)}
-            disabled={isLoading || isFetching}
-            size={isMobile ? 'small' : 'medium'}
-            showFirstButton
-            showLastButton
-          />
-        </Stack>
+        <Pagination
+          color="primary"
+          page={pagination.page}
+          count={pagination.totalPages}
+          onChange={(_, value) => handlePageChange(value)}
+          disabled={isLoading || isFetching}
+          size={isMobile ? 'small' : 'medium'}
+          showFirstButton
+          showLastButton
+        />
       </Stack>
     </Stack>
   )
