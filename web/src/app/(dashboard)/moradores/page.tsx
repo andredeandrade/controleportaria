@@ -20,10 +20,11 @@ export default function MoradoresPage() {
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
         <Box>
-          <Typography variant="h2" fontWeight={700} sx={{ color: '#31394D' }}>
+          <Typography variant="h2" fontWeight={700} color="text.primary">
             Gestão de Moradores
           </Typography>
-          <Typography variant="body2" sx={{ color: '#BEC8D2', mt: '4px' }}>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>
             Gerencie os dados e acessos de todos os residentes do condomínio.
           </Typography>
         </Box>
