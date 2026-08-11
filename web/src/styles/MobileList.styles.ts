@@ -1,6 +1,7 @@
 'use client'
 
 import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
 
 export const MobileListCard = styled(Paper)({
@@ -9,4 +10,11 @@ export const MobileListCard = styled(Paper)({
   backgroundColor: '#171f33',
   borderColor: '#424754',
   boxShadow: 'none',
+})
+
+export const MobileFieldLabel = styled(Typography)({
+  color: '#475569',
+  fontWeight: 700,
+  letterSpacing: '0.04em',
+  textTransform: 'uppercase',
 })

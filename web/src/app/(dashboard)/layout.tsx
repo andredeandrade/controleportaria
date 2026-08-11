@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0b1326' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <TopBar
         drawerWidth={drawerWidth}
         onOpenMenu={() => {
@@ -64,7 +64,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           width: { md: `calc(100% - ${drawerWidth}px)` },
           px: { xs: 2, md: 4 },
           py: 3,
-          backgroundColor: '#0b1326',
           minHeight: '100vh',
         }}
       >

@@ -35,7 +35,7 @@ export function ResidentsList() {
   const rangeEnd = Math.min(pagination.page * pagination.pageSize, pagination.total)
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={6} mt={20}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={1}
