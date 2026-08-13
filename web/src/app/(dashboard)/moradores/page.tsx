@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function MoradoresPage() {
   return (
-    <Stack spacing={3} margin="20px 10px">
+    <Stack spacing={1.5} sx={{ pt: 6 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={2}
@@ -20,8 +20,8 @@ export default function MoradoresPage() {
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
         <Box>
-          <Typography variant="h2" fontWeight={700} color="text.primary">
-            Gestão de Moradores
+          <Typography variant="h2" fontWeight={600} sx={{ color: 'primary.dark' }}>
+            Moradores
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>

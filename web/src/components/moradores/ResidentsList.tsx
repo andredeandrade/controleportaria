@@ -7,6 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Pagination from '@mui/material/Pagination'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
@@ -17,6 +18,7 @@ import { ListSearchField } from '@/components/table/ListSearchField'
 
 export function ResidentsList() {
   const theme = useTheme()
+  const filterHoverBg = alpha(theme.palette.primary.main, 0.05)
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const {
     records,
@@ -35,43 +37,45 @@ export function ResidentsList() {
   const rangeEnd = Math.min(pagination.page * pagination.pageSize, pagination.total)
 
   return (
-    <Stack spacing={6} mt={20}>
+    <Stack spacing={1.5}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={1}
         alignItems={{ xs: 'stretch', sm: 'center' }}
+        sx={{ pt: 1.5 }}
       >
         <ListSearchField
           value={searchTerm}
           onChange={handleSearchChange}
-          placeholder="Buscar por nome, unidade ou documento..."
+          placeholder="Buscar por nome, CPF ou unidade..."
           fullWidth
           sx={{
-            maxWidth: { xs: '100%', sm: 400 },
-            '& .MuiOutlinedInput-root': {
-              backgroundColor: '#131b2e',
-              '& input': { color: '#dae2fd' },
-              '& input::placeholder': { color: '#8c909f', opacity: 1 },
-              '& .MuiInputAdornment-root svg': { color: '#8c909f' },
-              '& fieldset': { borderColor: '#424754' },
-              '&:hover fieldset': { borderColor: '#8c909f' },
-              '&.Mui-focused fieldset': { borderColor: '#adc6ff', borderWidth: 2 },
-            },
+            maxWidth: { xs: '100%', sm: 384 },
           }}
         />
         <Button
           variant="outlined"
           startIcon={<FilterListRoundedIcon />}
           sx={{
-            borderColor: '#424754',
-            color: '#c2c6d6',
+            borderColor: 'divider',
+            color: 'text.secondary',
             flexShrink: 0,
-            '&:hover': { borderColor: '#8c909f', backgroundColor: 'rgba(173, 198, 255, 0.06)' },
+            minHeight: 40,
+            px: '17px',
+            py: '9px',
+            '&:hover': {
+              borderColor: 'text.disabled',
+              backgroundColor: filterHoverBg,
+            },
           }}
         >
           Filtros
         </Button>
       </Stack>
+
+      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, pt: 1.5 }}>
+        {pagination.total} moradores encontrados
+      </Typography>
 
       {isError ? (
         <Alert
@@ -101,9 +105,10 @@ export function ResidentsList() {
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         justifyContent="space-between"
         spacing={1}
+        sx={{ pt: 0.5 }}
       >
-        <Typography variant="body2" sx={{ color: '#8c909f' }}>
-          Mostrando {rangeStart} a {rangeEnd} de {pagination.total} registros
+        <Typography variant="caption" sx={{ color: '#505F76' }}>
+          {rangeStart}-{rangeEnd} de {pagination.total} moradores
         </Typography>
 
         <Pagination
@@ -113,8 +118,22 @@ export function ResidentsList() {
           onChange={(_, value) => handlePageChange(value)}
           disabled={isLoading || isFetching}
           size={isMobile ? 'small' : 'medium'}
-          showFirstButton
-          showLastButton
+          sx={{
+            '& .MuiPaginationItem-root': {
+              minWidth: 32,
+              height: 32,
+              borderRadius: '6px',
+              color: 'text.secondary',
+              fontWeight: 600,
+            },
+            '& .MuiPaginationItem-root.Mui-selected': {
+              color: 'primary.contrastText',
+              backgroundColor: 'primary.main',
+            },
+            '& .MuiPaginationItem-root.Mui-selected:hover': {
+              backgroundColor: 'primary.dark',
+            },
+          }}
         />
       </Stack>
     </Stack>

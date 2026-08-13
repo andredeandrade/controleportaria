@@ -1,9 +1,12 @@
 'use client'
 
-import EditRoundedIcon from '@mui/icons-material/EditRounded'
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
 import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
+import { useTheme } from '@mui/material/styles'
 import type { ColumnDef } from '@tanstack/react-table'
-import Link from 'next/link'
 
 import { DataTable } from '@/components/table/DataTable'
 import type { ResidentRecord } from '@/types/moradores'
@@ -18,10 +21,29 @@ function formatVehicles(vehicles: ResidentRecord['vehicles']) {
 }
 
 export function ResidentsTable({ records }: ResidentsTableProps) {
+  const theme = useTheme()
+  const actionHoverBg = alpha(theme.palette.primary.main, 0.08)
+  const rowHoverBg = alpha(theme.palette.primary.main, 0.03)
+
   const columns: ColumnDef<ResidentRecord>[] = [
-    { accessorKey: 'name', header: 'Nome' },
+    {
+      id: 'resident',
+      header: 'Morador',
+      cell: ({ row }) => (
+        <Stack spacing={0.25}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+            {row.original.name}
+          </Typography>
+          {row.original.document ? (
+            <Typography sx={{ fontSize: '11px', lineHeight: '20px', color: '#505F76' }}>
+              CPF: {row.original.document}
+            </Typography>
+          ) : null}
+        </Stack>
+      ),
+    },
     { accessorKey: 'unit', header: 'Unidade' },
-    { accessorKey: 'relation', header: 'Vínculo' },
+    { accessorKey: 'relation', header: 'Tipo' },
     { accessorKey: 'phone', header: 'Telefone' },
     {
       id: 'vehicles',
@@ -31,18 +53,21 @@ export function ResidentsTable({ records }: ResidentsTableProps) {
     {
       id: 'actions',
       header: 'Ações',
-      cell: ({ row }) => (
+      cell: () => (
         <IconButton
-          component={Link}
-          href={`/moradores/${row.original.id}/editar`}
           size="small"
-          aria-label="Editar morador"
+          aria-label="Abrir ações do morador"
           sx={{
-            color: '#8c909f',
-            '&:hover': { color: '#adc6ff', backgroundColor: 'rgba(173, 198, 255, 0.08)' },
+            color: 'text.secondary',
+            borderRadius: 1,
+            p: 0.5,
+            '&:hover': {
+              color: 'primary.main',
+              backgroundColor: actionHoverBg,
+            },
           }}
         >
-          <EditRoundedIcon fontSize="small" />
+          <MoreVertRoundedIcon fontSize="small" />
         </IconButton>
       ),
     },
@@ -54,29 +79,39 @@ export function ResidentsTable({ records }: ResidentsTableProps) {
       columns={columns}
       emptyMessage="Nenhum morador encontrado."
       containerSx={{
-        backgroundColor: '#171f33',
-        border: '1px solid #424754',
+        backgroundColor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
         borderRadius: 2,
         overflow: 'hidden',
       }}
       headerCellSx={{
         px: '24px',
-        backgroundColor: '#131b2e',
-        color: '#c2c6d6',
-        fontSize: '0.75rem',
-        fontWeight: 600,
-        letterSpacing: '0.05em',
-        borderBottom: '1px solid #424754',
+        py: '12px',
+        backgroundColor: 'grey.50',
+        color: 'text.secondary',
+        fontSize: '0.875rem',
+        fontWeight: 500,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
         whiteSpace: 'nowrap',
+        '&:last-of-type': {
+          textAlign: 'right',
+        },
       }}
       bodyCellSx={{
         px: '24px',
-        color: '#dae2fd',
+        py: '12px',
+        color: 'text.primary',
         fontSize: '0.875rem',
-        borderBottom: '1px solid #1f2a3f',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        '&:last-of-type': {
+          textAlign: 'right',
+        },
       }}
       rowSx={{
-        '&:hover': { backgroundColor: 'rgba(173, 198, 255, 0.04)' },
+        '&:hover': { backgroundColor: rowHoverBg },
         '&:last-child td': { borderBottom: 'none' },
       }}
     />

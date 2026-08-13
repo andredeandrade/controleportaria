@@ -17,11 +17,12 @@ export function RegisterResidentButton({ fullWidth = false }: RegisterResidentBu
       color="primary"
       fullWidth={fullWidth}
       startIcon={<AddRoundedIcon />}
+      sx={{ minHeight: 40, px: 2 }}
       onClick={() => {
         router.push('/moradores/cadastrar')
       }}
     >
-      Cadastrar Novo Morador
+      Adicionar morador
     </Button>
   )
 }

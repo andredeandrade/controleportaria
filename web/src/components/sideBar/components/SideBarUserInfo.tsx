@@ -30,9 +30,10 @@ export default function SideBarUserInfo() {
           sx={{
             width: 36,
             height: 36,
-            bgcolor: 'rgba(173, 198, 255, 0.14)',
-            color: '#adc6ff',
-            border: '1px solid rgba(173, 198, 255, 0.24)',
+            bgcolor: '#131B2E',
+            color: '#94A3B8',
+            border: '1px solid',
+            borderColor: '#334155',
           }}
         >
           <PersonRoundedIcon sx={{ fontSize: 20 }} />
@@ -43,7 +44,7 @@ export default function SideBarUserInfo() {
             variant="subtitle2"
             noWrap
             sx={{
-              color: '#dae2fd',
+              color: '#FFFFFF',
               letterSpacing: 'normal',
               fontWeight: 600,
               fontSize: '0.875rem',
@@ -54,7 +55,7 @@ export default function SideBarUserInfo() {
           <Typography
             variant="caption"
             noWrap
-            sx={{ color: '#8c909f', fontWeight: 400, lineHeight: 1.4 }}
+            sx={{ color: '#0EA5E9', fontWeight: 400, lineHeight: 1.4 }}
           >
             {roleLabel}
           </Typography>

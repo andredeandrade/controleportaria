@@ -18,24 +18,17 @@ import { logout } from '@/services/auth/service'
 import { useState } from 'react'
 import SideBarUserInfo from './components/SideBarUserInfo'
 
-// Design tokens — sidebar usa a camada mais escura da hierarquia tonal
-const sidebar = {
-  bg: '#060e20',
-  border: '#424754',
-  itemText: '#dae2fd',
-  itemTextMuted: '#c2c6d6',
-  itemHover: 'rgba(173, 198, 255, 0.06)',
-  itemActive: 'rgba(173, 198, 255, 0.12)',
-  itemActiveBorder: '#adc6ff',
-  childDot: '#8c909f',
-  childDotActive: '#adc6ff',
-}
-
 type SideBarProps = {
   onItemClick?: () => void
 }
 
 export default function SideBar({ onItemClick }: SideBarProps) {
+  const itemHoverBg = 'rgba(173, 198, 255, 0.06)'
+  const itemSelectedBg = 'rgba(0, 76, 110, 1)'
+  const itemSelectedHoverBg = 'rgba(0, 76, 110, 0.92)'
+  const childSelectedBg = 'rgba(173, 198, 255, 0.12)'
+  const scrollBarColor = '#334155 transparent'
+
   const pathname = usePathname() ?? ''
   const router = useRouter()
   const menuItems = useSidebarRoutes()
@@ -53,29 +46,30 @@ export default function SideBar({ onItemClick }: SideBarProps) {
 
   const itemButtonSx = {
     borderRadius: '8px',
-    color: sidebar.itemText,
+    color: '#CBD5E1',
     minHeight: 40,
     px: '10px',
     '& .MuiListItemIcon-root': { minWidth: 36, color: 'inherit' },
-    '&:hover': { backgroundColor: sidebar.itemHover },
+    '&:hover': { backgroundColor: itemHoverBg },
     '&.Mui-selected': {
-      backgroundColor: sidebar.itemActive,
-      color: sidebar.itemActiveBorder,
-      borderLeft: `2px solid ${sidebar.itemActiveBorder}`,
-      pl: '8px',
-      '& .MuiListItemIcon-root': { color: sidebar.itemActiveBorder },
+      backgroundColor: itemSelectedBg,
+      color: '#89CEFF',
+      '& .MuiListItemIcon-root': { color: '#89CEFF' },
     },
-    '&.Mui-selected:hover': { backgroundColor: 'rgba(173, 198, 255, 0.18)' },
+    '&.Mui-selected:hover': {
+      backgroundColor: itemSelectedHoverBg,
+    },
   }
 
   return (
     <Box
       component="aside"
       sx={{
-        width: { xs: '100%', md: 280 },
-        minWidth: { md: 280 },
-        backgroundColor: sidebar.bg,
-        borderRight: { md: `1px solid ${sidebar.border}` },
+        width: { xs: '100%', md: 256 },
+        minWidth: { md: 256 },
+        backgroundColor: '#0B1326',
+        borderRight: { md: '1px solid' },
+        borderColor: '#334155',
         height: { xs: 'auto', md: '100vh' },
         display: 'flex',
         flexDirection: 'column',
@@ -83,7 +77,7 @@ export default function SideBar({ onItemClick }: SideBarProps) {
     >
       <SideBarUserInfo />
 
-      <Divider sx={{ borderColor: sidebar.border, mx: 2 }} />
+      <Divider sx={{ borderColor: 'rgba(51,65,85,0.5)', mx: 2 }} />
 
       {/* Nav principal — cresce para empurrar ações ao rodapé */}
       <List
@@ -93,10 +87,10 @@ export default function SideBar({ onItemClick }: SideBarProps) {
           flexGrow: 1,
           overflowY: 'auto',
           scrollbarWidth: 'thin',
-          scrollbarColor: `${sidebar.border} transparent`,
+          scrollbarColor: scrollBarColor,
           '&::-webkit-scrollbar': { width: 4 },
           '&::-webkit-scrollbar-track': { background: 'transparent' },
-          '&::-webkit-scrollbar-thumb': { backgroundColor: sidebar.border, borderRadius: 4 },
+          '&::-webkit-scrollbar-thumb': { backgroundColor: '#334155', borderRadius: 4 },
         }}
       >
         {menuItems.map((item) => {
@@ -156,13 +150,11 @@ export default function SideBar({ onItemClick }: SideBarProps) {
                       sx={{
                         ...itemButtonSx,
                         ml: '20px',
-                        color: childSelected ? sidebar.itemActiveBorder : sidebar.itemTextMuted,
+                        color: childSelected ? '#89CEFF' : '#94A3B8',
                         fontSize: '0.8125rem',
                         '& .MuiListItemIcon-root': { minWidth: 24, color: 'inherit' },
                         '&.Mui-selected': {
-                          backgroundColor: sidebar.itemActive,
-                          borderLeft: `2px solid ${sidebar.itemActiveBorder}`,
-                          pl: '8px',
+                          backgroundColor: childSelectedBg,
                         },
                       }}
                     >
@@ -172,9 +164,7 @@ export default function SideBar({ onItemClick }: SideBarProps) {
                             width: 5,
                             height: 5,
                             borderRadius: '50%',
-                            backgroundColor: childSelected
-                              ? sidebar.childDotActive
-                              : sidebar.childDot,
+                            backgroundColor: childSelected ? '#89CEFF' : '#94A3B8',
                           }}
                         />
                       </ListItemIcon>
@@ -198,7 +188,7 @@ export default function SideBar({ onItemClick }: SideBarProps) {
       </List>
 
       {/* Ações de rodapé */}
-      <Divider sx={{ borderColor: sidebar.border, mx: 2 }} />
+      <Divider sx={{ borderColor: 'rgba(51,65,85,0.5)', mx: 2 }} />
       <List sx={{ px: '8px', py: '8px' }}>
         <ListItem disablePadding sx={{ mb: '2px' }}>
           <ListItemButton component={Link} href="/configuracoes" sx={itemButtonSx}>
@@ -215,7 +205,7 @@ export default function SideBar({ onItemClick }: SideBarProps) {
             disabled={isLoggingOut}
             sx={{
               ...itemButtonSx,
-              color: isLoggingOut ? sidebar.itemTextMuted : sidebar.itemText,
+              color: isLoggingOut ? '#94A3B8' : '#EF4444',
             }}
           >
             <ListItemIcon>

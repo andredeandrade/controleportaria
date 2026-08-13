@@ -30,6 +30,7 @@ export type ResidentVehicleRecord = {
 export type ResidentRecord = {
   id: string
   name: string
+  document?: string
   unit: string
   relation: string
   phone: string

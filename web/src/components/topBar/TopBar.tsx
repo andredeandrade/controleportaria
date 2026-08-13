@@ -2,13 +2,11 @@
 
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded'
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 import AppBar from '@mui/material/AppBar'
 import Badge from '@mui/material/Badge'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Toolbar from '@mui/material/Toolbar'
-import Link from 'next/link'
 
 type TopBarProps = {
   drawerWidth: number
@@ -23,17 +21,18 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
       sx={{
         ml: { md: `${drawerWidth}px` },
         width: { md: `calc(100% - ${drawerWidth}px)` },
-        backgroundColor: 'rgba(6, 14, 32, 0.92)',
-        backdropFilter: 'blur(8px)',
-        borderBottom: '1px solid #424754',
+        backgroundColor: '#F8F9FF',
+        borderBottom: '1px solid',
+        borderColor: '#BEC8D2',
+        color: '#505F76',
       }}
     >
-      <Toolbar sx={{ minHeight: 56, px: { xs: '12px', md: '24px' } }}>
+      <Toolbar sx={{ minHeight: 64, px: { xs: '12px', md: '24px' } }}>
         <IconButton
           edge="start"
           color="inherit"
           onClick={onOpenMenu}
-          sx={{ display: { md: 'none' }, mr: 1, color: '#dae2fd' }}
+          sx={{ display: { md: 'none' }, mr: 1, color: 'text.primary' }}
         >
           <MenuRoundedIcon />
         </IconButton>
@@ -46,15 +45,18 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
             color="inherit"
             aria-label="Notificações"
             sx={{
-              color: '#c2c6d6',
-              '&:hover': { color: '#dae2fd', backgroundColor: 'rgba(173, 198, 255, 0.08)' },
+              color: '#505F76',
+              '&:hover': {
+                color: '#0D1C2D',
+                backgroundColor: 'rgba(14, 165, 233, 0.08)',
+              },
             }}
           >
             <Badge
               variant="dot"
               sx={{
                 '& .MuiBadge-dot': {
-                  backgroundColor: '#4edea3',
+                  backgroundColor: 'success.main',
                   width: 7,
                   height: 7,
                   borderRadius: '50%',
@@ -63,18 +65,6 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
             >
               <NotificationsNoneRoundedIcon fontSize="small" />
             </Badge>
-          </IconButton>
-
-          <IconButton
-            component={Link}
-            href="/configuracoes"
-            aria-label="Configurações"
-            sx={{
-              color: '#c2c6d6',
-              '&:hover': { color: '#dae2fd', backgroundColor: 'rgba(173, 198, 255, 0.08)' },
-            }}
-          >
-            <SettingsRoundedIcon fontSize="small" />
           </IconButton>
         </Box>
       </Toolbar>
