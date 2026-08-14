@@ -1,5 +1,11 @@
 'use client'
 
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
+import { useTheme } from '@mui/material/styles'
 import type { ColumnDef } from '@tanstack/react-table'
 
 import { DataTable } from '@/components/table/DataTable'
@@ -10,35 +16,60 @@ type ResidentsTableProps = {
 }
 
 function formatVehicles(vehicles: ResidentRecord['vehicles']) {
-  if (vehicles.length === 0) {
-    return 'Sem veículo cadastrado'
-  }
-
-  return vehicles.map((vehicle) => `${vehicle.type}: ${vehicle.plate}`).join(' | ')
+  if (vehicles.length === 0) return '-'
+  return vehicles.map((v) => v.plate).join(', ')
 }
 
 export function ResidentsTable({ records }: ResidentsTableProps) {
+  const theme = useTheme()
+  const actionHoverBg = alpha(theme.palette.primary.main, 0.08)
+  const rowHoverBg = alpha(theme.palette.primary.main, 0.03)
+
   const columns: ColumnDef<ResidentRecord>[] = [
     {
-      accessorKey: 'name',
-      header: 'Nome',
+      id: 'resident',
+      header: 'Morador',
+      cell: ({ row }) => (
+        <Stack spacing={0.25}>
+          <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+            {row.original.name}
+          </Typography>
+          {row.original.document ? (
+            <Typography sx={{ fontSize: '11px', lineHeight: '20px', color: '#505F76' }}>
+              CPF: {row.original.document}
+            </Typography>
+          ) : null}
+        </Stack>
+      ),
     },
-    {
-      accessorKey: 'unit',
-      header: 'Unidade',
-    },
-    {
-      accessorKey: 'relation',
-      header: 'Vínculo',
-    },
-    {
-      accessorKey: 'phone',
-      header: 'Telefone',
-    },
+    { accessorKey: 'unit', header: 'Unidade' },
+    { accessorKey: 'relation', header: 'Tipo' },
+    { accessorKey: 'phone', header: 'Telefone' },
     {
       id: 'vehicles',
       header: 'Veículos',
       cell: ({ row }) => formatVehicles(row.original.vehicles),
+    },
+    {
+      id: 'actions',
+      header: 'Ações',
+      cell: () => (
+        <IconButton
+          size="small"
+          aria-label="Abrir ações do morador"
+          sx={{
+            color: 'text.secondary',
+            borderRadius: 1,
+            p: 0.5,
+            '&:hover': {
+              color: 'primary.main',
+              backgroundColor: actionHoverBg,
+            },
+          }}
+        >
+          <MoreVertRoundedIcon fontSize="small" />
+        </IconButton>
+      ),
     },
   ]
 
@@ -48,42 +79,40 @@ export function ResidentsTable({ records }: ResidentsTableProps) {
       columns={columns}
       emptyMessage="Nenhum morador encontrado."
       containerSx={{
-        bgcolor: '#F8FAFC',
-        borderColor: 'rgba(203, 213, 225, 0.9)',
-        borderRadius: 3,
+        backgroundColor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 2,
         overflow: 'hidden',
-        boxShadow: '0 18px 40px rgba(15, 23, 42, 0.12)',
       }}
       headerCellSx={{
-        px: 3,
-        py: 2.25,
-        bgcolor: '#E2E8F0',
-        color: '#0F172A',
-        fontSize: '0.95rem',
-        fontWeight: 700,
-        borderBottom: '1px solid rgba(203, 213, 225, 0.9)',
+        px: '24px',
+        py: '12px',
+        backgroundColor: 'grey.50',
+        color: 'text.secondary',
+        fontSize: '0.875rem',
+        fontWeight: 500,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
         whiteSpace: 'nowrap',
+        '&:last-of-type': {
+          textAlign: 'right',
+        },
       }}
       bodyCellSx={{
-        px: 3,
-        py: 2.5,
-        color: '#0F172A',
-        fontSize: '0.95rem',
-        borderBottom: '1px solid rgba(226, 232, 240, 1)',
+        px: '24px',
+        py: '12px',
+        color: 'text.primary',
+        fontSize: '0.875rem',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        '&:last-of-type': {
+          textAlign: 'right',
+        },
       }}
       rowSx={{
-        '&:nth-of-type(odd)': {
-          bgcolor: '#FFFFFF',
-        },
-        '&:nth-of-type(even)': {
-          bgcolor: '#F8FAFC',
-        },
-        '&:hover': {
-          bgcolor: '#EEF2FF',
-        },
-        '&:last-child td': {
-          borderBottom: 'none',
-        },
+        '&:hover': { backgroundColor: rowHoverBg },
+        '&:last-child td': { borderBottom: 'none' },
       }}
     />
   )

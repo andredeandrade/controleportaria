@@ -1,10 +1,10 @@
+import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
 import { ResidentsList } from '@/components/moradores/ResidentsList'
 import { RegisterResidentButton } from '@/components/moradores/RegisterResidentButton'
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
   title: 'Moradores',
@@ -12,26 +12,26 @@ export const metadata: Metadata = {
 
 export default function MoradoresPage() {
   return (
-    <Stack spacing={2}>
+    <Stack spacing={1.5} sx={{ pt: 6 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={2}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        <Typography variant="h6" fontWeight={700} sx={{ color: 'grey.900' }}>
-          Moradores
-        </Typography>
+        <Box>
+          <Typography variant="h2" fontWeight={600} sx={{ color: 'primary.dark' }}>
+            Moradores
+          </Typography>
 
-        <Stack
-          direction="row"
-          justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}
-          sx={{
-            width: { xs: '100%', sm: 'auto' },
-          }}
-        >
+          <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>
+            Gerencie os dados e acessos de todos os residentes do condomínio.
+          </Typography>
+        </Box>
+
+        <Box sx={{ flexShrink: 0 }}>
           <RegisterResidentButton />
-        </Stack>
+        </Box>
       </Stack>
 
       <ResidentsList />

@@ -1,5 +1,6 @@
 'use client'
 
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import Button from '@mui/material/Button'
 import { useRouter } from 'next/navigation'
 
@@ -10,27 +11,18 @@ type RegisterResidentButtonProps = {
 export function RegisterResidentButton({ fullWidth = false }: RegisterResidentButtonProps) {
   const router = useRouter()
 
-  const handleNavigateToRegister = () => {
-    router.push('/moradores/cadastrar')
-  }
-
   return (
     <Button
       variant="contained"
+      color="primary"
       fullWidth={fullWidth}
-      onClick={handleNavigateToRegister}
-      sx={{
-        bgcolor: '#16A34A',
-        color: '#FFFFFF',
-        fontWeight: 700,
-        boxShadow: 'none',
-        '&:hover': {
-          bgcolor: '#15803D',
-          boxShadow: 'none',
-        },
+      startIcon={<AddRoundedIcon />}
+      sx={{ minHeight: 40, px: 2 }}
+      onClick={() => {
+        router.push('/moradores/cadastrar')
       }}
     >
-      Cadastrar
+      Adicionar morador
     </Button>
   )
 }

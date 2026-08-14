@@ -9,7 +9,7 @@ import { useState } from 'react'
 import SideBar from '@/components/sideBar'
 import TopBar from '@/components/topBar'
 
-const drawerWidth = 280
+const drawerWidth = 256
 
 type DashboardLayoutProps = {
   children: ReactNode
@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0b1326' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <TopBar
         drawerWidth={drawerWidth}
         onOpenMenu={() => {
@@ -40,8 +40,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             '& .MuiDrawer-paper': {
               width: drawerWidth,
               boxSizing: 'border-box',
-              borderRight: 'none',
-              backgroundColor: '#060e20',
+              borderRight: '1px solid',
+              borderColor: 'divider',
+              backgroundColor: 'background.paper',
             },
           }}
         >
@@ -62,13 +63,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         sx={{
           flexGrow: 1,
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          px: { xs: 2, md: 4 },
-          py: 3,
-          backgroundColor: '#0b1326',
+          px: { xs: 2, md: 6 },
+          py: 0,
           minHeight: '100vh',
+          backgroundImage:
+            'linear-gradient(180deg, #F8F9FF 0px, #F8F9FF 64px, #FFFFFF 64px, #FFFFFF 100%)',
         }}
       >
-        <Toolbar sx={{ minHeight: 56 }} />
+        <Toolbar sx={{ minHeight: 64 }} />
         {children}
       </Box>
     </Box>

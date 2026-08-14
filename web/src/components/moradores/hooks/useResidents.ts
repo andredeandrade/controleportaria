@@ -37,6 +37,7 @@ export function useResidents() {
   const records: ResidentRecord[] = (residentsQuery.data?.items ?? []).map((item) => ({
     id: item.id,
     name: item.fullName,
+    document: item.document ?? undefined,
     unit: item.unit,
     relation: RESIDENT_RELATION_LABEL[item.relation as ResidentRelationEnum] ?? item.relation,
     phone: item.phone ?? '-',
