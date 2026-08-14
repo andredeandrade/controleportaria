@@ -302,9 +302,9 @@ export const reportsService = {
       totalActiveAccesses,
       totalAccessesToday,
     ] = await prisma.$transaction([
-      prisma.resident.count({ where: { condominiumId, ...entityDateFilter } }),
-      prisma.visitor.count({ where: { condominiumId, ...entityDateFilter } }),
-      prisma.serviceProvider.count({ where: { condominiumId, ...entityDateFilter } }),
+      prisma.resident.count({ where: { condominiumId } }),
+      prisma.visitor.count({ where: { condominiumId } }),
+      prisma.serviceProvider.count({ where: { condominiumId } }),
       prisma.event.count({ where: { condominiumId, ...entityDateFilter } }),
       prisma.incident.count({ where: { condominiumId, ...entityDateFilter } }),
       prisma.authorization.count({ where: { condominiumId, ...entityDateFilter } }),
