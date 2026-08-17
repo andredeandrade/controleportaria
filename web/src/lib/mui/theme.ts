@@ -1,109 +1,55 @@
 import { createTheme } from '@mui/material/styles'
 
 const colors = {
-  // Brand / Primary
-  primary50: '#F0F9FF',
-  primary100: '#E0F2FE',
-  primary200: '#BAE6FD',
-  primary300: '#7DD3FC',
-  primary400: '#38BDF8',
-  primary500: '#0EA5E9',
-  primary600: '#0284C7',
-  primary700: '#0369A1',
-  primary800: '#075985',
-  primary900: '#0C4A6E',
-
-  // Neutral
-  neutral50: '#F8FAFC',
-  neutral100: '#F1F5F9',
-  neutral200: '#E2E8F0',
-  neutral300: '#CBD5E1',
-  neutral400: '#94A3B8',
-  neutral500: '#64748B',
-  neutral600: '#475569',
-  neutral700: '#334155',
-  neutral800: '#1E293B',
-  neutral900: '#0F172A',
+  // Brand / Primary (emerald)
+  primary: '#34d399',
+  primaryContrastText: '#0d2318',
 
   // Semantic
-  success50: '#F0FDF4',
-  success500: '#22C55E',
-  success600: '#16A34A',
-  success700: '#15803D',
+  success: '#34d399',
+  warning: '#fbbf24',
+  error: '#ef4444',
+  info: '#60a5fa',
 
-  warning50: '#FFFBEB',
-  warning500: '#F59E0B',
-  warning600: '#D97706',
-  warning700: '#B45309',
+  // Surfaces
+  background: '#16181d',
+  surface: '#1c1f25',
 
-  error50: '#FEF2F2',
-  error500: '#EF4444',
-  error600: '#DC2626',
-  error700: '#B91C1C',
+  // Text
+  text: '#fafafa',
+  textSecondary: '#9aa1ab',
+  textDisabled: '#5b636d',
 
-  info50: '#EFF6FF',
-  info500: '#3B82F6',
-  info600: '#2563EB',
-  info700: '#1D4ED8',
-
-  // Product semantic colors
-  background: '#FFFFFF',
-  surface: '#FFFFFF',
-  surfaceSubtle: '#F8FAFC',
-  surfaceMuted: '#F1F5F9',
-
-  layoutDark: '#0B1326',
-  surfaceDark: '#131B2E',
-
-  text: '#31394D',
-  textSecondary: '#64748B',
-  textDisabled: '#94A3B8',
-
-  textOnDark: '#FFFFFF',
-  textOnDarkSecondary: '#BEC8D2',
-
-  border: '#CBD5E1',
-  borderSubtle: '#E2E8F0',
-  borderStrong: '#94A3B8',
+  // Borders — opacity-based whites over the dark surfaces, per design system
+  borderSubtle: 'rgba(255, 255, 255, 0.06)',
+  borderDefault: 'rgba(255, 255, 255, 0.1)',
+  borderStrong: 'rgba(255, 255, 255, 0.16)',
+  overlaySubtle: 'rgba(255, 255, 255, 0.04)',
 } as const
 
 const theme = createTheme({
   palette: {
-    mode: 'light',
+    mode: 'dark',
 
     primary: {
-      main: colors.primary500,
-      light: colors.primary400,
-      dark: colors.primary700,
-      contrastText: colors.textOnDark,
+      main: colors.primary,
+      contrastText: colors.primaryContrastText,
     },
 
     success: {
-      main: colors.success500,
-      light: colors.success50,
-      dark: colors.success700,
-      contrastText: colors.textOnDark,
+      main: colors.success,
     },
 
     warning: {
-      main: colors.warning500,
-      light: colors.warning50,
-      dark: colors.warning700,
-      contrastText: colors.text,
+      main: colors.warning,
     },
 
     error: {
-      main: colors.error500,
-      light: colors.error50,
-      dark: colors.error700,
-      contrastText: colors.textOnDark,
+      main: colors.error,
     },
 
     info: {
-      main: colors.info500,
-      light: colors.info50,
-      dark: colors.info700,
-      contrastText: colors.textOnDark,
+      main: colors.info,
     },
 
     background: {
@@ -117,39 +63,53 @@ const theme = createTheme({
       disabled: colors.textDisabled,
     },
 
-    divider: colors.border,
+    divider: colors.borderDefault,
   },
 
   spacing: 4,
 
   shape: {
-    borderRadius: 8,
+    borderRadius: 12,
   },
 
   typography: {
     fontFamily: 'var(--font-inter), Inter, system-ui, sans-serif',
 
     h1: {
+      fontFamily: "var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif",
       fontSize: '2rem',
       lineHeight: 1.25,
-      fontWeight: 700,
+      fontWeight: 800,
     },
 
     h2: {
+      fontFamily: "var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif",
       fontSize: '1.5rem',
       lineHeight: 1.3,
-      fontWeight: 600,
+      fontWeight: 700,
     },
 
     h3: {
+      fontFamily: "var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif",
       fontSize: '1.25rem',
       lineHeight: 1.4,
-      fontWeight: 600,
+      fontWeight: 700,
     },
 
     h4: {
+      fontFamily: "var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif",
       fontSize: '1.125rem',
       lineHeight: 1.4,
+      fontWeight: 700,
+    },
+
+    h5: {
+      fontFamily: "var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif",
+      fontWeight: 600,
+    },
+
+    h6: {
+      fontFamily: "var(--font-plus-jakarta-sans), 'Plus Jakarta Sans', sans-serif",
       fontWeight: 600,
     },
 
@@ -196,7 +156,7 @@ const theme = createTheme({
 
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 999,
           textTransform: 'none',
           transition: 'background-color 0.2s ease-in-out',
         },
@@ -222,7 +182,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundColor: colors.surface,
-          borderRadius: 8,
+          borderRadius: 12,
 
           '&:hover .MuiOutlinedInput-notchedOutline': {
             borderColor: colors.borderStrong,
@@ -230,20 +190,20 @@ const theme = createTheme({
 
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
             borderWidth: 2,
-            borderColor: colors.primary500,
+            borderColor: colors.primary,
           },
 
           '&.Mui-error .MuiOutlinedInput-notchedOutline': {
-            borderColor: colors.error500,
+            borderColor: colors.error,
           },
 
           '&.Mui-disabled': {
-            backgroundColor: colors.surfaceMuted,
+            backgroundColor: colors.overlaySubtle,
           },
         },
 
         notchedOutline: {
-          borderColor: colors.border,
+          borderColor: colors.borderDefault,
         },
 
         input: {
@@ -258,6 +218,13 @@ const theme = createTheme({
             color: colors.textDisabled,
             WebkitTextFillColor: colors.textDisabled,
           },
+
+          '&:-webkit-autofill': {
+            WebkitBoxShadow: `0 0 0 100px ${colors.surface} inset`,
+            WebkitTextFillColor: colors.text,
+            caretColor: colors.text,
+            transition: 'background-color 9999s ease-out 0s',
+          },
         },
       },
     },
@@ -268,7 +235,7 @@ const theme = createTheme({
           backgroundColor: colors.surface,
           backgroundImage: 'none',
           border: `1px solid ${colors.borderSubtle}`,
-          borderRadius: 16,
+          borderRadius: 18,
           boxShadow: 'none',
         },
       },
@@ -277,7 +244,37 @@ const theme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 9999,
+          borderRadius: 8,
+        },
+      },
+    },
+
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+      },
+    },
+
+    MuiTextField: {
+      defaultProps: {
+        variant: 'outlined',
+      },
+    },
+
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 18,
+        },
+      },
+    },
+
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderColor: colors.borderSubtle,
         },
       },
     },

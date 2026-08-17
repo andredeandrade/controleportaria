@@ -9,7 +9,7 @@ type TextFieldLabelProps = Omit<TypographyProps, 'children'> & {
 
 export function TextFieldLabel({ children, required = false, ...props }: TextFieldLabelProps) {
   return (
-    <Typography variant="body2" color="grey.900" {...props}>
+    <Typography variant="body2" color="text.secondary" {...props}>
       {children}
       {required ? (
         <Typography component="span" color="error.main">

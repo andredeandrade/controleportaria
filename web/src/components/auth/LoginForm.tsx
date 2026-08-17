@@ -6,13 +6,15 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
+import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLogin } from './hooks/useLogin'
-import AuthTextField from './components/AuthTextField'
+import { TextField, TextFieldLabel, TextFieldStack } from '@/components/form'
 import { extractTenantSlugFromHost } from '@/lib/auth/session'
 import { useAppSnackbar } from '@/providers'
 
@@ -61,107 +63,114 @@ export function LoginForm() {
   }
 
   return (
-    <Stack spacing={1} sx={{ width: '100%', maxWidth: 360, px: { xs: 0.5, sm: 1 } }}>
-      <Stack spacing={1.25} alignItems="center">
+    <Paper
+      elevation={0}
+      sx={{
+        width: 380,
+        maxWidth: '100%',
+        p: 10,
+        borderRadius: 2,
+        border: '1px solid',
+        borderColor: (theme) => alpha(theme.palette.common.white, 0.06),
+        boxShadow: '0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 5.5,
+      }}
+    >
+      <Stack spacing={0.75} alignItems="center">
         <Box
-          component="img"
-          src="/images/login-logo.svg"
-          alt="Logo Controle Portaria"
           sx={{
-            width: { xs: 180, sm: 200 },
-            height: 'auto',
-            opacity: 0.92,
-            filter: 'drop-shadow(0 10px 24px rgba(2, 6, 23, 0.55))',
+            width: 44,
+            height: 44,
+            borderRadius: 1,
+            bgcolor: 'primary.main',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'primary.contrastText',
+            fontFamily: 'var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif',
+            fontWeight: 800,
+            fontSize: 20,
           }}
-        />
+        >
+          C
+        </Box>
 
-        <Typography variant="h5" component="h1" textAlign="center" fontWeight={500} color="#F8FAFC">
-          Controle Portaria
+        <Typography variant="h3" component="h1" textAlign="center" sx={{ mt: 0.75 }}>
+          Controle
+          <Box component="span" sx={{ color: 'primary.main' }}>
+            Portaria
+          </Box>
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary">
+          Acesse o painel administrativo
         </Typography>
       </Stack>
 
-      <Stack spacing={2.25} component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
-        <AuthTextField
-          label="E-mail"
-          type="email"
-          autoComplete="email"
-          fullWidth
-          required
-          variant="standard"
-          error={Boolean(errors.email)}
-          helperText={errors.email?.message}
-          {...register('email', {
-            required: 'Informe seu e-mail.',
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: 'Informe um e-mail valido.',
-            },
-          })}
-        />
+      <Stack spacing={3.5} component="form" noValidate onSubmit={handleSubmit(onSubmit)}>
+        <TextFieldStack>
+          <TextFieldLabel required>E-mail</TextFieldLabel>
+          <TextField
+            type="email"
+            placeholder="seu@email.com"
+            autoComplete="email"
+            error={Boolean(errors.email)}
+            helperText={errors.email?.message}
+            {...register('email', {
+              required: 'Informe seu e-mail.',
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: 'Informe um e-mail valido.',
+              },
+            })}
+          />
+        </TextFieldStack>
 
-        <AuthTextField
-          label="Senha"
-          type={showPassword ? 'text' : 'password'}
-          autoComplete="current-password"
-          fullWidth
-          required
-          variant="standard"
-          error={Boolean(errors.password)}
-          helperText={errors.password?.message}
-          {...register('password', {
-            required: 'Informe sua senha.',
-            minLength: {
-              value: 8,
-              message: 'A senha deve ter pelo menos 8 caracteres.',
-            },
-          })}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  type="button"
-                  onClick={handleTogglePassword}
-                  edge="end"
-                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                  sx={{ color: 'rgba(226, 232, 240, 0.82)' }}
-                >
-                  {showPassword ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+        <TextFieldStack>
+          <TextFieldLabel required>Senha</TextFieldLabel>
+          <TextField
+            type={showPassword ? 'text' : 'password'}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            error={Boolean(errors.password)}
+            helperText={errors.password?.message}
+            {...register('password', {
+              required: 'Informe sua senha.',
+              minLength: {
+                value: 8,
+                message: 'A senha deve ter pelo menos 8 caracteres.',
+              },
+            })}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    type="button"
+                    onClick={handleTogglePassword}
+                    edge="end"
+                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  >
+                    {showPassword ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </TextFieldStack>
 
         <Button
           type="submit"
           variant="contained"
+          color="primary"
           size="large"
           fullWidth
           disabled={isSubmitting || loginMutation.isPending}
-          sx={{
-            alignSelf: 'center',
-            maxWidth: 230,
-            borderRadius: 1,
-            py: 1.15,
-            fontWeight: 500,
-            textTransform: 'none',
-            letterSpacing: 0.2,
-            color: '#020617',
-            backgroundColor: '#F8FAFC',
-            boxShadow: 'none',
-            '&:hover': {
-              backgroundColor: '#E2E8F0',
-              boxShadow: 'none',
-            },
-            '&.Mui-disabled': {
-              color: 'rgba(2, 6, 23, 0.4)',
-              backgroundColor: 'rgba(248, 250, 252, 0.5)',
-            },
-          }}
         >
           {isSubmitting || loginMutation.isPending ? 'Entrando...' : 'Entrar'}
         </Button>
       </Stack>
-    </Stack>
+    </Paper>
   )
 }
