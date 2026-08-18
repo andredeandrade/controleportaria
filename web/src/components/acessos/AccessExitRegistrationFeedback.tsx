@@ -9,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import MenuItem from '@mui/material/MenuItem'
 import { useMemo, useState } from 'react'
 
-import { ConfirmExitButton, ExitDialogActions } from '@/components/acessos/styles/AccessStyles'
+import { ExitDialogActions } from '@/components/acessos/styles/AccessStyles'
 import { TextField } from '@/components/form'
 import { useAppSnackbar } from '@/providers'
 
@@ -56,7 +56,7 @@ export function AccessExitRegistrationFeedback({
       errorMessage={errorMessage}
       onClose={onClose}
       onSuccess={() => {
-        showSuccess('Saida registrada com sucesso.')
+        showSuccess('Saída registrada com sucesso.')
       }}
     />
   )
@@ -168,16 +168,17 @@ function AccessExitRegistrationDialog({
           ) : null}
         </DialogContent>
         <ExitDialogActions>
-          <Button onClick={onClose} color="inherit" disabled={isPending}>
+          <Button onClick={onClose} color="inherit" variant="outlined" disabled={isPending}>
             Cancelar
           </Button>
-          <ConfirmExitButton
-            onClick={() => void handleConfirm()}
+          <Button
             variant="contained"
+            color="error"
+            onClick={() => void handleConfirm()}
             disabled={isPending}
           >
-            {isPending ? 'Confirmando...' : 'Confirmar saida'}
-          </ConfirmExitButton>
+            {isPending ? 'Confirmando...' : 'Confirmar saída'}
+          </Button>
         </ExitDialogActions>
       </Dialog>
     </>

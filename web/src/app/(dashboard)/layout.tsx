@@ -66,8 +66,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           px: { xs: 2, md: 6 },
           py: 0,
           minHeight: '100vh',
-          backgroundImage:
-            'linear-gradient(180deg, #F8F9FF 0px, #F8F9FF 64px, #FFFFFF 64px, #FFFFFF 100%)',
+          bgcolor: 'background.default',
         }}
       >
         <Toolbar sx={{ minHeight: 64 }} />

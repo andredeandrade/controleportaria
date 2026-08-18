@@ -5,9 +5,13 @@ import { useRouter } from 'next/navigation'
 
 type AccessRegisterButtonProps = {
   fullWidth?: boolean
+  size?: 'medium' | 'large'
 }
 
-export function AccessRegisterButton({ fullWidth = false }: AccessRegisterButtonProps) {
+export function AccessRegisterButton({
+  fullWidth = false,
+  size = 'medium',
+}: AccessRegisterButtonProps) {
   const router = useRouter()
 
   const handleNavigateToRegister = () => {
@@ -17,20 +21,12 @@ export function AccessRegisterButton({ fullWidth = false }: AccessRegisterButton
   return (
     <Button
       variant="contained"
+      color="primary"
+      size={size}
       fullWidth={fullWidth}
       onClick={handleNavigateToRegister}
-      sx={{
-        bgcolor: '#16A34A',
-        color: '#FFFFFF',
-        fontWeight: 700,
-        boxShadow: 'none',
-        '&:hover': {
-          bgcolor: '#15803D',
-          boxShadow: 'none',
-        },
-      }}
     >
-      Registrar
+      Registrar Acesso
     </Button>
   )
 }
