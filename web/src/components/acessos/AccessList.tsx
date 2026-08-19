@@ -33,6 +33,9 @@ export function AccessList() {
     handleCloseExitConfirmation,
     isLoading,
     isFetching,
+    isError,
+    errorMessage,
+    refetch,
   } = useAccessList({ viewMode })
 
   const handleConfirmExit = async (personIds?: string[], observations?: string) => {
@@ -116,6 +119,10 @@ export function AccessList() {
             records={records}
             onRegisterExit={handleOpenExitConfirmation}
             showActions
+            isLoading={isLoading}
+            isError={isError}
+            errorMessage={errorMessage}
+            onRetry={refetch}
           />
         )}
 
