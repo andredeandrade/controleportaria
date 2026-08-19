@@ -122,6 +122,15 @@ Somente então criar algo novo.
 
 O objetivo é manter o frontend consistente e evitar duplicação e proliferação de componentes.
 
+## Verificação após implementar
+
+Depois de implementar uma feature/alteração, a verificação padrão é rodar apenas:
+
+- `pnpm --filter ./web build` (ou `pnpm --filter ./web exec tsc --noEmit`) — confirma que o build/compilação TypeScript não tem erro.
+- `pnpm --filter ./web lint` — confirma que não há erro novo de lint.
+
+Não tente subir o dev server (`pnpm dev`/`next dev`), abrir navegador, matar/inspecionar processos em portas, instalar Playwright/Chromium ou qualquer outro comando exploratório para "ver a tela funcionando" — isso não deve ser feito por padrão. Encerre a verificação assim que build e lint passarem. Só vá além disso (dev server, captura de tela, etc.) se o usuário pedir explicitamente.
+
 ## Regras comuns aos agentes deste projeto
 
 - Responda em português (pt-BR).

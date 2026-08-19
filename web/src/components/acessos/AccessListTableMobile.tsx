@@ -31,13 +31,6 @@ export function AccessListTableMobile({
             </Stack>
 
             <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Categoria</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.category}
-              </Typography>
-            </Stack>
-
-            <Stack spacing={0.25}>
               <MobileFieldLabel variant="caption">Locomoção</MobileFieldLabel>
               <Typography variant="body2" color="#0F172A">
                 {record.locomotion}

@@ -27,7 +27,7 @@ export function DashboardRecentAccesses() {
     isError,
     errorMessage,
     refetch,
-  } = useAccessList({ viewMode: 'history' })
+  } = useAccessList({ viewMode: 'all' })
 
   const recentRecords = records.slice(0, RECENT_ACCESSES_LIMIT)
 

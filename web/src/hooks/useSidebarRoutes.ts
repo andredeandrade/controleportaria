@@ -32,12 +32,8 @@ const sidebarRoutesConfig: SidebarRoute[] = [
   },
   {
     label: 'Acessos',
+    href: '/acessos',
     IconComponent: SwapHorizRoundedIcon,
-    children: [
-      { label: 'Registrar Entrada', href: '/acessos/registrar' },
-      { label: 'Acessos Ativos', href: '/acessos?status=active' },
-      { label: 'Histórico de Acessos', href: '/acessos?status=history' },
-    ],
   },
   {
     label: 'Moradores',

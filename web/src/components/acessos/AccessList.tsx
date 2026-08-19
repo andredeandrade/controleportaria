@@ -1,31 +1,25 @@
 'use client'
 
-import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
-import MenuItem from '@mui/material/MenuItem'
-import Pagination from '@mui/material/Pagination'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
-import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
 import { AccessExitRegistrationFeedback } from '@/components/acessos/AccessExitRegistrationFeedback'
 import { useCheckOutAccessRecord } from '@/components/acessos/hooks/useCheckOutAccessRecord'
 import { useAccessList } from '@/components/acessos/hooks/useAccessList'
-import { TextField } from '@/components/form'
 import { ListSearchField } from '@/components/table/ListSearchField'
+import { ListPagination } from '@/components/table/ListPagination'
+import type { AccessListViewMode } from '@/types/acessos'
 import { AccessListTable } from './AccessListTable'
 import { AccessListTableMobile } from './AccessListTableMobile'
 
 export function AccessList() {
   const theme = useTheme()
-  const searchParams = useSearchParams()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const statusParam = searchParams.get('status')
-  const viewMode = statusParam === 'history' ? 'history' : 'active'
-  const showExitActions = viewMode === 'active' || viewMode === 'history'
+  const [viewMode, setViewMode] = useState<AccessListViewMode>('all')
   const checkOutMutation = useCheckOutAccessRecord()
 
   const {
@@ -35,14 +29,10 @@ export function AccessList() {
     searchTerm,
     handleSearchChange,
     handlePageChange,
-    handlePageSizeChange,
     handleOpenExitConfirmation,
     handleCloseExitConfirmation,
     isLoading,
     isFetching,
-    isError,
-    errorMessage,
-    refetch,
   } = useAccessList({ viewMode })
 
   const handleConfirmExit = async (personIds?: string[], observations?: string) => {
@@ -59,94 +49,81 @@ export function AccessList() {
 
   return (
     <>
-      <Stack spacing={2}>
-        <Stack spacing={1} sx={{ px: { xs: 0.5, sm: 1 } }}>
+      <Stack spacing={5}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2.5}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          sx={{ px: { xs: 0.5, sm: 1 } }}
+        >
           <ListSearchField
             value={searchTerm}
             onChange={handleSearchChange}
-            placeholder="Buscar por nome, categoria, locomoção ou placa"
+            placeholder="Buscar por nome, documento ou placa..."
             fullWidth
             sx={{
               maxWidth: { xs: '100%', sm: 420 },
             }}
           />
+
+          <Stack direction="row" spacing={1}>
+            <Button
+              size="small"
+              variant={viewMode === 'all' ? 'contained' : 'outlined'}
+              color={viewMode === 'all' ? 'primary' : 'inherit'}
+              onClick={() => setViewMode('all')}
+              sx={
+                viewMode === 'all'
+                  ? undefined
+                  : { color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }
+              }
+            >
+              Todos
+            </Button>
+
+            <Button
+              size="small"
+              variant={viewMode === 'active' ? 'contained' : 'outlined'}
+              color={viewMode === 'active' ? 'primary' : 'inherit'}
+              onClick={() => setViewMode('active')}
+              sx={
+                viewMode === 'active'
+                  ? undefined
+                  : { color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }
+              }
+            >
+              Acesso ativo
+            </Button>
+          </Stack>
         </Stack>
 
-        {isError ? (
-          <Alert
-            severity="error"
-            action={
-              <Button color="inherit" size="small" onClick={() => void refetch()}>
-                Tentar novamente
-              </Button>
-            }
-          >
-            {errorMessage}
-          </Alert>
-        ) : null}
+        <Typography
+          variant="body2"
+          color="text.disabled"
+          sx={{ fontSize: '0.8125rem', px: { xs: 0.5, sm: 1 } }}
+        >
+          {pagination.total} acessos encontrados
+        </Typography>
 
-        {isLoading ? (
-          <Stack alignItems="center" justifyContent="center" sx={{ py: 8 }}>
-            <CircularProgress size={28} />
-          </Stack>
-        ) : isMobile ? (
+        {isMobile ? (
           <AccessListTableMobile
             records={records}
             onRegisterExit={handleOpenExitConfirmation}
-            showActions={showExitActions}
+            showActions
           />
         ) : (
           <AccessListTable
             records={records}
             onRegisterExit={handleOpenExitConfirmation}
-            showActions={showExitActions}
+            showActions
           />
         )}
 
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1.5}
-          alignItems={{ xs: 'stretch', sm: 'center' }}
-          justifyContent="space-between"
-          sx={{ px: { xs: 0.5, sm: 1 } }}
-        >
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="body2" color="text.secondary">
-              Itens por pagina
-            </Typography>
-
-            <TextField
-              select
-              value={String(pagination.pageSize)}
-              onChange={(event) => handlePageSizeChange(Number(event.target.value))}
-              size="small"
-              sx={{ width: 90 }}
-            >
-              {[10, 20, 50].map((size) => (
-                <MenuItem key={size} value={String(size)}>
-                  {size}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Stack>
-
-          <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-            <Typography variant="body2" color="text.secondary">
-              Total: {pagination.total}
-            </Typography>
-
-            <Pagination
-              color="primary"
-              page={pagination.page}
-              count={pagination.totalPages}
-              onChange={(_, value) => handlePageChange(value)}
-              disabled={isLoading || isFetching}
-              size={isMobile ? 'small' : 'medium'}
-              showFirstButton
-              showLastButton
-            />
-          </Stack>
-        </Stack>
+        <ListPagination
+          pagination={pagination}
+          onPageChange={handlePageChange}
+          disabled={isLoading || isFetching}
+        />
       </Stack>
 
       <AccessExitRegistrationFeedback

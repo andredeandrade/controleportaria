@@ -1,5 +1,6 @@
 'use client'
 
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import Button from '@mui/material/Button'
 import { useRouter } from 'next/navigation'
 
@@ -24,6 +25,7 @@ export function AccessRegisterButton({
       color="primary"
       size={size}
       fullWidth={fullWidth}
+      startIcon={<AddRoundedIcon fontSize="small" />}
       onClick={handleNavigateToRegister}
     >
       Registrar Acesso

@@ -1,10 +1,11 @@
 import type { AccessRecord } from '@/app/api/access-records/types'
 
-export type AccessListViewMode = 'active' | 'history'
+export type AccessListViewMode = 'active' | 'all'
 
 export type AccessRecordListItem = {
   id: string
   name: string
+  document: string
   category: string
   locomotion: string
   plate: string
@@ -55,6 +56,8 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
       .join(', ') ||
     '-'
 
+  const document = firstPerson?.document?.trim() ? firstPerson.document : '-'
+
   const categoryRaw = firstPerson?.category ?? ''
   const category = (ACCESS_PERSON_CATEGORY_LABEL[categoryRaw] ?? categoryRaw) || '-'
 
@@ -81,6 +84,7 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
   return {
     id: item.id,
     name,
+    document,
     category,
     locomotion,
     plate: item.plate?.trim() ? item.plate : '-',

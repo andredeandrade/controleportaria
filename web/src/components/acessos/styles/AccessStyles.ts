@@ -4,20 +4,24 @@ import Button from '@mui/material/Button'
 import DialogActions from '@mui/material/DialogActions'
 import { styled } from '@mui/material/styles'
 
-export const AccessRegisterButton = styled(Button)(({ theme }) => ({
-  minWidth: 148,
-  backgroundColor: theme.palette.error.main,
-  color: '#FFFFFF',
+export const RegisterExitButton = styled(Button)(({ theme }) => ({
+  minWidth: 128,
+  borderRadius: 999,
   fontWeight: 700,
+  fontSize: '0.8rem',
+  lineHeight: 1.3,
+  whiteSpace: 'normal',
+  textAlign: 'center',
+  backgroundColor: theme.palette.common.white,
+  color: theme.palette.grey[900],
   boxShadow: 'none',
   '&:hover': {
-    backgroundColor: theme.palette.error.dark,
+    backgroundColor: theme.palette.grey[200],
     boxShadow: 'none',
   },
 }))
 
-export const MobileRegisterExitButton = styled(AccessRegisterButton)({
-  minWidth: 128,
+export const MobileRegisterExitButton = styled(RegisterExitButton)({
   alignSelf: 'flex-start',
 })
 

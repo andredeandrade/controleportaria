@@ -34,7 +34,7 @@ export function useAccessList({ viewMode }: UseAccessListParams) {
     }
   }, [searchTerm])
 
-  const apiStatus = viewMode === 'history' ? 'all' : 'open'
+  const apiStatus = viewMode === 'active' ? 'open' : 'all'
 
   const accessRecordsQuery = useQuery({
     queryKey: ['access-records', page, pageSize, debouncedSearchTerm, apiStatus],

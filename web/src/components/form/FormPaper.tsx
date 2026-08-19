@@ -10,6 +10,7 @@ const StyledFormPaper = styled(MuiPaper)({
   minHeight: 220,
   backgroundColor: 'rgba(15, 23, 42, 0.1)',
   boxShadow: 'none',
+  overflow: 'hidden',
 })
 
 export function FormPaper({ sx, ...props }: FormPaperProps) {

@@ -1,8 +1,10 @@
 'use client'
 
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import type { ColumnDef } from '@tanstack/react-table'
 
-import { AccessRegisterButton } from '@/components/acessos/styles/AccessStyles'
+import { RegisterExitButton } from '@/components/acessos/styles/AccessStyles'
 import { DataTable } from '@/components/table/DataTable'
 import type { AccessRecord } from '@/components/acessos/hooks/useAccessList'
 
@@ -12,15 +14,38 @@ type AccessListTableProps = {
   onRegisterExit: (record: AccessRecord) => void
 }
 
+function DateTimeCell({ value }: { value: string }) {
+  const [datePart, timePart] = value.split(', ')
+
+  return (
+    <Stack spacing={0}>
+      <Typography variant="body2" color="text.primary">
+        {datePart}
+      </Typography>
+      {timePart ? (
+        <Typography variant="caption" color="text.disabled">
+          {timePart}
+        </Typography>
+      ) : null}
+    </Stack>
+  )
+}
+
 export function AccessListTable({ records, showActions, onRegisterExit }: AccessListTableProps) {
   const columns: ColumnDef<AccessRecord>[] = [
     {
-      accessorKey: 'name',
+      id: 'name',
       header: 'Nome',
-    },
-    {
-      accessorKey: 'category',
-      header: 'Categoria',
+      cell: ({ row }) => (
+        <Stack spacing={0.25}>
+          <Typography variant="body2" fontWeight={700} color="text.primary">
+            {row.original.name}
+          </Typography>
+          <Typography variant="caption" color="text.disabled" sx={{ fontFamily: 'monospace' }}>
+            {row.original.document}
+          </Typography>
+        </Stack>
+      ),
     },
     {
       accessorKey: 'locomotion',
@@ -31,32 +56,34 @@ export function AccessListTable({ records, showActions, onRegisterExit }: Access
       header: 'Placa',
     },
     {
-      accessorKey: 'entryAt',
-      header: 'Entrada em',
+      id: 'entryAt',
+      header: 'Entrada',
+      cell: ({ row }) => <DateTimeCell value={row.original.entryAt} />,
     },
     {
-      accessorKey: 'exitAt',
-      header: 'Saída em',
+      id: 'exitAt',
+      header: 'Saída',
+      cell: ({ row }) => <DateTimeCell value={row.original.exitAt} />,
     },
   ]
 
   if (showActions) {
     columns.push({
       id: 'actions',
-      header: 'Ação',
+      header: '',
       cell: ({ row }) => {
         if (row.original.hasExited) {
           return null
         }
 
         return (
-          <AccessRegisterButton
+          <RegisterExitButton
             variant="contained"
             size="small"
             onClick={() => onRegisterExit(row.original)}
           >
             Registrar saida
-          </AccessRegisterButton>
+          </RegisterExitButton>
         )
       },
     })
@@ -68,38 +95,33 @@ export function AccessListTable({ records, showActions, onRegisterExit }: Access
       columns={columns}
       emptyMessage="Nenhuma movimentação de entrada encontrada."
       containerSx={{
-        bgcolor: '#F8FAFC',
-        borderColor: 'rgba(203, 213, 225, 0.9)',
-        borderRadius: 3,
+        bgcolor: 'background.paper',
+        borderColor: 'rgba(255, 255, 255, 0.06)',
+        borderRadius: '18px',
         overflow: 'hidden',
-        boxShadow: '0 18px 40px rgba(15, 23, 42, 0.12)',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
       }}
       headerCellSx={{
-        px: 3,
-        py: 2.25,
-        bgcolor: '#E2E8F0',
-        color: '#0F172A',
-        fontSize: '0.95rem',
-        fontWeight: 700,
-        borderBottom: '1px solid rgba(203, 213, 225, 0.9)',
+        padding: '10px 14px',
+        color: 'text.disabled',
+        fontSize: '0.75rem',
+        fontWeight: 600,
+        textTransform: 'uppercase',
+        letterSpacing: '0.04em',
+        borderBottom: '1px solid',
+        borderColor: 'rgba(255, 255, 255, 0.06)',
         whiteSpace: 'nowrap',
       }}
       bodyCellSx={{
-        px: 3,
-        py: 2.5,
-        color: '#0F172A',
-        fontSize: '0.95rem',
-        borderBottom: '1px solid rgba(226, 232, 240, 1)',
+        padding: '14px',
+        color: 'text.primary',
+        fontSize: '0.875rem',
+        borderBottom: '1px solid',
+        borderColor: 'rgba(255, 255, 255, 0.06)',
       }}
       rowSx={{
-        '&:nth-of-type(odd)': {
-          bgcolor: '#FFFFFF',
-        },
-        '&:nth-of-type(even)': {
-          bgcolor: '#F8FAFC',
-        },
         '&:hover': {
-          bgcolor: '#EEF2FF',
+          bgcolor: 'action.hover',
         },
         '&:last-child td': {
           borderBottom: 'none',
