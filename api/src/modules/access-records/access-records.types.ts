@@ -2,13 +2,13 @@ export interface AccessRecordPersonInput {
   category: string
   name: string
   document?: string
+  unit?: string
 }
 
 export interface CheckInAccessRecordInput {
   condominiumId: string
   people: AccessRecordPersonInput[]
   company?: string
-  unit?: string
   locomotion?: string
   color?: string
   plate?: string
@@ -37,6 +37,7 @@ export interface AccessRecordPersonResponse {
   id: string
   category: string
   name: string
+  unit: string | null
   document: string | null
   checkOutAt: Date | null
   checkedOutByUserId: string | null
@@ -48,7 +49,6 @@ export interface AccessRecordResponse {
   id: string
   people: AccessRecordPersonResponse[]
   company: string | null
-  unit: string | null
   locomotion: string | null
   color: string | null
   plate: string | null

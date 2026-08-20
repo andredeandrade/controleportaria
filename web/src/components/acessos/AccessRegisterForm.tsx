@@ -31,12 +31,12 @@ type PersonFormValues = {
   category: AccessPersonTypeValue | ''
   name: string
   document: string
+  unit: string
 }
 
 type AccessRegisterFormValues = {
   people: PersonFormValues[]
   company: string
-  unit: string
   locomotion: LocomotionValue | ''
   color: ColorValue | ''
   plate: string
@@ -56,9 +56,8 @@ export function AccessRegisterForm() {
     formState: { errors, isSubmitting },
   } = useForm<AccessRegisterFormValues>({
     defaultValues: {
-      people: [{ category: '', name: '', document: '' }],
+      people: [{ category: '', name: '', document: '', unit: '' }],
       company: '',
-      unit: '',
       locomotion: '',
       color: '',
       plate: '',
@@ -76,14 +75,11 @@ export function AccessRegisterForm() {
   const hasServiceProvider = watchedPeople?.some(
     (person) => person.category === 'prestador_servico',
   )
-  const hasUnitResponsible = watchedPeople?.some(
-    (person) => person.category === 'visitante' || person.category === 'prestador_servico',
-  )
 
   const [searchQueries, setSearchQueries] = useState<Record<string, string>>({})
 
   const handleAddPerson = () => {
-    append({ category: '', name: '', document: '' })
+    append({ category: '', name: '', document: '', unit: '' })
   }
 
   const handleRemovePerson = (index: number) => {
@@ -97,9 +93,9 @@ export function AccessRegisterForm() {
           category: person.category,
           name: person.name.trim(),
           document: person.document.trim() || undefined,
+          unit: person.unit.trim() || undefined,
         })),
         company: data.company.trim() || undefined,
-        unit: data.unit.trim() || undefined,
         locomotion: data.locomotion || undefined,
         color: data.color || undefined,
         plate: data.plate.trim() || undefined,
@@ -120,6 +116,11 @@ export function AccessRegisterForm() {
       {fields.map((personField, index) => {
         const canRemovePerson = fields.length > 1 && index > 0
         const isFirstPerson = index === 0
+        const personCategory = watchedPeople?.[index]?.category
+        const unitLabel =
+          personCategory === 'visitante' || personCategory === 'prestador_servico'
+            ? 'Unidade responsável'
+            : 'Unidade'
 
         return (
           <Card key={personField.id} sx={{ p: 5, overflow: 'hidden' }}>
@@ -172,7 +173,7 @@ export function AccessRegisterForm() {
               </TextFieldStack>
 
               <Grid container spacing={3.5}>
-                <Grid size={{ xs: 12, sm: isFirstPerson ? 4 : 6 }}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                   <TextFieldStack>
                     <TextFieldLabel required>Nome</TextFieldLabel>
                     <TextField
@@ -186,23 +187,19 @@ export function AccessRegisterForm() {
                   </TextFieldStack>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: isFirstPerson ? 4 : 6 }}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                   <TextFieldStack>
                     <TextFieldLabel>Documento (CPF/RG)</TextFieldLabel>
                     <TextField {...register(`people.${index}.document`)} />
                   </TextFieldStack>
                 </Grid>
 
-                {isFirstPerson ? (
-                  <Grid size={{ xs: 12, sm: 4 }}>
-                    <TextFieldStack>
-                      <TextFieldLabel>
-                        {hasUnitResponsible ? 'Unidade responsável' : 'Unidade'}
-                      </TextFieldLabel>
-                      <TextField {...register('unit')} />
-                    </TextFieldStack>
-                  </Grid>
-                ) : null}
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <TextFieldStack>
+                    <TextFieldLabel>{unitLabel}</TextFieldLabel>
+                    <TextField {...register(`people.${index}.unit`)} />
+                  </TextFieldStack>
+                </Grid>
               </Grid>
 
               {isFirstPerson && hasServiceProvider ? (

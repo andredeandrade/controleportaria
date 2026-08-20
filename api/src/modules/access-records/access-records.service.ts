@@ -58,6 +58,7 @@ function validatePeople(people: AccessRecordPersonInput[] | undefined): AccessRe
     const category = String(person.category ?? '').trim()
     const name = String(person.name ?? '').trim()
     const document = normalizeOptionalText(person.document)
+    const unit = normalizeOptionalText(person.unit)
 
     if (!PERSON_CATEGORIES.has(category)) {
       throw new HttpError(400, `Categoria da pessoa ${index + 1} inválida.`)
@@ -75,6 +76,7 @@ function validatePeople(people: AccessRecordPersonInput[] | undefined): AccessRe
       category,
       name,
       document: document ?? undefined,
+      unit: unit ?? undefined,
     }
   })
 }
@@ -162,7 +164,6 @@ function parsePagination(input: ListAccessRecordsInput): {
 function toResponse(accessRecord: {
   id: string
   company: string | null
-  unit: string | null
   locomotion: string | null
   color: string | null
   plateEncrypted: string | null
@@ -179,6 +180,7 @@ function toResponse(accessRecord: {
     id: string
     category: string
     name: string
+    unit: string | null
     documentEncrypted: string | null
     checkOutAt: Date | null
     checkedOutByUserId: string | null
@@ -191,6 +193,7 @@ function toResponse(accessRecord: {
       id: person.id,
       category: person.category,
       name: person.name,
+      unit: person.unit,
       document: person.documentEncrypted ? decryptText(person.documentEncrypted) : null,
       checkOutAt: person.checkOutAt,
       checkedOutByUserId: person.checkedOutByUserId,
@@ -200,7 +203,6 @@ function toResponse(accessRecord: {
       isOpen: person.checkOutAt === null,
     })),
     company: accessRecord.company,
-    unit: accessRecord.unit,
     locomotion: accessRecord.locomotion,
     color: accessRecord.color,
     plate: accessRecord.plateEncrypted ? decryptText(accessRecord.plateEncrypted) : null,
@@ -224,7 +226,6 @@ function toResponse(accessRecord: {
 function matchesSearch(
   accessRecord: {
     company: string | null
-    unit: string | null
     locomotion: string | null
     color: string | null
     plateEncrypted: string | null
@@ -232,6 +233,7 @@ function matchesSearch(
     people: Array<{
       category: string
       name: string
+      unit: string | null
       documentEncrypted: string | null
     }>
   },
@@ -245,7 +247,6 @@ function matchesSearch(
 
   const searchableValues = [
     accessRecord.company,
-    accessRecord.unit,
     accessRecord.locomotion,
     accessRecord.color,
     accessRecord.plateEncrypted ? decryptText(accessRecord.plateEncrypted) : null,
@@ -253,6 +254,7 @@ function matchesSearch(
     ...accessRecord.people.flatMap((person) => [
       person.name,
       person.category,
+      person.unit,
       person.documentEncrypted ? decryptText(person.documentEncrypted) : null,
     ]),
   ]
@@ -266,7 +268,6 @@ export const accessRecordsService = {
   async checkIn(input: CheckInAccessRecordInput): Promise<AccessRecordResponse> {
     const people = validatePeople(input.people)
     const company = normalizeOptionalText(input.company)
-    const unit = normalizeOptionalText(input.unit)
     const locomotion = validateLocomotion(input.locomotion)
     const color = validateColor(input.color)
     const plate = normalizeOptionalText(input.plate)
@@ -277,7 +278,6 @@ export const accessRecordsService = {
       data: {
         condominiumId: input.condominiumId,
         company,
-        unit,
         locomotion,
         color,
         plateEncrypted: plate ? encryptText(plate) : null,
@@ -288,6 +288,7 @@ export const accessRecordsService = {
           create: people.map((person) => ({
             category: person.category,
             name: person.name,
+            unit: person.unit ?? null,
             documentEncrypted: person.document ? encryptText(person.document) : null,
           })),
         },
