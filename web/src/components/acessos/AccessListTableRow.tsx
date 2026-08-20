@@ -23,8 +23,8 @@ export function AccessListTableRow({ record, showActions, onRegisterExit }: Acce
           <Typography variant="body2" fontWeight={700} color="text.primary">
             {record.name}
           </Typography>
-          <Typography variant="caption" color="text.disabled" sx={{ fontFamily: 'monospace' }}>
-            {record.document}
+          <Typography variant="caption" color="text.disabled">
+            {record.categoryUnit}
           </Typography>
         </Stack>
       </TableCell>

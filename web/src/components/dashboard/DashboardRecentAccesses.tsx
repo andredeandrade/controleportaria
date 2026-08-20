@@ -110,7 +110,7 @@ export function DashboardRecentAccesses() {
                     {record.name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary" noWrap>
-                    {record.category}
+                    {record.categoryUnit}
                   </Typography>
                 </Stack>
 

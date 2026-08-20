@@ -5,8 +5,7 @@ export type AccessListViewMode = 'active' | 'all'
 export type AccessRecordListItem = {
   id: string
   name: string
-  document: string
-  category: string
+  categoryUnit: string
   locomotion: string
   plate: string
   entryAt: string
@@ -56,10 +55,11 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
       .join(', ') ||
     '-'
 
-  const document = firstPerson?.document?.trim() ? firstPerson.document : '-'
-
   const categoryRaw = firstPerson?.category ?? ''
   const category = (ACCESS_PERSON_CATEGORY_LABEL[categoryRaw] ?? categoryRaw) || '-'
+
+  const unitValue = item.unit?.trim()
+  const categoryUnit = category !== '-' ? (unitValue ? `${category}: ${unitValue}` : category) : '-'
 
   const locomotionRaw = item.locomotion ?? ''
   const locomotion = (ACCESS_LOCOMOTION_LABEL[locomotionRaw] ?? locomotionRaw) || '-'
@@ -84,8 +84,7 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
   return {
     id: item.id,
     name,
-    document,
-    category,
+    categoryUnit,
     locomotion,
     plate: item.plate?.trim() ? item.plate : '-',
     entryAt,

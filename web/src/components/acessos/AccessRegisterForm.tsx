@@ -172,7 +172,7 @@ export function AccessRegisterForm() {
               </TextFieldStack>
 
               <Grid container spacing={3.5}>
-                <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid size={{ xs: 12, sm: isFirstPerson ? 4 : 6 }}>
                   <TextFieldStack>
                     <TextFieldLabel required>Nome</TextFieldLabel>
                     <TextField
@@ -186,25 +186,29 @@ export function AccessRegisterForm() {
                   </TextFieldStack>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid size={{ xs: 12, sm: isFirstPerson ? 4 : 6 }}>
                   <TextFieldStack>
                     <TextFieldLabel>Documento (CPF/RG)</TextFieldLabel>
                     <TextField {...register(`people.${index}.document`)} />
                   </TextFieldStack>
                 </Grid>
+
+                {isFirstPerson ? (
+                  <Grid size={{ xs: 12, sm: 4 }}>
+                    <TextFieldStack>
+                      <TextFieldLabel>
+                        {hasUnitResponsible ? 'Unidade responsável' : 'Unidade'}
+                      </TextFieldLabel>
+                      <TextField {...register('unit')} />
+                    </TextFieldStack>
+                  </Grid>
+                ) : null}
               </Grid>
 
               {isFirstPerson && hasServiceProvider ? (
                 <TextFieldStack>
                   <TextFieldLabel>Empresa</TextFieldLabel>
                   <TextField {...register('company')} />
-                </TextFieldStack>
-              ) : null}
-
-              {isFirstPerson && hasUnitResponsible ? (
-                <TextFieldStack>
-                  <TextFieldLabel>Unidade responsável</TextFieldLabel>
-                  <TextField {...register('unit')} />
                 </TextFieldStack>
               ) : null}
 
