@@ -23,9 +23,11 @@ export function AccessListTableRow({ record, showActions, onRegisterExit }: Acce
           <Typography variant="body2" fontWeight={700} color="text.primary">
             {record.name}
           </Typography>
-          <Typography variant="caption" color="text.disabled" sx={{ fontFamily: 'monospace' }}>
-            {record.document}
-          </Typography>
+          {record.categoryUnits.map((categoryUnit) => (
+            <Typography key={categoryUnit.id} variant="caption" color="text.disabled">
+              {categoryUnit.label}
+            </Typography>
+          ))}
         </Stack>
       </TableCell>
       <TableCell>{record.locomotion}</TableCell>

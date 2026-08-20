@@ -25,6 +25,7 @@ function parseCreateBody(body: unknown): CreateAccessRecordRequest {
           name: String(personPayload['name'] ?? ''),
           document:
             typeof personPayload['document'] === 'string' ? personPayload['document'] : undefined,
+          unit: typeof personPayload['unit'] === 'string' ? personPayload['unit'] : undefined,
         }
       })
     : []
@@ -32,7 +33,6 @@ function parseCreateBody(body: unknown): CreateAccessRecordRequest {
   return {
     people,
     company: typeof payload['company'] === 'string' ? payload['company'] : undefined,
-    unit: typeof payload['unit'] === 'string' ? payload['unit'] : undefined,
     locomotion: typeof payload['locomotion'] === 'string' ? payload['locomotion'] : undefined,
     color: typeof payload['color'] === 'string' ? payload['color'] : undefined,
     plate: typeof payload['plate'] === 'string' ? payload['plate'] : undefined,

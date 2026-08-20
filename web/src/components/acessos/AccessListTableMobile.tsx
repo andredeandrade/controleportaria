@@ -31,6 +31,17 @@ export function AccessListTableMobile({
             </Stack>
 
             <Stack spacing={0.25}>
+              <MobileFieldLabel variant="caption">Categoria</MobileFieldLabel>
+              <Stack spacing={0.25}>
+                {record.categoryUnits.map((categoryUnit) => (
+                  <Typography key={categoryUnit.id} variant="body2" color="#0F172A">
+                    {categoryUnit.label}
+                  </Typography>
+                ))}
+              </Stack>
+            </Stack>
+
+            <Stack spacing={0.25}>
               <MobileFieldLabel variant="caption">Locomoção</MobileFieldLabel>
               <Typography variant="body2" color="#0F172A">
                 {record.locomotion}

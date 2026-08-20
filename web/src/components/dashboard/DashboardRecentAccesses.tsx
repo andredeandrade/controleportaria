@@ -109,9 +109,16 @@ export function DashboardRecentAccesses() {
                   <Typography variant="body2" fontWeight={700} noWrap>
                     {record.name}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" noWrap>
-                    {record.category}
-                  </Typography>
+                  {record.categoryUnits.map((categoryUnit) => (
+                    <Typography
+                      key={categoryUnit.id}
+                      variant="caption"
+                      color="text.secondary"
+                      noWrap
+                    >
+                      {categoryUnit.label}
+                    </Typography>
+                  ))}
                 </Stack>
 
                 {record.hasExited ? (

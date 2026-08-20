@@ -34,6 +34,7 @@ function parsePeople(value: unknown): AccessRecordPersonInput[] {
         category: '',
         name: '',
         document: '',
+        unit: '',
       }
     }
 
@@ -43,6 +44,7 @@ function parsePeople(value: unknown): AccessRecordPersonInput[] {
       category: String(personRecord['category'] ?? ''),
       name: String(personRecord['name'] ?? ''),
       document: readOptionalString(personRecord['document']),
+      unit: readOptionalString(personRecord['unit']),
     }
   })
 }
@@ -79,7 +81,6 @@ export const accessRecordsController = {
       condominiumId: req.authUser.condominiumId,
       people: parsePeople(body['people']),
       company: readOptionalString(body['company']),
-      unit: readOptionalString(body['unit']),
       locomotion: readOptionalString(body['locomotion']),
       color: readOptionalString(body['color']),
       plate: readOptionalString(body['plate']),
