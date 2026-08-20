@@ -8,6 +8,7 @@ export interface CheckInAccessRecordInput {
   condominiumId: string
   people: AccessRecordPersonInput[]
   company?: string
+  unit?: string
   locomotion?: string
   color?: string
   plate?: string
@@ -47,6 +48,7 @@ export interface AccessRecordResponse {
   id: string
   people: AccessRecordPersonResponse[]
   company: string | null
+  unit: string | null
   locomotion: string | null
   color: string | null
   plate: string | null

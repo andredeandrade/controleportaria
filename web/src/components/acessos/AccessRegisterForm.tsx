@@ -36,6 +36,7 @@ type PersonFormValues = {
 type AccessRegisterFormValues = {
   people: PersonFormValues[]
   company: string
+  unit: string
   locomotion: LocomotionValue | ''
   color: ColorValue | ''
   plate: string
@@ -57,6 +58,7 @@ export function AccessRegisterForm() {
     defaultValues: {
       people: [{ category: '', name: '', document: '' }],
       company: '',
+      unit: '',
       locomotion: '',
       color: '',
       plate: '',
@@ -73,6 +75,9 @@ export function AccessRegisterForm() {
   const watchedPeople = useWatch({ control, name: 'people' })
   const hasServiceProvider = watchedPeople?.some(
     (person) => person.category === 'prestador_servico',
+  )
+  const hasUnitResponsible = watchedPeople?.some(
+    (person) => person.category === 'visitante' || person.category === 'prestador_servico',
   )
 
   const [searchQueries, setSearchQueries] = useState<Record<string, string>>({})
@@ -94,6 +99,7 @@ export function AccessRegisterForm() {
           document: person.document.trim() || undefined,
         })),
         company: data.company.trim() || undefined,
+        unit: data.unit.trim() || undefined,
         locomotion: data.locomotion || undefined,
         color: data.color || undefined,
         plate: data.plate.trim() || undefined,
@@ -192,6 +198,13 @@ export function AccessRegisterForm() {
                 <TextFieldStack>
                   <TextFieldLabel>Empresa</TextFieldLabel>
                   <TextField {...register('company')} />
+                </TextFieldStack>
+              ) : null}
+
+              {isFirstPerson && hasUnitResponsible ? (
+                <TextFieldStack>
+                  <TextFieldLabel>Unidade responsável</TextFieldLabel>
+                  <TextField {...register('unit')} />
                 </TextFieldStack>
               ) : null}
 

@@ -188,6 +188,7 @@ export const AccessRecordScalarFieldEnum = {
   id: 'id',
   condominiumId: 'condominiumId',
   company: 'company',
+  unit: 'unit',
   locomotion: 'locomotion',
   color: 'color',
   plateEncrypted: 'plateEncrypted',

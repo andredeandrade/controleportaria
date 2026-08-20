@@ -13,6 +13,7 @@ export type AccessRecord = {
   id: string
   people: AccessRecordPerson[]
   company: string | null
+  unit: string | null
   locomotion: string | null
   color: string | null
   plate: string | null
@@ -45,6 +46,7 @@ export type CreateAccessRecordRequest = {
     document?: string
   }>
   company?: string
+  unit?: string
   locomotion?: string
   color?: string
   plate?: string
