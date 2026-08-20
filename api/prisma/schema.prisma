@@ -173,6 +173,7 @@ model AccessRecord {
   condominiumId              String
   condominium                Condominium @relation(fields: [condominiumId], references: [id], onDelete: Restrict)
   company                    String?
+  unit                       String?
   locomotion                 String?
   color                      String?
   plateEncrypted             String?

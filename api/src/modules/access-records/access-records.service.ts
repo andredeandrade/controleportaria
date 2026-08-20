@@ -162,6 +162,7 @@ function parsePagination(input: ListAccessRecordsInput): {
 function toResponse(accessRecord: {
   id: string
   company: string | null
+  unit: string | null
   locomotion: string | null
   color: string | null
   plateEncrypted: string | null
@@ -199,6 +200,7 @@ function toResponse(accessRecord: {
       isOpen: person.checkOutAt === null,
     })),
     company: accessRecord.company,
+    unit: accessRecord.unit,
     locomotion: accessRecord.locomotion,
     color: accessRecord.color,
     plate: accessRecord.plateEncrypted ? decryptText(accessRecord.plateEncrypted) : null,
@@ -222,6 +224,7 @@ function toResponse(accessRecord: {
 function matchesSearch(
   accessRecord: {
     company: string | null
+    unit: string | null
     locomotion: string | null
     color: string | null
     plateEncrypted: string | null
@@ -242,6 +245,7 @@ function matchesSearch(
 
   const searchableValues = [
     accessRecord.company,
+    accessRecord.unit,
     accessRecord.locomotion,
     accessRecord.color,
     accessRecord.plateEncrypted ? decryptText(accessRecord.plateEncrypted) : null,
@@ -262,6 +266,7 @@ export const accessRecordsService = {
   async checkIn(input: CheckInAccessRecordInput): Promise<AccessRecordResponse> {
     const people = validatePeople(input.people)
     const company = normalizeOptionalText(input.company)
+    const unit = normalizeOptionalText(input.unit)
     const locomotion = validateLocomotion(input.locomotion)
     const color = validateColor(input.color)
     const plate = normalizeOptionalText(input.plate)
@@ -272,6 +277,7 @@ export const accessRecordsService = {
       data: {
         condominiumId: input.condominiumId,
         company,
+        unit,
         locomotion,
         color,
         plateEncrypted: plate ? encryptText(plate) : null,

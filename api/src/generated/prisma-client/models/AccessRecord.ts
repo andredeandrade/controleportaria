@@ -28,6 +28,7 @@ export type AccessRecordMinAggregateOutputType = {
   id: string | null
   condominiumId: string | null
   company: string | null
+  unit: string | null
   locomotion: string | null
   color: string | null
   plateEncrypted: string | null
@@ -46,6 +47,7 @@ export type AccessRecordMaxAggregateOutputType = {
   id: string | null
   condominiumId: string | null
   company: string | null
+  unit: string | null
   locomotion: string | null
   color: string | null
   plateEncrypted: string | null
@@ -64,6 +66,7 @@ export type AccessRecordCountAggregateOutputType = {
   id: number
   condominiumId: number
   company: number
+  unit: number
   locomotion: number
   color: number
   plateEncrypted: number
@@ -84,6 +87,7 @@ export type AccessRecordMinAggregateInputType = {
   id?: true
   condominiumId?: true
   company?: true
+  unit?: true
   locomotion?: true
   color?: true
   plateEncrypted?: true
@@ -102,6 +106,7 @@ export type AccessRecordMaxAggregateInputType = {
   id?: true
   condominiumId?: true
   company?: true
+  unit?: true
   locomotion?: true
   color?: true
   plateEncrypted?: true
@@ -120,6 +125,7 @@ export type AccessRecordCountAggregateInputType = {
   id?: true
   condominiumId?: true
   company?: true
+  unit?: true
   locomotion?: true
   color?: true
   plateEncrypted?: true
@@ -211,6 +217,7 @@ export type AccessRecordGroupByOutputType = {
   id: string
   condominiumId: string
   company: string | null
+  unit: string | null
   locomotion: string | null
   color: string | null
   plateEncrypted: string | null
@@ -250,6 +257,7 @@ export type AccessRecordWhereInput = {
   id?: Prisma.StringFilter<"AccessRecord"> | string
   condominiumId?: Prisma.StringFilter<"AccessRecord"> | string
   company?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
+  unit?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
   locomotion?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
   color?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
   plateEncrypted?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
@@ -272,6 +280,7 @@ export type AccessRecordOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   condominiumId?: Prisma.SortOrder
   company?: Prisma.SortOrderInput | Prisma.SortOrder
+  unit?: Prisma.SortOrderInput | Prisma.SortOrder
   locomotion?: Prisma.SortOrderInput | Prisma.SortOrder
   color?: Prisma.SortOrderInput | Prisma.SortOrder
   plateEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -297,6 +306,7 @@ export type AccessRecordWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AccessRecordWhereInput | Prisma.AccessRecordWhereInput[]
   condominiumId?: Prisma.StringFilter<"AccessRecord"> | string
   company?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
+  unit?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
   locomotion?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
   color?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
   plateEncrypted?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
@@ -319,6 +329,7 @@ export type AccessRecordOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   condominiumId?: Prisma.SortOrder
   company?: Prisma.SortOrderInput | Prisma.SortOrder
+  unit?: Prisma.SortOrderInput | Prisma.SortOrder
   locomotion?: Prisma.SortOrderInput | Prisma.SortOrder
   color?: Prisma.SortOrderInput | Prisma.SortOrder
   plateEncrypted?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -343,6 +354,7 @@ export type AccessRecordScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"AccessRecord"> | string
   condominiumId?: Prisma.StringWithAggregatesFilter<"AccessRecord"> | string
   company?: Prisma.StringNullableWithAggregatesFilter<"AccessRecord"> | string | null
+  unit?: Prisma.StringNullableWithAggregatesFilter<"AccessRecord"> | string | null
   locomotion?: Prisma.StringNullableWithAggregatesFilter<"AccessRecord"> | string | null
   color?: Prisma.StringNullableWithAggregatesFilter<"AccessRecord"> | string | null
   plateEncrypted?: Prisma.StringNullableWithAggregatesFilter<"AccessRecord"> | string | null
@@ -360,6 +372,7 @@ export type AccessRecordScalarWhereWithAggregatesInput = {
 export type AccessRecordCreateInput = {
   id?: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -380,6 +393,7 @@ export type AccessRecordUncheckedCreateInput = {
   id?: string
   condominiumId: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -398,6 +412,7 @@ export type AccessRecordUncheckedCreateInput = {
 export type AccessRecordUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -418,6 +433,7 @@ export type AccessRecordUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   condominiumId?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -437,6 +453,7 @@ export type AccessRecordCreateManyInput = {
   id?: string
   condominiumId: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -454,6 +471,7 @@ export type AccessRecordCreateManyInput = {
 export type AccessRecordUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -470,6 +488,7 @@ export type AccessRecordUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   condominiumId?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -498,6 +517,7 @@ export type AccessRecordCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   condominiumId?: Prisma.SortOrder
   company?: Prisma.SortOrder
+  unit?: Prisma.SortOrder
   locomotion?: Prisma.SortOrder
   color?: Prisma.SortOrder
   plateEncrypted?: Prisma.SortOrder
@@ -516,6 +536,7 @@ export type AccessRecordMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   condominiumId?: Prisma.SortOrder
   company?: Prisma.SortOrder
+  unit?: Prisma.SortOrder
   locomotion?: Prisma.SortOrder
   color?: Prisma.SortOrder
   plateEncrypted?: Prisma.SortOrder
@@ -534,6 +555,7 @@ export type AccessRecordMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   condominiumId?: Prisma.SortOrder
   company?: Prisma.SortOrder
+  unit?: Prisma.SortOrder
   locomotion?: Prisma.SortOrder
   color?: Prisma.SortOrder
   plateEncrypted?: Prisma.SortOrder
@@ -700,6 +722,7 @@ export type AccessRecordUpdateOneRequiredWithoutPeopleNestedInput = {
 export type AccessRecordCreateWithoutCheckedInByUserInput = {
   id?: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -719,6 +742,7 @@ export type AccessRecordUncheckedCreateWithoutCheckedInByUserInput = {
   id?: string
   condominiumId: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -746,6 +770,7 @@ export type AccessRecordCreateManyCheckedInByUserInputEnvelope = {
 export type AccessRecordCreateWithoutCheckedOutByUserInput = {
   id?: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -765,6 +790,7 @@ export type AccessRecordUncheckedCreateWithoutCheckedOutByUserInput = {
   id?: string
   condominiumId: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -812,6 +838,7 @@ export type AccessRecordScalarWhereInput = {
   id?: Prisma.StringFilter<"AccessRecord"> | string
   condominiumId?: Prisma.StringFilter<"AccessRecord"> | string
   company?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
+  unit?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
   locomotion?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
   color?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
   plateEncrypted?: Prisma.StringNullableFilter<"AccessRecord"> | string | null
@@ -845,6 +872,7 @@ export type AccessRecordUpdateManyWithWhereWithoutCheckedOutByUserInput = {
 export type AccessRecordCreateWithoutCondominiumInput = {
   id?: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -863,6 +891,7 @@ export type AccessRecordCreateWithoutCondominiumInput = {
 export type AccessRecordUncheckedCreateWithoutCondominiumInput = {
   id?: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -907,6 +936,7 @@ export type AccessRecordUpdateManyWithWhereWithoutCondominiumInput = {
 export type AccessRecordCreateWithoutPeopleInput = {
   id?: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -926,6 +956,7 @@ export type AccessRecordUncheckedCreateWithoutPeopleInput = {
   id?: string
   condominiumId: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -959,6 +990,7 @@ export type AccessRecordUpdateToOneWithWhereWithoutPeopleInput = {
 export type AccessRecordUpdateWithoutPeopleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -978,6 +1010,7 @@ export type AccessRecordUncheckedUpdateWithoutPeopleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   condominiumId?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -996,6 +1029,7 @@ export type AccessRecordCreateManyCheckedInByUserInput = {
   id?: string
   condominiumId: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -1013,6 +1047,7 @@ export type AccessRecordCreateManyCheckedOutByUserInput = {
   id?: string
   condominiumId: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -1029,6 +1064,7 @@ export type AccessRecordCreateManyCheckedOutByUserInput = {
 export type AccessRecordUpdateWithoutCheckedInByUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1048,6 +1084,7 @@ export type AccessRecordUncheckedUpdateWithoutCheckedInByUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   condominiumId?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1066,6 +1103,7 @@ export type AccessRecordUncheckedUpdateManyWithoutCheckedInByUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   condominiumId?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1082,6 +1120,7 @@ export type AccessRecordUncheckedUpdateManyWithoutCheckedInByUserInput = {
 export type AccessRecordUpdateWithoutCheckedOutByUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1101,6 +1140,7 @@ export type AccessRecordUncheckedUpdateWithoutCheckedOutByUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   condominiumId?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1119,6 +1159,7 @@ export type AccessRecordUncheckedUpdateManyWithoutCheckedOutByUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   condominiumId?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1135,6 +1176,7 @@ export type AccessRecordUncheckedUpdateManyWithoutCheckedOutByUserInput = {
 export type AccessRecordCreateManyCondominiumInput = {
   id?: string
   company?: string | null
+  unit?: string | null
   locomotion?: string | null
   color?: string | null
   plateEncrypted?: string | null
@@ -1152,6 +1194,7 @@ export type AccessRecordCreateManyCondominiumInput = {
 export type AccessRecordUpdateWithoutCondominiumInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1170,6 +1213,7 @@ export type AccessRecordUpdateWithoutCondominiumInput = {
 export type AccessRecordUncheckedUpdateWithoutCondominiumInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1188,6 +1232,7 @@ export type AccessRecordUncheckedUpdateWithoutCondominiumInput = {
 export type AccessRecordUncheckedUpdateManyWithoutCondominiumInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locomotion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plateEncrypted?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1237,6 +1282,7 @@ export type AccessRecordSelect<ExtArgs extends runtime.Types.Extensions.Internal
   id?: boolean
   condominiumId?: boolean
   company?: boolean
+  unit?: boolean
   locomotion?: boolean
   color?: boolean
   plateEncrypted?: boolean
@@ -1260,6 +1306,7 @@ export type AccessRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   condominiumId?: boolean
   company?: boolean
+  unit?: boolean
   locomotion?: boolean
   color?: boolean
   plateEncrypted?: boolean
@@ -1281,6 +1328,7 @@ export type AccessRecordSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   condominiumId?: boolean
   company?: boolean
+  unit?: boolean
   locomotion?: boolean
   color?: boolean
   plateEncrypted?: boolean
@@ -1302,6 +1350,7 @@ export type AccessRecordSelectScalar = {
   id?: boolean
   condominiumId?: boolean
   company?: boolean
+  unit?: boolean
   locomotion?: boolean
   color?: boolean
   plateEncrypted?: boolean
@@ -1316,7 +1365,7 @@ export type AccessRecordSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AccessRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "condominiumId" | "company" | "locomotion" | "color" | "plateEncrypted" | "brandModel" | "observationsEncrypted" | "checkOutObservationsEncrypted" | "checkInAt" | "checkOutAt" | "checkedInByUserId" | "checkedOutByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["accessRecord"]>
+export type AccessRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "condominiumId" | "company" | "unit" | "locomotion" | "color" | "plateEncrypted" | "brandModel" | "observationsEncrypted" | "checkOutObservationsEncrypted" | "checkInAt" | "checkOutAt" | "checkedInByUserId" | "checkedOutByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["accessRecord"]>
 export type AccessRecordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   condominium?: boolean | Prisma.CondominiumDefaultArgs<ExtArgs>
   checkedInByUser?: boolean | Prisma.AccessRecord$checkedInByUserArgs<ExtArgs>
@@ -1347,6 +1396,7 @@ export type $AccessRecordPayload<ExtArgs extends runtime.Types.Extensions.Intern
     id: string
     condominiumId: string
     company: string | null
+    unit: string | null
     locomotion: string | null
     color: string | null
     plateEncrypted: string | null
@@ -1789,6 +1839,7 @@ export interface AccessRecordFieldRefs {
   readonly id: Prisma.FieldRef<"AccessRecord", 'String'>
   readonly condominiumId: Prisma.FieldRef<"AccessRecord", 'String'>
   readonly company: Prisma.FieldRef<"AccessRecord", 'String'>
+  readonly unit: Prisma.FieldRef<"AccessRecord", 'String'>
   readonly locomotion: Prisma.FieldRef<"AccessRecord", 'String'>
   readonly color: Prisma.FieldRef<"AccessRecord", 'String'>
   readonly plateEncrypted: Prisma.FieldRef<"AccessRecord", 'String'>
