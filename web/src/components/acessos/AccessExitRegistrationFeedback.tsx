@@ -9,6 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import MenuItem from '@mui/material/MenuItem'
 import { useMemo, useState } from 'react'
 
+import { useAccessListContext } from '@/components/acessos/context/AccessListContext'
 import { ExitDialogActions } from '@/components/acessos/styles/AccessStyles'
 import { TextField } from '@/components/form'
 import { useAppSnackbar } from '@/providers'
@@ -26,22 +27,15 @@ type ExitRegistrationTarget = {
 
 type ExitRegistrationDialogTarget = NonNullable<ExitRegistrationTarget>
 
-type AccessExitRegistrationFeedbackProps = {
-  target: ExitRegistrationTarget
-  onConfirm: (personIds?: string[], observations?: string) => Promise<void>
-  isPending: boolean
-  errorMessage: string | null
-  onClose: () => void
-}
-
-export function AccessExitRegistrationFeedback({
-  target,
-  onConfirm,
-  isPending,
-  errorMessage,
-  onClose,
-}: AccessExitRegistrationFeedbackProps) {
+export function AccessExitRegistrationFeedback() {
   const { showSuccess } = useAppSnackbar()
+  const {
+    selectedRecord: target,
+    handleConfirmExit: onConfirm,
+    isCheckOutPending: isPending,
+    checkOutErrorMessage: errorMessage,
+    handleCloseExitConfirmation: onClose,
+  } = useAccessListContext()
 
   if (!target) {
     return null

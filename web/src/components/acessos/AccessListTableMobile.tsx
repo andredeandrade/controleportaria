@@ -3,21 +3,17 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { useAccessListContext } from '@/components/acessos/context/AccessListContext'
 import { MobileRegisterExitButton } from '@/components/acessos/styles/AccessStyles'
 import { MobileListCard, MobileFieldLabel } from '@/styles/MobileList.styles'
-import type { AccessRecord } from '@/components/acessos/hooks/useAccessList'
 
-type AccessListTableMobileProps = {
-  records: AccessRecord[]
-  showActions: boolean
-  onRegisterExit: (record: AccessRecord) => void
-}
+export function AccessListTableMobile() {
+  const {
+    records,
+    showExitActions: showActions,
+    handleOpenExitConfirmation: onRegisterExit,
+  } = useAccessListContext()
 
-export function AccessListTableMobile({
-  records,
-  showActions,
-  onRegisterExit,
-}: AccessListTableMobileProps) {
   return (
     <Stack spacing={1.5}>
       {records.map((record) => (

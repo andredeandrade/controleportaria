@@ -2,7 +2,7 @@
 
 import { AccessListTableRow } from '@/components/acessos/AccessListTableRow'
 import { AccessListTableRowLoader } from '@/components/acessos/AccessListTableRowLoader'
-import type { AccessRecord } from '@/components/acessos/hooks/useAccessList'
+import { useAccessListContext } from '@/components/acessos/context/AccessListContext'
 import { ListErrorState } from '@/components/table/ListErrorState'
 import { Table } from '@/components/table/Table'
 import { TableBody } from '@/components/table/TableBody'
@@ -12,27 +12,18 @@ import { TableHeadCell } from '@/components/table/TableHeadCell'
 import { TableRow } from '@/components/table/TableRow'
 
 const SKELETON_ROW_COUNT = 5
-const DEFAULT_ERROR_MESSAGE = 'Erro ao carregar registros de acesso.'
 
-type AccessListTableProps = {
-  records: AccessRecord[]
-  showActions: boolean
-  onRegisterExit: (record: AccessRecord) => void
-  isLoading?: boolean
-  isError?: boolean
-  errorMessage?: string
-  onRetry?: () => void
-}
+export function AccessListTable() {
+  const {
+    records,
+    showExitActions: showActions,
+    handleOpenExitConfirmation: onRegisterExit,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch: onRetry,
+  } = useAccessListContext()
 
-export function AccessListTable({
-  records,
-  showActions,
-  onRegisterExit,
-  isLoading = false,
-  isError = false,
-  errorMessage = DEFAULT_ERROR_MESSAGE,
-  onRetry = () => {},
-}: AccessListTableProps) {
   const columnCount = showActions ? 6 : 5
 
   return (

@@ -18,7 +18,6 @@ type UseAccessListParams = {
 export type AccessRecord = AccessRecordListItem
 
 export function useAccessList({ viewMode }: UseAccessListParams) {
-  const [selectedRecord, setSelectedRecord] = useState<AccessRecord | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [page, setPage] = useState(1)
@@ -51,14 +50,6 @@ export function useAccessList({ viewMode }: UseAccessListParams) {
     totalPages: 1,
   }
 
-  const handleOpenExitConfirmation = (record: AccessRecord) => {
-    setSelectedRecord(record)
-  }
-
-  const handleCloseExitConfirmation = () => {
-    setSelectedRecord(null)
-  }
-
   const handleSearchChange = (value: string) => {
     setPage(1)
     setSearchTerm(value)
@@ -76,13 +67,10 @@ export function useAccessList({ viewMode }: UseAccessListParams) {
   return {
     records,
     pagination,
-    selectedRecord,
     searchTerm,
     handleSearchChange,
     handlePageChange,
     handlePageSizeChange,
-    handleOpenExitConfirmation,
-    handleCloseExitConfirmation,
     isLoading: accessRecordsQuery.isPending,
     isFetching: accessRecordsQuery.isFetching,
     isError: accessRecordsQuery.isError,
