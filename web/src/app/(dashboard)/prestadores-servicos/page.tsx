@@ -2,9 +2,9 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
-import { RegisterServiceProviderButton } from '@/components/prestadores-servicos/RegisterServiceProviderButton'
-import { ServiceProvidersList } from '@/components/prestadores-servicos/ServiceProvidersList'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
+import { RegisterServiceProviderButton } from '@/modules/prestadores-servicos/components/RegisterServiceProviderButton'
+import { ServiceProvidersList } from '@/modules/prestadores-servicos/components/ServiceProvidersList'
 
 export const metadata: Metadata = {
   title: 'Prestadores de Serviços',

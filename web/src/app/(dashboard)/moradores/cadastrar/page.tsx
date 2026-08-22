@@ -2,8 +2,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { RegisterResidentForm } from '@/components/moradores/RegisterResidentForm'
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
+import { RegisterResidentForm } from '@/modules/moradores/components/RegisterResidentForm'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
   title: 'Cadastrar Morador',

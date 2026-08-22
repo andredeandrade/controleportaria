@@ -2,8 +2,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { AccessRegisterForm } from '@/components/acessos/AccessRegisterForm'
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
+import { AccessRegisterForm } from '@/modules/acessos/components/AccessRegisterForm'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
   title: 'Registrar Acesso',

@@ -6,8 +6,8 @@ import Toolbar from '@mui/material/Toolbar'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 
-import SideBar from '@/components/sideBar'
-import TopBar from '@/components/topBar'
+import SideBar from '@/modules/sideBar'
+import TopBar from '@/modules/topBar'
 
 const drawerWidth = 256
 

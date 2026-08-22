@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { AccessList } from '@/components/acessos/AccessList'
-import { AccessRegisterButton } from '@/components/acessos/AccessRegisterButton'
+import { AccessList } from '@/modules/acessos/components/AccessList'
+import { AccessRegisterButton } from '@/modules/acessos/components/AccessRegisterButton'
 
 export const metadata: Metadata = {
   title: 'Acessos',

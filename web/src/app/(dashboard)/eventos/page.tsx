@@ -2,9 +2,9 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { RegisterEventButton } from '@/components/eventos/RegisterEventButton'
-import { EventsList } from '@/components/eventos/EventsList'
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
+import { RegisterEventButton } from '@/modules/eventos/components/RegisterEventButton'
+import { EventsList } from '@/modules/eventos/components/EventsList'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
   title: 'Eventos',

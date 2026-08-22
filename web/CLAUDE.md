@@ -6,18 +6,18 @@ This file complements the repository root `CLAUDE.md`. It documents frontend-spe
 
 - `page.tsx` files are server components (no `'use client'`): they only set `export const metadata` and render one client component that owns state/data-fetching.
 - Root `app/layout.tsx` is a server component. `app/(dashboard)/layout.tsx` is `'use client'` (owns mobile drawer open/close state).
-- The actual dividing line: anything using hooks, MUI interactive state, or React Query needs `'use client'` at the top. Nearly every component file under `components/`, `hooks/`, and `providers/` has it.
+- The actual dividing line: anything using hooks, MUI interactive state, or React Query needs `'use client'` at the top. Nearly every component file under `modules/`, `hooks/`, and `providers/` has it.
 - The middleware file is `src/proxy.ts` (not `middleware.ts`), exporting `proxy()` instead of `middleware()` — a breaking-change rename in this custom Next.js build (see root `AGENTS.md`).
 
 ## MUI / theme
 
 - Theme lives in `src/lib/mui/theme.ts` — manual color scale, `spacing: 4`, `shape.borderRadius: 8`, custom typography, component overrides for `MuiButton`/`MuiOutlinedInput`/`MuiCard`/`MuiChip`. Wired through `providers/AppThemeProvider.tsx` (`AppRouterCacheProvider` for SSR emotion cache → `ThemeProvider` → `CssBaseline`).
-- `sx` is the default styling mechanism throughout. `styled()` is reserved for a handful of shared primitives (`components/form/TextField.tsx`, `styles/MobileList.styles.ts`) — don't reach for `styled()` for one-off component styling, use `sx`.
+- `sx` is the default styling mechanism throughout. `styled()` is reserved for a handful of shared primitives (`modules/form/components/TextField.tsx`, `styles/MobileList.styles.ts`) — don't reach for `styled()` for one-off component styling, use `sx`.
 
 ## React Query
 
 - Global defaults (`lib/react-query/queryClient.ts`): 30s `staleTime`, `retry: 1` for queries / `retry: 0` for mutations, `refetchOnWindowFocus: false`.
-- Per-domain hook pair, colocated under `components/<domain>/hooks/`: `use<Domain>.ts` (list query) + `useCreate<Domain>.ts` (mutation).
+- Per-domain hook pair, colocated under `modules/<domain>/hooks/`: `use<Domain>.ts` (list query) + `useCreate<Domain>.ts` (mutation).
 - Query keys are arrays like `['residents', page, pageSize, debouncedSearchTerm]`; search input is locally debounced (~350ms) before it enters the key.
 - Mutations invalidate by key **prefix** on success (`invalidateQueries({ queryKey: ['residents'] })`), not the exact compound key — follow this broad-invalidate pattern for new mutations.
 
@@ -29,20 +29,20 @@ This file complements the repository root `CLAUDE.md`. It documents frontend-spe
 
 ## TanStack Table
 
-- `components/table/DataTable.tsx` is the single generic table, built on `useReactTable` with only `getCoreRowModel` registered — no client-side sorting/filtering/pagination.
+- `modules/table/components/DataTable.tsx` is the single generic table, built on `useReactTable` with only `getCoreRowModel` registered — no client-side sorting/filtering/pagination.
 - Pagination, sorting, and search are server-side: the list hook sends `page`/`pageSize`/search params to the BFF route, which forwards them to the Express API; the table renders whatever page it's given, plus an MUI `Pagination` bound to `pagination.totalPages`/`pagination.page` from the response.
 - Columns are `ColumnDef<T>[]` defined inline per domain in `<Domain>Table.tsx`, mixing `accessorKey` columns with custom `id`+`cell` columns for composite/action cells.
 - `DataTable.tsx` carries an eslint-disable for `react-hooks/incompatible-library` (TanStack Table is flagged by the React Compiler lint) — expected, not something to "fix".
 
-## Domain component structure (`components/<domain>/`)
+## Domain component structure (`modules/<domain>/`)
 
 Repeated identically across `acessos`, `autorizacoes`, `eventos`, `moradores`, `ocorrencias`, `prestadores-servicos`, `visitantes`:
-- `<Domain>List.tsx` — orchestrator: calls the list hook, picks mobile vs desktop via `useMediaQuery(theme.breakpoints.down('sm'))`, handles loading/error/empty inline (see below), delegates to Table or MobileList.
-- `<Domain>Table.tsx` / `<Domain>MobileList.tsx` — the responsive split, both fed the same `records` prop.
-- `Register<Domain>Form.tsx` / `Register<Domain>Button.tsx`.
-- `hooks/use<Domain>.ts`, `hooks/useCreate<Domain>.ts`.
+- `components/<Domain>List.tsx` — orchestrator: calls the list hook, picks mobile vs desktop via `useMediaQuery(theme.breakpoints.down('sm'))`, handles loading/error/empty inline (see below), delegates to Table or MobileList.
+- `components/<Domain>Table.tsx` / `mobile/<Domain>MobileList.tsx` — the responsive split, both fed the same `records` prop. Mobile-specific components live in a dedicated `mobile/` subfolder, as a sibling of `components/`.
+- `components/Register<Domain>Form.tsx` / `components/Register<Domain>Button.tsx`.
+- `hooks/use<Domain>.ts`, `hooks/useCreate<Domain>.ts` — `hooks/` (and `context/`/`providers/`/`styles/` where present) stay as siblings of `components/`/`mobile/`, not nested inside them.
 
-Most domain folders have **no** `index.ts` barrel — import each file directly by path. Barrels only exist for `components/form/`, `providers/`, `components/sideBar/`, `components/topBar/`, `lib/mui/`.
+Most domain folders have **no** `index.ts` barrel — import each file directly by path. Barrels only exist for `modules/form/` (`modules/form/index.ts` re-exporting from `./components/`), `providers/`, `modules/sideBar/`, `modules/topBar/`, `lib/mui/`.
 
 ## BFF layer (`src/app/api/<domain>/`)
 
@@ -79,8 +79,8 @@ Each route folder is `route.ts` + `helpers.ts` + `types.ts`:
 
 ## Reuse / known duplication
 
-- `components/form/` barrel (`TextField`, `TextFieldStack`, `FormPaper`, `ColorSelect`, `PersonTypeSelect`, `LocomotionSelect`) is the shared form-primitive layer — reuse these instead of styling raw MUI inputs.
-- There is no shared `utils/`/`helpers/` module for formatting. Formatting logic (e.g. `formatVehicles()`) is currently duplicated per component (`ResidentsTable.tsx` and `ResidentsMobileList.tsx` each define their own copy) — extracting a shared helper is reasonable if you're touching this area, but don't assume one already exists elsewhere.
+- `modules/form/` barrel (`TextField`, `TextFieldStack`, `FormPaper`, `ColorSelect`, `PersonTypeSelect`, `LocomotionSelect`) is the shared form-primitive layer — reuse these instead of styling raw MUI inputs.
+- There is no shared `utils/`/`helpers/` module for formatting. Formatting logic (e.g. `formatVehicles()`) is currently duplicated per component (`moradores/components/ResidentsTable.tsx` and `moradores/mobile/ResidentsMobileList.tsx` each define their own copy) — extracting a shared helper is reasonable if you're touching this area, but don't assume one already exists elsewhere.
 
 ## Performance
 

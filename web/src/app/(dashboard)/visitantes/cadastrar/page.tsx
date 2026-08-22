@@ -2,8 +2,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
-import { RegisterVisitorForm } from '@/components/visitantes/RegisterVisitorForm'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
+import { RegisterVisitorForm } from '@/modules/visitantes/components/RegisterVisitorForm'
 
 export const metadata: Metadata = {
   title: 'Cadastrar Visitante',
