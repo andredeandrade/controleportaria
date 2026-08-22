@@ -10,10 +10,11 @@ import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 
 import { useCreateAccessRecord } from '@/components/acessos/hooks/useCreateAccessRecord'
+import { type PersonSearchOption } from '@/components/acessos/hooks/usePersonSearch'
+import { PersonSearchAutocomplete } from '@/components/acessos/PersonSearchAutocomplete'
 import {
   type AccessPersonTypeValue,
   type ColorValue,
@@ -53,6 +54,7 @@ export function AccessRegisterForm() {
     control,
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<AccessRegisterFormValues>({
     defaultValues: {
@@ -76,14 +78,27 @@ export function AccessRegisterForm() {
     (person) => person.category === 'prestador_servico',
   )
 
-  const [searchQueries, setSearchQueries] = useState<Record<string, string>>({})
-
   const handleAddPerson = () => {
     append({ category: '', name: '', document: '', unit: '' })
   }
 
   const handleRemovePerson = (index: number) => {
     remove(index)
+  }
+
+  const handlePersonSelect = (index: number, option: PersonSearchOption) => {
+    setValue(`people.${index}.name`, option.name, { shouldDirty: true, shouldValidate: true })
+    setValue(`people.${index}.document`, option.document, { shouldDirty: true })
+    setValue(`people.${index}.unit`, option.unit, { shouldDirty: true })
+
+    if (index === 0) {
+      if (option.locomotion) {
+        setValue('locomotion', option.locomotion, { shouldDirty: true, shouldValidate: true })
+      }
+      if (option.companyName) {
+        setValue('company', option.companyName, { shouldDirty: true })
+      }
+    }
   }
 
   const onSubmit = async (data: AccessRegisterFormValues) => {
@@ -163,12 +178,9 @@ export function AccessRegisterForm() {
 
               <TextFieldStack>
                 <TextFieldLabel>Buscar cadastro</TextFieldLabel>
-                <TextField
-                  placeholder="Nome, CPF ou unidade..."
-                  value={searchQueries[personField.id] ?? ''}
-                  onChange={(event) =>
-                    setSearchQueries((prev) => ({ ...prev, [personField.id]: event.target.value }))
-                  }
+                <PersonSearchAutocomplete
+                  category={personCategory || ''}
+                  onSelect={(option) => handlePersonSelect(index, option)}
                 />
               </TextFieldStack>
 
