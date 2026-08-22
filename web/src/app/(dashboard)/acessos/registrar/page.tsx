@@ -2,21 +2,30 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { AccessRegisterForm } from '@/components/acessos/AccessRegisterForm'
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
+import { AccessRegisterForm } from '@/modules/acessos/components/AccessRegisterForm'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
-  title: 'Registrar Entrada',
+  title: 'Registrar Acesso',
 }
 
 export default function AcessoRegistrarPage() {
   return (
-    <Stack spacing={2}>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ color: 'grey.900' }}>
-        <BackToPreviousPageButton ariaLabel="Voltar para a pagina anterior" />
+    <Stack spacing={6} py={5}>
+      <Stack spacing={2}>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <BackToPreviousPageButton
+            ariaLabel="Voltar para a pagina anterior"
+            fallbackHref="/acessos"
+          />
 
-        <Typography variant="h6" fontWeight={700} color="inherit">
-          Registrar entrada
+          <Typography variant="h2" fontWeight={700} color="text.primary">
+            Registrar Acesso
+          </Typography>
+        </Stack>
+
+        <Typography variant="body2" color="text.secondary">
+          Identifique a categoria e preencha os dados para registrar o acesso.
         </Typography>
       </Stack>
 

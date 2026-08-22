@@ -2,8 +2,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
-import { RegisterServiceProviderForm } from '@/components/prestadores-servicos/RegisterServiceProviderForm'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
+import { RegisterServiceProviderForm } from '@/modules/prestadores-servicos/components/RegisterServiceProviderForm'
 
 export const metadata: Metadata = {
   title: 'Cadastrar Prestador de Serviços',

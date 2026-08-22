@@ -34,6 +34,7 @@ function parsePeople(value: unknown): AccessRecordPersonInput[] {
         category: '',
         name: '',
         document: '',
+        unit: '',
       }
     }
 
@@ -43,6 +44,7 @@ function parsePeople(value: unknown): AccessRecordPersonInput[] {
       category: String(personRecord['category'] ?? ''),
       name: String(personRecord['name'] ?? ''),
       document: readOptionalString(personRecord['document']),
+      unit: readOptionalString(personRecord['unit']),
     }
   })
 }

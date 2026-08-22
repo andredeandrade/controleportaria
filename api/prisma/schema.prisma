@@ -202,6 +202,7 @@ model AccessRecordPerson {
   accessRecord      AccessRecord @relation(fields: [accessRecordId], references: [id], onDelete: Cascade)
   category          String
   name              String
+  unit              String?
   documentEncrypted String?
   checkOutObservationsEncrypted String?
   checkOutAt        DateTime?

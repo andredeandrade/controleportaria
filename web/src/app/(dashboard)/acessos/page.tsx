@@ -1,43 +1,32 @@
 import type { Metadata } from 'next'
+import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { AccessList } from '@/components/acessos/AccessList'
-import { AccessRegisterButton } from '@/components/acessos/AccessRegisterButton'
+import { AccessList } from '@/modules/acessos/components/AccessList'
+import { AccessRegisterButton } from '@/modules/acessos/components/AccessRegisterButton'
 
-type AcessosPageProps = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+export const metadata: Metadata = {
+  title: 'Acessos',
 }
 
-const getAccessPageTitle = (status: string | string[] | undefined): string => {
-  const normalizedStatus = Array.isArray(status) ? status[0] : status
-
-  return normalizedStatus === 'history' ? 'Histórico de Acessos' : 'Acessos Ativos'
-}
-
-export async function generateMetadata({ searchParams }: AcessosPageProps): Promise<Metadata> {
-  const resolvedSearchParams = await searchParams
-  const pageTitle = getAccessPageTitle(resolvedSearchParams.status)
-
-  return {
-    title: pageTitle,
-  }
-}
-
-export default async function AcessosPage({ searchParams }: AcessosPageProps) {
-  const resolvedSearchParams = await searchParams
-  const pageTitle = getAccessPageTitle(resolvedSearchParams.status)
-
+export default function AcessosPage() {
   return (
-    <Stack spacing={2}>
+    <Stack spacing={6} py={5}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
+        spacing={4}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        <Typography variant="h6" fontWeight={700} sx={{ color: 'grey.900' }}>
-          {pageTitle}
-        </Typography>
+        <Box>
+          <Typography variant="h2" fontWeight={700} color="text.primary">
+            Acessos
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>
+            Acompanhe as entradas e saídas registradas na portaria.
+          </Typography>
+        </Box>
 
         <Stack
           direction="row"
