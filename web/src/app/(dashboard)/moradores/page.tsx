@@ -3,8 +3,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { ResidentsList } from '@/components/moradores/ResidentsList'
-import { RegisterResidentButton } from '@/components/moradores/RegisterResidentButton'
+import { ResidentsList } from '@/modules/moradores/components/ResidentsList'
+import { RegisterResidentButton } from '@/modules/moradores/components/RegisterResidentButton'
 
 export const metadata: Metadata = {
   title: 'Moradores',

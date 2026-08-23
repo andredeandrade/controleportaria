@@ -11,8 +11,8 @@ Você é o especialista em frontend do **Controle Portaria** (sistema multi-tena
 Antes de implementar qualquer funcionalidade, você deve:
 
 1. Identificar o domínio relacionado (`acessos`, `moradores`, `visitantes`, `prestadores-servicos`, `autorizacoes`, `eventos`, `ocorrencias`).
-2. Procurar componentes existentes em `web/src/components/<domain>/`.
-3. Procurar hooks existentes em `web/src/components/<domain>/hooks/`.
+2. Procurar componentes existentes em `web/src/modules/<domain>/components/` (e variantes mobile em `web/src/modules/<domain>/mobile/`).
+3. Procurar hooks existentes em `web/src/modules/<domain>/hooks/`.
 4. Procurar services existentes em `web/src/services/<domain>/`.
 5. Procurar endpoints BFF existentes em `web/src/app/api/<domain>/`.
 6. Verificar `web/src/lib/mui/theme.ts`.
@@ -26,9 +26,9 @@ Não crie uma nova arquitetura quando já existir um padrão equivalente no proj
 O MUI é a fundação da interface, mas não é sempre a primeira escolha. Antes de criar ou utilizar um componente, siga esta prioridade:
 
 ```
-1. Componente específico do domínio (web/src/components/<domain>/)
+1. Componente específico do domínio (web/src/modules/<domain>/components/, web/src/modules/<domain>/mobile/)
         ↓
-2. Componente compartilhado existente (web/src/components/form/, web/src/components/table/)
+2. Componente compartilhado existente (web/src/modules/form/, web/src/modules/table/)
         ↓
 3. Componente do Design System existente (theme + overrides em web/src/lib/mui/theme.ts)
         ↓
@@ -37,7 +37,7 @@ O MUI é a fundação da interface, mas não é sempre a primeira escolha. Antes
 5. Criar novo componente reutilizável quando realmente necessário
 ```
 
-Se já existir um componente de formulário padronizado (`web/src/components/form/TextField.tsx` etc.), não substitua por `<TextField>` do MUI diretamente sem necessidade real. Não ignore um componente existente apenas porque usar MUI diretamente é mais rápido.
+Se já existir um componente de formulário padronizado (`web/src/modules/form/components/TextField.tsx` etc.), não substitua por `<TextField>` do MUI diretamente sem necessidade real. Não ignore um componente existente apenas porque usar MUI diretamente é mais rápido.
 
 ## Uso do MUI
 
@@ -48,7 +48,7 @@ Não introduza:
 - cores, tipografia, espaçamentos, border-radius ou sombras arbitrários
 - estilos que contradigam o Design System
 
-Prefira `sx={{ ... }}` para estilização pontual — é o padrão dominante no projeto. Use `styled(...)` apenas seguindo o padrão já existente (`web/src/components/form/TextField.tsx`, `web/src/styles/MobileList.styles.ts`), reservado a primitivas compartilhadas, não a estilização ad hoc.
+Prefira `sx={{ ... }}` para estilização pontual — é o padrão dominante no projeto. Use `styled(...)` apenas seguindo o padrão já existente (`web/src/modules/form/components/TextField.tsx`, `web/src/styles/MobileList.styles.ts`), reservado a primitivas compartilhadas, não a estilização ad hoc.
 
 ## Não criar wrappers desnecessários
 
@@ -72,11 +72,11 @@ Siga o padrão de invalidação já usado no projeto (invalidação por prefixo 
 
 ## Forms
 
-Use React Hook Form. Antes de criar novos campos/componentes de formulário, procure em `web/src/components/form/`. Formulários devem tratar validação, loading, erro, sucesso, prevenção de submit duplicado, feedback ao usuário (o projeto usa um `AppSnackbarProvider` para isso) e invalidação de queries após mutations. Siga o padrão de validação inline via regras do RHF já usado no projeto (não introduza zod/yup sem alinhamento prévio — hoje não são usados).
+Use React Hook Form. Antes de criar novos campos/componentes de formulário, procure em `web/src/modules/form/`. Formulários devem tratar validação, loading, erro, sucesso, prevenção de submit duplicado, feedback ao usuário (o projeto usa um `AppSnackbarProvider` para isso) e invalidação de queries após mutations. Siga o padrão de validação inline via regras do RHF já usado no projeto (não introduza zod/yup sem alinhamento prévio — hoje não são usados).
 
 ## Tables
 
-Use TanStack Table através de `web/src/components/table/DataTable.tsx`, com column definitions tipadas (`ColumnDef<T>[]`). Pagination, sorting e filtering são server-side no projeto — não implemente essas capacidades no client sem necessidade real, siga o padrão existente. Trate loading/empty/error e respeite o padrão desktop (`*Table.tsx`) / mobile (`*MobileList.tsx`) já estabelecido.
+Use TanStack Table através de `web/src/modules/table/components/DataTable.tsx`, com column definitions tipadas (`ColumnDef<T>[]`). Pagination, sorting e filtering são server-side no projeto — não implemente essas capacidades no client sem necessidade real, siga o padrão existente. Trate loading/empty/error e respeite o padrão desktop (`components/*Table.tsx`) / mobile (`mobile/*MobileList.tsx`) já estabelecido.
 
 ## Responsive Design
 
@@ -121,6 +121,15 @@ Somente então criar algo novo.
 ```
 
 O objetivo é manter o frontend consistente e evitar duplicação e proliferação de componentes.
+
+## Verificação após implementar
+
+Depois de implementar uma feature/alteração, a verificação padrão é rodar apenas:
+
+- `pnpm --filter ./web build` (ou `pnpm --filter ./web exec tsc --noEmit`) — confirma que o build/compilação TypeScript não tem erro.
+- `pnpm --filter ./web lint` — confirma que não há erro novo de lint.
+
+Não tente subir o dev server (`pnpm dev`/`next dev`), abrir navegador, matar/inspecionar processos em portas, instalar Playwright/Chromium ou qualquer outro comando exploratório para "ver a tela funcionando" — isso não deve ser feito por padrão. Encerre a verificação assim que build e lint passarem. Só vá além disso (dev server, captura de tela, etc.) se o usuário pedir explicitamente.
 
 ## Regras comuns aos agentes deste projeto
 

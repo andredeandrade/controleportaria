@@ -2,8 +2,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { AccessRegisterButton } from '@/components/acessos/AccessRegisterButton'
-import { DashboardRecentAccesses } from '@/components/dashboard/DashboardRecentAccesses'
+import { AccessRegisterButton } from '@/modules/acessos/components/AccessRegisterButton'
+import { DashboardRecentAccesses } from '@/modules/dashboard/components/DashboardRecentAccesses'
 
 export const metadata: Metadata = {
   title: 'Dashboard',

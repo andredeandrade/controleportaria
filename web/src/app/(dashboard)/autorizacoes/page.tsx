@@ -1,9 +1,9 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
-import { RegisterAuthorizationButton } from '@/components/autorizacoes/RegisterAuthorizationButton'
-import { AuthorizationsList } from '@/components/autorizacoes/AuthorizationsList'
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
+import { RegisterAuthorizationButton } from '@/modules/autorizacoes/components/RegisterAuthorizationButton'
+import { AuthorizationsList } from '@/modules/autorizacoes/components/AuthorizationsList'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
   title: 'Autorizações',

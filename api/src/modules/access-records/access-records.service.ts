@@ -58,6 +58,7 @@ function validatePeople(people: AccessRecordPersonInput[] | undefined): AccessRe
     const category = String(person.category ?? '').trim()
     const name = String(person.name ?? '').trim()
     const document = normalizeOptionalText(person.document)
+    const unit = normalizeOptionalText(person.unit)
 
     if (!PERSON_CATEGORIES.has(category)) {
       throw new HttpError(400, `Categoria da pessoa ${index + 1} inválida.`)
@@ -75,6 +76,7 @@ function validatePeople(people: AccessRecordPersonInput[] | undefined): AccessRe
       category,
       name,
       document: document ?? undefined,
+      unit: unit ?? undefined,
     }
   })
 }
@@ -178,6 +180,7 @@ function toResponse(accessRecord: {
     id: string
     category: string
     name: string
+    unit: string | null
     documentEncrypted: string | null
     checkOutAt: Date | null
     checkedOutByUserId: string | null
@@ -190,6 +193,7 @@ function toResponse(accessRecord: {
       id: person.id,
       category: person.category,
       name: person.name,
+      unit: person.unit,
       document: person.documentEncrypted ? decryptText(person.documentEncrypted) : null,
       checkOutAt: person.checkOutAt,
       checkedOutByUserId: person.checkedOutByUserId,
@@ -229,6 +233,7 @@ function matchesSearch(
     people: Array<{
       category: string
       name: string
+      unit: string | null
       documentEncrypted: string | null
     }>
   },
@@ -249,6 +254,7 @@ function matchesSearch(
     ...accessRecord.people.flatMap((person) => [
       person.name,
       person.category,
+      person.unit,
       person.documentEncrypted ? decryptText(person.documentEncrypted) : null,
     ]),
   ]
@@ -282,6 +288,7 @@ export const accessRecordsService = {
           create: people.map((person) => ({
             category: person.category,
             name: person.name,
+            unit: person.unit ?? null,
             documentEncrypted: person.document ? encryptText(person.document) : null,
           })),
         },

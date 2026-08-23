@@ -1,11 +1,16 @@
 import type { AccessRecord } from '@/app/api/access-records/types'
 
-export type AccessListViewMode = 'active' | 'history'
+export type AccessListViewMode = 'active' | 'all'
+
+export type AccessRecordCategoryUnit = {
+  id: string
+  label: string
+}
 
 export type AccessRecordListItem = {
   id: string
   name: string
-  category: string
+  categoryUnits: AccessRecordCategoryUnit[]
   locomotion: string
   plate: string
   entryAt: string
@@ -41,9 +46,16 @@ export const ACCESS_LOCOMOTION_LABEL: Record<string, string> = {
   outro: 'Outro',
 }
 
+function buildCategoryUnitLabel(person: { category: string; unit: string | null }): string {
+  const categoryRaw = person.category ?? ''
+  const category = (ACCESS_PERSON_CATEGORY_LABEL[categoryRaw] ?? categoryRaw) || '-'
+
+  const unitValue = person.unit?.trim()
+  return category !== '-' ? (unitValue ? `${category}: ${unitValue}` : category) : '-'
+}
+
 export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
   const peopleToDisplay = item.isOpen ? item.people.filter((person) => person.isOpen) : item.people
-  const firstPerson = peopleToDisplay[0] ?? item.people[0]
   const name =
     peopleToDisplay
       .map((person) => person.name.trim())
@@ -55,8 +67,11 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
       .join(', ') ||
     '-'
 
-  const categoryRaw = firstPerson?.category ?? ''
-  const category = (ACCESS_PERSON_CATEGORY_LABEL[categoryRaw] ?? categoryRaw) || '-'
+  const peopleForCategoryUnits = peopleToDisplay.length > 0 ? peopleToDisplay : item.people
+  const categoryUnits = peopleForCategoryUnits.map((person) => ({
+    id: person.id,
+    label: buildCategoryUnitLabel(person),
+  }))
 
   const locomotionRaw = item.locomotion ?? ''
   const locomotion = (ACCESS_LOCOMOTION_LABEL[locomotionRaw] ?? locomotionRaw) || '-'
@@ -81,7 +96,7 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
   return {
     id: item.id,
     name,
-    category,
+    categoryUnits,
     locomotion,
     plate: item.plate?.trim() ? item.plate : '-',
     entryAt,

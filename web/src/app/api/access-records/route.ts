@@ -25,6 +25,7 @@ function parseCreateBody(body: unknown): CreateAccessRecordRequest {
           name: String(personPayload['name'] ?? ''),
           document:
             typeof personPayload['document'] === 'string' ? personPayload['document'] : undefined,
+          unit: typeof personPayload['unit'] === 'string' ? personPayload['unit'] : undefined,
         }
       })
     : []

@@ -2,9 +2,9 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
-import { VisitorsList } from '@/components/visitantes/VisitorsList'
-import { RegisterVisitorButton } from '@/components/visitantes/RegisterVisitorButton'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
+import { VisitorsList } from '@/modules/visitantes/components/VisitorsList'
+import { RegisterVisitorButton } from '@/modules/visitantes/components/RegisterVisitorButton'
 
 export const metadata: Metadata = {
   title: 'Visitantes',

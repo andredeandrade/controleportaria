@@ -2,8 +2,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { RegisterAuthorizationForm } from '@/components/autorizacoes/RegisterAuthorizationForm'
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
+import { RegisterAuthorizationForm } from '@/modules/autorizacoes/components/RegisterAuthorizationForm'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
   title: 'Nova autorização',

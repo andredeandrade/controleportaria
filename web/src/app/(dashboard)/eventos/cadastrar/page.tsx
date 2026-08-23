@@ -2,8 +2,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { RegisterEventForm } from '@/components/eventos/RegisterEventForm'
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
+import { RegisterEventForm } from '@/modules/eventos/components/RegisterEventForm'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
   title: 'Cadastrar Evento',

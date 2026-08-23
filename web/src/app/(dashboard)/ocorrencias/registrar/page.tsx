@@ -2,8 +2,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
-import { RegisterOccurrenceForm } from '@/components/ocorrencias/RegisterOccurrenceForm'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
+import { RegisterOccurrenceForm } from '@/modules/ocorrencias/components/RegisterOccurrenceForm'
 
 export const metadata: Metadata = {
   title: 'Registrar Ocorrência',

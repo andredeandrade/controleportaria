@@ -65,17 +65,17 @@ Each domain (`auth`, `condominiums`, `residents`, `visitors`, `service-providers
 ### Web BFF route pattern (`web/src/app/api/<domain>/`)
 Each Next.js Route Handler pairs `route.ts` (handler) + `helpers.ts` (server-side fetch to the Express API + error translation) + `types.ts` (request/response shapes). Follow this 3-file structure for new BFF endpoints rather than inlining fetch logic in `route.ts`.
 
-### Web feature-folder pattern (`web/src/components/<domain>/`)
-Each domain (`acessos`, `moradores`, `visitantes`, `prestadores-servicos`, `autorizacoes`, `eventos`, `ocorrencias`) bundles `*List.tsx`, `*Table.tsx`, `*MobileList.tsx` (responsive split), `Register*Form.tsx`, `Register*Button.tsx`, plus a local `hooks/` subfolder. Match this shape when adding a new domain area.
+### Web feature-folder pattern (`web/src/modules/<domain>/`)
+Each domain (`acessos`, `moradores`, `visitantes`, `prestadores-servicos`, `autorizacoes`, `eventos`, `ocorrencias`) bundles a `components/` subfolder with `*List.tsx`, `*Table.tsx`, `Register*Form.tsx`, `Register*Button.tsx`; a `mobile/` subfolder with the responsive-split `*MobileList.tsx`; and a local `hooks/` subfolder as siblings of `components/`/`mobile/`. Match this shape when adding a new domain area.
 
 ### Shared building blocks
 - `web/src/services/shared/http.ts` — `safeReadJson()` / `getApiErrorMessage()`, used by every `services/<domain>/service.ts`; each domain also defines its own `<Domain>ServiceError extends Error`.
-- `web/src/components/form/` — shared form primitives (`TextField`, `TextFieldStack`, `FormPaper`, `ColorSelect`, `PersonTypeSelect`, `LocomotionSelect`), barreled via `index.ts`.
+- `web/src/modules/form/` — shared form primitives (`TextField`, `TextFieldStack`, `FormPaper`, `ColorSelect`, `PersonTypeSelect`, `LocomotionSelect`) living in `form/components/`, barreled via `form/index.ts`.
 - `web/src/lib/mui/theme.ts` — the MUI theme (Inter font, custom palette, component overrides); wired through `web/src/providers/AppThemeProvider.tsx` with `AppRouterCacheProvider` for SSR emotion caching.
 - `web/src/providers/AppProviders.tsx` — nests ReactQuery → Theme → Snackbar providers, mounted once in root `layout.tsx`.
 - Server state is React Query only (`web/src/lib/react-query/queryClient.ts`, 30s staleTime, no refetch-on-focus) via a per-domain `useX.ts` (query) / `useCreateX.ts` (mutation) hook pair — never duplicate server cache in local state.
 - Forms use `react-hook-form` throughout.
-- Tables use `@tanstack/react-table` via `web/src/components/table/DataTable.tsx` with typed column defs.
+- Tables use `@tanstack/react-table` via `web/src/modules/table/components/DataTable.tsx` with typed column defs.
 - PDF export uses `jspdf`/`jspdf-autotable` (`web/src/services/relatorios/pdf.ts`).
 
 ## Conventions

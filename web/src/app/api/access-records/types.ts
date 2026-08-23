@@ -3,6 +3,7 @@ export type AccessRecordPerson = {
   category: string
   name: string
   document: string | null
+  unit: string | null
   checkOutAt: string | null
   checkedOutByUserId: string | null
   checkOutObservations: string | null
@@ -43,6 +44,7 @@ export type CreateAccessRecordRequest = {
     category: string
     name: string
     document?: string
+    unit?: string
   }>
   company?: string
   locomotion?: string

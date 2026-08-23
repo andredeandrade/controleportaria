@@ -2,10 +2,10 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { BackToPreviousPageButton } from '@/components/navigation/BackToPreviousPageButton'
-import { RegisterOccurrenceButton } from '@/components/ocorrencias/RegisterOccurrenceButton'
+import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
+import { RegisterOccurrenceButton } from '@/modules/ocorrencias/components/RegisterOccurrenceButton'
 
-import { OccurrencesList } from '@/components/ocorrencias/OccurrencesList'
+import { OccurrencesList } from '@/modules/ocorrencias/components/OccurrencesList'
 
 export const metadata: Metadata = {
   title: 'Ocorrências',

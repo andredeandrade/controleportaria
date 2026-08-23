@@ -1,4 +1,4 @@
-import type { PersonTypeValue } from '@/components/form/PersonTypeSelect'
+import type { PersonTypeValue } from '@/modules/form/components/PersonTypeSelect'
 
 export type AuthorizationRecord = {
   id: string

@@ -1,4 +1,4 @@
-import { LoginForm } from '@/components/auth/LoginForm'
+import { LoginForm } from '@/modules/auth/components/LoginForm'
 import Box from '@mui/material/Box'
 import type { Metadata } from 'next'
 

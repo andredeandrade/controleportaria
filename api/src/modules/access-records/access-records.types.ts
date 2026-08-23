@@ -2,6 +2,7 @@ export interface AccessRecordPersonInput {
   category: string
   name: string
   document?: string
+  unit?: string
 }
 
 export interface CheckInAccessRecordInput {
@@ -36,6 +37,7 @@ export interface AccessRecordPersonResponse {
   id: string
   category: string
   name: string
+  unit: string | null
   document: string | null
   checkOutAt: Date | null
   checkedOutByUserId: string | null
