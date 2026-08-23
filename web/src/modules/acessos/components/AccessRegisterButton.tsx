@@ -2,16 +2,19 @@
 
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import Button from '@mui/material/Button'
+import type { SxProps, Theme } from '@mui/material/styles'
 import { useRouter } from 'next/navigation'
 
 type AccessRegisterButtonProps = {
   fullWidth?: boolean
   size?: 'medium' | 'large'
+  sx?: SxProps<Theme>
 }
 
 export function AccessRegisterButton({
   fullWidth = false,
   size = 'medium',
+  sx,
 }: AccessRegisterButtonProps) {
   const router = useRouter()
 
@@ -27,6 +30,7 @@ export function AccessRegisterButton({
       fullWidth={fullWidth}
       startIcon={<AddRoundedIcon fontSize="small" />}
       onClick={handleNavigateToRegister}
+      sx={sx}
     >
       Registrar Acesso
     </Button>

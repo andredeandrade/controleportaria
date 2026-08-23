@@ -127,7 +127,7 @@ export function AccessRegisterForm() {
   }
 
   return (
-    <Stack component="form" spacing={5} onSubmit={handleSubmit(onSubmit)}>
+    <Stack component="form" spacing={{ xs: 4, sm: 5 }} onSubmit={handleSubmit(onSubmit)}>
       {fields.map((personField, index) => {
         const canRemovePerson = fields.length > 1 && index > 0
         const isFirstPerson = index === 0
@@ -138,8 +138,8 @@ export function AccessRegisterForm() {
             : 'Unidade'
 
         return (
-          <Card key={personField.id} sx={{ p: 5, overflow: 'hidden' }}>
-            <Stack spacing={3.5}>
+          <Card key={personField.id} sx={{ p: { xs: 3, sm: 5 }, overflow: 'hidden' }}>
+            <Stack spacing={{ xs: 3, sm: 3.5 }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography
                   variant="overline"
@@ -184,7 +184,7 @@ export function AccessRegisterForm() {
                 />
               </TextFieldStack>
 
-              <Grid container spacing={3.5}>
+              <Grid container spacing={{ xs: 2.5, sm: 3.5 }}>
                 <Grid size={{ xs: 12, sm: 4 }}>
                   <TextFieldStack>
                     <TextFieldLabel required>Nome</TextFieldLabel>
@@ -223,7 +223,7 @@ export function AccessRegisterForm() {
 
               {isFirstPerson ? (
                 <>
-                  <Grid container spacing={3.5}>
+                  <Grid container spacing={{ xs: 2.5, sm: 3.5 }}>
                     <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                       <TextFieldStack>
                         <TextFieldLabel required>Locomoção</TextFieldLabel>
@@ -302,21 +302,38 @@ export function AccessRegisterForm() {
       </Button>
 
       <Stack
-        direction="row"
+        direction={{ xs: 'column-reverse', sm: 'row' }}
         justifyContent="flex-end"
         spacing={1.5}
-        sx={{ pt: 2, borderTop: '1px solid', borderColor: 'rgba(255, 255, 255, 0.06)' }}
+        sx={{
+          pt: 2,
+          pb: { xs: 2, sm: 0 },
+          borderTop: '1px solid',
+          borderColor: 'rgba(255, 255, 255, 0.06)',
+          position: { xs: 'sticky', sm: 'static' },
+          bottom: 0,
+          bgcolor: 'background.default',
+        }}
       >
         <Button
           variant="outlined"
           color="inherit"
           onClick={() => router.back()}
-          sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+          sx={{
+            color: 'text.primary',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            width: { xs: '100%', sm: 'auto' },
+          }}
         >
           Cancelar
         </Button>
 
-        <Button type="submit" disabled={isSubmitting || createAccessRecordMutation.isPending} variant="contained">
+        <Button
+          type="submit"
+          disabled={isSubmitting || createAccessRecordMutation.isPending}
+          variant="contained"
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
           {isSubmitting || createAccessRecordMutation.isPending ? (
             <Stack direction="row" spacing={1} alignItems="center">
               <CircularProgress size={18} color="inherit" />

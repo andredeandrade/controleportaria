@@ -21,9 +21,18 @@ export const RegisterExitButton = styled(Button)(({ theme }) => ({
   },
 }))
 
-export const MobileRegisterExitButton = styled(RegisterExitButton)({
-  alignSelf: 'flex-start',
-})
+export const MobileRegisterExitButton = styled(Button)(({ theme }) => ({
+  width: '100%',
+  borderRadius: 999,
+  fontWeight: 700,
+  fontSize: '0.8125rem',
+  borderColor: theme.palette.divider,
+  color: theme.palette.text.primary,
+  '&:hover': {
+    borderColor: theme.palette.text.secondary,
+    backgroundColor: theme.palette.action.hover,
+  },
+}))
 
 export const ExitDialogActions = styled(DialogActions)({
   paddingLeft: 24,

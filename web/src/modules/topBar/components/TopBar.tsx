@@ -49,7 +49,6 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
     >
       <Toolbar sx={{ minHeight: 64, px: { xs: '12px', md: '24px' } }}>
         <IconButton
-          edge="start"
           color="inherit"
           onClick={onOpenMenu}
           sx={{ display: { md: 'none' }, mr: 1, color: 'text.primary' }}
@@ -101,7 +100,7 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
               <PersonRoundedIcon sx={{ fontSize: 18 }} />
             </Avatar>
 
-            <Box sx={{ minWidth: 0 }}>
+            <Box sx={{ minWidth: 0, display: { xs: 'none', sm: 'block' } }}>
               <Typography
                 variant="subtitle2"
                 noWrap

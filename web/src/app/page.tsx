@@ -14,7 +14,7 @@ export default function HomePage() {
         minHeight: '100vh',
         display: 'grid',
         placeItems: 'center',
-        px: 2,
+        px: { xs: 5, sm: 2 },
         bgcolor: 'background.default',
       }}
     >

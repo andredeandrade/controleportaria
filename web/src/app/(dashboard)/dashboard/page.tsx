@@ -11,9 +11,9 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <Stack spacing={6} py={5}>
+    <Stack spacing={{ xs: 3, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack
-        direction="row"
+        direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         flexWrap="wrap"
@@ -26,7 +26,7 @@ export default function DashboardPage() {
           </Typography>
         </Stack>
 
-        <AccessRegisterButton size="large" />
+        <AccessRegisterButton size="large" sx={{ width: { xs: '100%', sm: 'auto' } }} />
       </Stack>
 
       <DashboardRecentAccesses />
