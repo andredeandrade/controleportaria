@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 export default function AcessoRegistrarPage() {
   return (
-    <Stack spacing={6} py={5}>
-      <Stack spacing={2}>
+    <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
+      <Stack spacing={{ xs: 2.5, sm: 2 }}>
         <Stack direction="row" spacing={1.5} alignItems="center">
           <BackToPreviousPageButton
             ariaLabel="Voltar para a pagina anterior"

@@ -72,7 +72,7 @@ export default function SideBar({ onItemClick }: SideBarProps) {
         bgcolor: 'background.paper',
         borderRight: { md: '1px solid' },
         borderColor: 'divider',
-        height: { xs: 'auto', md: '100vh' },
+        height: { xs: 'auto', md: '100%' },
         display: 'flex',
         flexDirection: 'column',
       }}

@@ -5,6 +5,9 @@ export type AccessListViewMode = 'active' | 'all'
 export type AccessRecordCategoryUnit = {
   id: string
   label: string
+  category: string
+  categoryLabel: string
+  unit: string | null
 }
 
 export type AccessRecordListItem = {
@@ -71,6 +74,10 @@ export function formatAccessRecord(item: AccessRecord): AccessRecordListItem {
   const categoryUnits = peopleForCategoryUnits.map((person) => ({
     id: person.id,
     label: buildCategoryUnitLabel(person),
+    category: person.category,
+    categoryLabel:
+      (ACCESS_PERSON_CATEGORY_LABEL[person.category ?? ''] ?? person.category ?? '') || '-',
+    unit: person.unit?.trim() || null,
   }))
 
   const locomotionRaw = item.locomotion ?? ''

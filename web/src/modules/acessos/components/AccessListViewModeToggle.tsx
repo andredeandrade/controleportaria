@@ -9,7 +9,7 @@ export function AccessListViewModeToggle() {
   const { viewMode, setViewMode } = useAccessListContext()
 
   return (
-    <Stack direction="row" spacing={1}>
+    <Stack direction="row" spacing={2}>
       <Button
         size="small"
         variant={viewMode === 'all' ? 'contained' : 'outlined'}

@@ -11,22 +11,22 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <Stack spacing={6} py={5}>
+    <Stack spacing={{ xs: 7, sm: 5 }} py={{ xs: 3, sm: 5 }}>
       <Stack
-        direction="row"
+        direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         flexWrap="wrap"
-        spacing={2}
+        spacing={3}
       >
-        <Stack spacing={0.5} mb={2}>
+        <Stack spacing={2}>
           <Typography variant="h2">Dashboard</Typography>
           <Typography variant="body1" color="text.secondary">
             Visão geral de acessos do condomínio.
           </Typography>
         </Stack>
 
-        <AccessRegisterButton size="large" />
+        <AccessRegisterButton size="large" sx={{ width: { xs: '100%', sm: 'auto' } }} />
       </Stack>
 
       <DashboardRecentAccesses />

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function AcessosPage() {
   return (
-    <Stack spacing={6} py={5}>
+    <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={4}
@@ -35,7 +35,7 @@ export default function AcessosPage() {
             width: { xs: '100%', sm: 'auto' },
           }}
         >
-          <AccessRegisterButton />
+          <AccessRegisterButton sx={{ width: { xs: '100%', sm: 'auto' } }} />
         </Stack>
       </Stack>
 

@@ -18,7 +18,11 @@ type ListPaginationProps = {
 
 export function ListPagination({ pagination, onPageChange, disabled = false }: ListPaginationProps) {
   return (
-    <Stack direction="row" justifyContent="flex-end" sx={{ px: { xs: 0.5, sm: 1 } }}>
+    <Stack
+      direction="row"
+      justifyContent={{ xs: 'center', sm: 'flex-end' }}
+      sx={{ px: { xs: 0.5, sm: 1 } }}
+    >
       <Pagination
         page={pagination.page}
         count={pagination.totalPages}

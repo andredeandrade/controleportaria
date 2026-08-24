@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <TopBar
         drawerWidth={drawerWidth}
         onOpenMenu={() => {
@@ -27,7 +27,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         }}
       />
 
-      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
+      <Box
+        component="nav"
+        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 }, height: '100%' }}
+      >
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -53,7 +56,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           />
         </Drawer>
 
-        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Box sx={{ display: { xs: 'none', md: 'block' }, height: '100%' }}>
           <SideBar />
         </Box>
       </Box>
@@ -63,9 +66,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         sx={{
           flexGrow: 1,
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          px: { xs: 2, md: 6 },
+          px: { xs: 5, md: 6 },
           py: 0,
-          minHeight: '100vh',
+          height: '100%',
+          overflowY: 'auto',
           bgcolor: 'background.default',
         }}
       >
