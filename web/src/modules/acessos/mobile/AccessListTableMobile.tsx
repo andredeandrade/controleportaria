@@ -27,109 +27,107 @@ export function AccessListTableMobile() {
   } = useAccessListContext()
 
   return (
-    <Stack spacing={1.5}>
-      {records.map((record) => (
-        <MobileListCard key={record.id} variant="outlined" sx={{ p: 5 }}>
-          <Stack spacing={2}>
-            <Stack spacing={0.5}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="flex-start"
-                spacing={1}
-              >
-                <Typography variant="body1" fontWeight={700} color="text.primary">
-                  {record.name}
-                </Typography>
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  sx={{ flexWrap: 'wrap', rowGap: 0.5, justifyContent: 'flex-end' }}
-                >
+    <Stack spacing={3}>
+      {records.map((record) => {
+        const units = Array.from(
+          new Set(
+            record.categoryUnits
+              .map((categoryUnit) => categoryUnit.unit)
+              .filter((unit): unit is string => Boolean(unit)),
+          ),
+        )
+
+        return (
+          <MobileListCard key={record.id} variant="outlined" sx={{ p: 5 }}>
+            <Stack spacing={5}>
+              <Stack spacing={0.5}>
+                <Stack spacing={0.75}>
                   {record.categoryUnits.map((categoryUnit) => {
                     const chipColor =
                       categoryChipColor[categoryUnit.category] ?? DEFAULT_CATEGORY_CHIP_COLOR
+                    const personName =
+                      record.people.find((person) => person.id === categoryUnit.id)?.name ?? '-'
 
                     return (
-                      <Chip
+                      <Stack
                         key={categoryUnit.id}
-                        label={categoryUnit.categoryLabel}
-                        size="small"
-                        sx={{
-                          height: 22,
-                          fontSize: '0.6875rem',
-                          fontWeight: 600,
-                          backgroundColor: chipColor.bg,
-                          color: chipColor.color,
-                          border: 'none',
-                        }}
-                      />
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        spacing={1}
+                      >
+                        <Typography variant="body1" fontWeight={700} color="text.primary">
+                          {personName}
+                        </Typography>
+                        <Chip
+                          label={categoryUnit.categoryLabel}
+                          size="small"
+                          sx={{
+                            height: 22,
+                            fontSize: '0.6875rem',
+                            fontWeight: 600,
+                            backgroundColor: chipColor.bg,
+                            color: chipColor.color,
+                            border: 'none',
+                          }}
+                        />
+                      </Stack>
                     )
                   })}
                 </Stack>
-              </Stack>
 
-              {record.categoryUnits.length === 1 ? (
-                record.categoryUnits[0].unit ? (
+                {units.length > 0 ? (
                   <Typography variant="body2" color="text.secondary">
-                    {record.categoryUnits[0].unit}
+                    Unidade: {units.join(', ')}
                   </Typography>
-                ) : null
-              ) : (
+                ) : null}
+              </Stack>
+
+              <Divider sx={{ borderColor: 'divider' }} />
+
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
                 <Stack spacing={0.25}>
-                  {record.categoryUnits.map((categoryUnit) => (
-                    <Typography key={categoryUnit.id} variant="body2" color="text.secondary">
-                      {categoryUnit.label}
-                    </Typography>
-                  ))}
+                  <MobileFieldLabel variant="caption">Entrada</MobileFieldLabel>
+                  <Typography variant="body2" color="text.primary">
+                    {record.entryAt}
+                  </Typography>
                 </Stack>
-              )}
+
+                <Stack spacing={0.25}>
+                  <MobileFieldLabel variant="caption">Saída</MobileFieldLabel>
+                  <Typography variant="body2" color="text.primary">
+                    {record.exitAt}
+                  </Typography>
+                </Stack>
+
+                <Stack spacing={0.25}>
+                  <MobileFieldLabel variant="caption">Locomoção</MobileFieldLabel>
+                  <Typography variant="body2" color="text.primary">
+                    {record.locomotion}
+                  </Typography>
+                </Stack>
+
+                <Stack spacing={0.25}>
+                  <MobileFieldLabel variant="caption">Placa</MobileFieldLabel>
+                  <Typography variant="body2" color="text.primary">
+                    {record.plate}
+                  </Typography>
+                </Stack>
+              </Box>
+
+              {showActions && !record.hasExited ? (
+                <MobileRegisterExitButton
+                  variant="outlined"
+                  size="medium"
+                  onClick={() => onRegisterExit(record)}
+                >
+                  Registrar Saída
+                </MobileRegisterExitButton>
+              ) : null}
             </Stack>
-
-            <Divider sx={{ borderColor: 'divider' }} />
-
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
-              <Stack spacing={0.25}>
-                <MobileFieldLabel variant="caption">Entrada</MobileFieldLabel>
-                <Typography variant="body2" color="text.primary">
-                  {record.entryAt}
-                </Typography>
-              </Stack>
-
-              <Stack spacing={0.25}>
-                <MobileFieldLabel variant="caption">Saída</MobileFieldLabel>
-                <Typography variant="body2" color="text.primary">
-                  {record.exitAt}
-                </Typography>
-              </Stack>
-
-              <Stack spacing={0.25}>
-                <MobileFieldLabel variant="caption">Locomoção</MobileFieldLabel>
-                <Typography variant="body2" color="text.primary">
-                  {record.locomotion}
-                </Typography>
-              </Stack>
-
-              <Stack spacing={0.25}>
-                <MobileFieldLabel variant="caption">Placa</MobileFieldLabel>
-                <Typography variant="body2" color="text.primary">
-                  {record.plate}
-                </Typography>
-              </Stack>
-            </Box>
-
-            {showActions && !record.hasExited ? (
-              <MobileRegisterExitButton
-                variant="outlined"
-                size="small"
-                onClick={() => onRegisterExit(record)}
-              >
-                Registrar Saída
-              </MobileRegisterExitButton>
-            ) : null}
-          </Stack>
-        </MobileListCard>
-      ))}
+          </MobileListCard>
+        )
+      })}
     </Stack>
   )
 }

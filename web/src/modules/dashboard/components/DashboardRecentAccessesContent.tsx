@@ -64,7 +64,7 @@ export function DashboardRecentAccessesContent() {
   return (
     <>
       {isMobile ? (
-        <Stack spacing={2.5}>
+        <Stack spacing={4}>
           {title}
 
           {states}

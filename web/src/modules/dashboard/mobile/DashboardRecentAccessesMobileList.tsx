@@ -19,7 +19,7 @@ export function DashboardRecentAccessesMobileList({
   onRegisterExit,
 }: DashboardRecentAccessesMobileListProps) {
   return (
-    <Stack spacing={2}>
+    <Stack spacing={3}>
       {records.map((record) => (
         <MobileListCard key={record.id} variant="outlined">
           <Stack direction="row" alignItems="center" spacing={1.5}>
@@ -41,12 +41,7 @@ export function DashboardRecentAccessesMobileList({
                 {record.name}
               </Typography>
               {record.categoryUnits.map((categoryUnit) => (
-                <Typography
-                  key={categoryUnit.id}
-                  variant="caption"
-                  color="text.secondary"
-                  noWrap
-                >
+                <Typography key={categoryUnit.id} variant="caption" color="text.secondary" noWrap>
                   {categoryUnit.label}
                 </Typography>
               ))}

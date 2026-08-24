@@ -56,7 +56,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           />
         </Drawer>
 
-        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Box sx={{ display: { xs: 'none', md: 'block' }, height: '100%' }}>
           <SideBar />
         </Box>
       </Box>

@@ -13,7 +13,7 @@ export function LoginForm() {
 
   if (isMobile) {
     return (
-      <Box sx={{ width: 380, maxWidth: '100%' }}>
+      <Box sx={{ width: 380, maxWidth: '100%' }} px={5}>
         <LoginFormFields />
       </Box>
     )

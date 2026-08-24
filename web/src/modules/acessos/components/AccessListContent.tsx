@@ -23,7 +23,7 @@ export function AccessListContent() {
       <Stack spacing={{ xs: 4, sm: 5 }}>
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
-          spacing={{ xs: 1.5, sm: 2.5 }}
+          spacing={{ xs: 3, sm: 2.5 }}
           alignItems={{ xs: 'stretch', sm: 'center' }}
           sx={{ px: { xs: 0.5, sm: 1 } }}
         >

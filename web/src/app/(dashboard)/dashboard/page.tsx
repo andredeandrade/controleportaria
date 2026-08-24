@@ -11,15 +11,15 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <Stack spacing={{ xs: 3, sm: 6 }} py={{ xs: 3, sm: 5 }}>
+    <Stack spacing={{ xs: 7, sm: 5 }} py={{ xs: 3, sm: 5 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         flexWrap="wrap"
-        spacing={2}
+        spacing={3}
       >
-        <Stack spacing={0.5} mb={2}>
+        <Stack spacing={2}>
           <Typography variant="h2">Dashboard</Typography>
           <Typography variant="body1" color="text.secondary">
             Visão geral de acessos do condomínio.

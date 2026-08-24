@@ -139,7 +139,7 @@ export function AccessRegisterForm() {
 
         return (
           <Card key={personField.id} sx={{ p: { xs: 3, sm: 5 }, overflow: 'hidden' }}>
-            <Stack spacing={{ xs: 3, sm: 3.5 }}>
+            <Stack spacing={{ xs: 4, sm: 3.5 }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography
                   variant="overline"
@@ -279,7 +279,10 @@ export function AccessRegisterForm() {
                 </>
               ) : (
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <DirectionsCarFilledRoundedIcon fontSize="small" sx={{ color: 'text.disabled' }} />
+                  <DirectionsCarFilledRoundedIcon
+                    fontSize="small"
+                    sx={{ color: 'text.disabled' }}
+                  />
                   <Typography variant="body2" color="text.disabled">
                     Entra no mesmo veículo da Pessoa 1
                   </Typography>
