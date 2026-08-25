@@ -28,18 +28,22 @@ export function SummaryCard({
   isTotal = false,
 }: SummaryCardProps) {
   return (
-    <Card sx={{ borderRadius: 3, height: '100%' }}>
+    <Card sx={{ height: '100%' }}>
       <CardContent sx={{ p: 2.5 }}>
         <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           <Box>
-            <Typography variant="body2" color="text.secondary" fontWeight={500}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}
+            >
               {label}
             </Typography>
 
             {isLoading ? (
-              <Skeleton variant="text" width={64} height={48} sx={{ mt: 0.5 }} />
+              <Skeleton variant="text" width={64} height={40} sx={{ mt: 0.5 }} />
             ) : (
-              <Typography variant="h4" fontWeight={700} sx={{ mt: 0.5 }}>
+              <Typography variant="h2" sx={{ mt: 0.5 }}>
                 {value ?? '—'}
               </Typography>
             )}
@@ -58,15 +62,15 @@ export function SummaryCard({
 
           <Box
             sx={{
-              p: 1,
-              borderRadius: 2,
+              p: 1.5,
+              borderRadius: '12px',
               bgcolor: `${color}18`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Icon sx={{ color, fontSize: 28 }} />
+            <Icon sx={{ color, fontSize: 24 }} />
           </Box>
         </Box>
       </CardContent>
