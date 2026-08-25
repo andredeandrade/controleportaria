@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 
 import { AccessRegisterButton } from '@/modules/acessos/components/AccessRegisterButton'
 import { DashboardRecentAccesses } from '@/modules/dashboard/components/DashboardRecentAccesses'
+import { DashboardSummaryCards } from '@/modules/dashboard/components/DashboardSummaryCards'
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -28,6 +29,8 @@ export default function DashboardPage() {
 
         <AccessRegisterButton size="large" sx={{ width: { xs: '100%', sm: 'auto' } }} />
       </Stack>
+
+      <DashboardSummaryCards />
 
       <DashboardRecentAccesses />
     </Stack>
