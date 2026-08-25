@@ -4,26 +4,23 @@ import type { ReactNode } from 'react'
 import MuiTableBody from '@mui/material/TableBody'
 import MuiTableCell from '@mui/material/TableCell'
 import MuiTableRow from '@mui/material/TableRow'
-import Typography from '@mui/material/Typography'
 
 import { bodyCellSx } from '@/modules/table/styles/TableStyles'
 
 type TableBodyProps = {
   children: ReactNode
   isEmpty: boolean
-  emptyMessage: string
+  emptyState: ReactNode
   colSpan: number
 }
 
-export function TableBody({ children, isEmpty, emptyMessage, colSpan }: TableBodyProps) {
+export function TableBody({ children, isEmpty, emptyState, colSpan }: TableBodyProps) {
   return (
     <MuiTableBody>
       {isEmpty ? (
         <MuiTableRow>
           <MuiTableCell colSpan={colSpan} sx={bodyCellSx}>
-            <Typography variant="body2" color="text.secondary">
-              {emptyMessage}
-            </Typography>
+            {emptyState}
           </MuiTableCell>
         </MuiTableRow>
       ) : (

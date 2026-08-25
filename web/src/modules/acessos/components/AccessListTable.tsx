@@ -1,8 +1,12 @@
 'use client'
 
+import Button from '@mui/material/Button'
+
 import { AccessListTableRow } from '@/modules/acessos/components/AccessListTableRow'
 import { AccessListTableRowLoader } from '@/modules/acessos/components/AccessListTableRowLoader'
+import { AccessRegisterButton } from '@/modules/acessos/components/AccessRegisterButton'
 import { useAccessListContext } from '@/modules/acessos/context/AccessListContext'
+import { ListEmptyState } from '@/modules/table/components/ListEmptyState'
 import { ListErrorState } from '@/modules/table/components/ListErrorState'
 import { Table } from '@/modules/table/components/Table'
 import { TableBody } from '@/modules/table/components/TableBody'
@@ -22,6 +26,7 @@ export function AccessListTable() {
     isError,
     errorMessage,
     refetch: onRetry,
+    handleClearFilters,
   } = useAccessListContext()
 
   const columnCount = showActions ? 6 : 5
@@ -38,13 +43,30 @@ export function AccessListTable() {
       </TableHead>
       <TableBody
         isEmpty={!isError && !isLoading && records.length === 0}
-        emptyMessage="Nenhuma movimentação de entrada encontrada."
+        emptyState={
+          <ListEmptyState
+            title="Nenhum acesso encontrado."
+            description="Nenhum registro corresponde à busca ou ao filtro selecionado. Ajuste os critérios ou registre um novo acesso."
+            actions={
+              <>
+                <Button variant="outlined" onClick={handleClearFilters}>
+                  Limpar filtros
+                </Button>
+                <AccessRegisterButton />
+              </>
+            }
+          />
+        }
         colSpan={columnCount}
       >
         {isError ? (
           <TableRow>
             <TableCell colSpan={columnCount}>
-              <ListErrorState message={errorMessage} onRetry={onRetry} />
+              <ListErrorState
+                title="Não foi possível carregar os acessos."
+                message={errorMessage}
+                onRetry={onRetry}
+              />
             </TableCell>
           </TableRow>
         ) : isLoading ? (

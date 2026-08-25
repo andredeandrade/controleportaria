@@ -19,6 +19,7 @@ export type AccessListContextValue = AccessListQueryState & {
   handleConfirmExit: (personIds?: string[], observations?: string) => Promise<void>
   isCheckOutPending: boolean
   checkOutErrorMessage: string | null
+  handleClearFilters: () => void
 }
 
 export const AccessListContext = createContext<AccessListContextValue | null>(null)
