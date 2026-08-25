@@ -27,6 +27,11 @@ export function AccessListProvider({
 
   const showExitActions = true
 
+  const handleClearFilters = () => {
+    query.handleSearchChange('')
+    setViewMode('all')
+  }
+
   const handleConfirmExit = async (personIds?: string[], observations?: string) => {
     if (!selection.selectedItem) {
       return
@@ -53,6 +58,7 @@ export function AccessListProvider({
     handleConfirmExit,
     isCheckOutPending: checkOutMutation.isPending,
     checkOutErrorMessage: checkOutMutation.isError ? checkOutMutation.error.message : null,
+    handleClearFilters,
   }
 
   return <AccessListContext.Provider value={value}>{children}</AccessListContext.Provider>

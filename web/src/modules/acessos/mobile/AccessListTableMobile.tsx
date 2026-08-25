@@ -1,14 +1,17 @@
 'use client'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { AccessRegisterButton } from '@/modules/acessos/components/AccessRegisterButton'
 import { useAccessListContext } from '@/modules/acessos/context/AccessListContext'
 import { AccessListTableMobileLoader } from '@/modules/acessos/mobile/AccessListTableMobileLoader'
 import { MobileRegisterExitButton } from '@/modules/acessos/styles/AccessStyles'
+import { ListEmptyState } from '@/modules/table/components/ListEmptyState'
 import { ListErrorState } from '@/modules/table/components/ListErrorState'
 import { MobileListCard, MobileFieldLabel } from '@/styles/MobileList.styles'
 
@@ -32,20 +35,34 @@ export function AccessListTableMobile() {
     isError,
     errorMessage,
     refetch: onRetry,
+    handleClearFilters,
   } = useAccessListContext()
 
   return (
     <Stack spacing={3}>
       {isError ? (
-        <ListErrorState message={errorMessage} onRetry={onRetry} />
+        <ListErrorState
+          title="Não foi possível carregar os acessos."
+          message={errorMessage}
+          onRetry={onRetry}
+        />
       ) : isLoading ? (
         Array.from({ length: SKELETON_CARD_COUNT }).map((_, index) => (
           <AccessListTableMobileLoader key={index} showActions={showActions} />
         ))
       ) : records.length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
-          Nenhuma movimentação de entrada encontrada.
-        </Typography>
+        <ListEmptyState
+          title="Nenhum acesso encontrado."
+          description="Nenhum registro corresponde à busca ou ao filtro selecionado. Ajuste os critérios ou registre um novo acesso."
+          actions={
+            <>
+              <Button variant="outlined" onClick={handleClearFilters}>
+                Limpar filtros
+              </Button>
+              <AccessRegisterButton />
+            </>
+          }
+        />
       ) : (
         records.map((record) => {
           const units = Array.from(
