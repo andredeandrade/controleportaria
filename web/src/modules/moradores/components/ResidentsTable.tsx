@@ -1,119 +1,78 @@
 'use client'
 
-import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
-import IconButton from '@mui/material/IconButton'
-import Stack from '@mui/material/Stack'
-import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
-import { useTheme } from '@mui/material/styles'
-import type { ColumnDef } from '@tanstack/react-table'
+import Button from '@mui/material/Button'
 
-import { DataTable } from '@/modules/table/components/DataTable'
-import type { ResidentRecord } from '@/types/moradores'
+import { RegisterResidentButton } from '@/modules/moradores/components/RegisterResidentButton'
+import { ResidentsTableRow } from '@/modules/moradores/components/ResidentsTableRow'
+import { ResidentsTableRowLoader } from '@/modules/moradores/components/ResidentsTableRowLoader'
+import { useResidentListContext } from '@/modules/moradores/context/ResidentListContext'
+import { ListEmptyState } from '@/modules/table/components/ListEmptyState'
+import { ListErrorState } from '@/modules/table/components/ListErrorState'
+import { Table } from '@/modules/table/components/Table'
+import { TableBody } from '@/modules/table/components/TableBody'
+import { TableCell } from '@/modules/table/components/TableCell'
+import { TableHead } from '@/modules/table/components/TableHead'
+import { TableHeadCell } from '@/modules/table/components/TableHeadCell'
+import { TableRow } from '@/modules/table/components/TableRow'
 
-type ResidentsTableProps = {
-  records: ResidentRecord[]
-}
+const SKELETON_ROW_COUNT = 5
+const COLUMN_COUNT = 5
 
-function formatVehicles(vehicles: ResidentRecord['vehicles']) {
-  if (vehicles.length === 0) return '-'
-  return vehicles.map((v) => v.plate).join(', ')
-}
-
-export function ResidentsTable({ records }: ResidentsTableProps) {
-  const theme = useTheme()
-  const actionHoverBg = alpha(theme.palette.primary.main, 0.08)
-  const rowHoverBg = alpha(theme.palette.primary.main, 0.03)
-
-  const columns: ColumnDef<ResidentRecord>[] = [
-    {
-      id: 'resident',
-      header: 'Morador',
-      cell: ({ row }) => (
-        <Stack spacing={0.25}>
-          <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
-            {row.original.name}
-          </Typography>
-          {row.original.document ? (
-            <Typography sx={{ fontSize: '11px', lineHeight: '20px', color: '#505F76' }}>
-              CPF: {row.original.document}
-            </Typography>
-          ) : null}
-        </Stack>
-      ),
-    },
-    { accessorKey: 'unit', header: 'Unidade' },
-    { accessorKey: 'relation', header: 'Tipo' },
-    { accessorKey: 'phone', header: 'Telefone' },
-    {
-      id: 'vehicles',
-      header: 'Veículos',
-      cell: ({ row }) => formatVehicles(row.original.vehicles),
-    },
-    {
-      id: 'actions',
-      header: 'Ações',
-      cell: () => (
-        <IconButton
-          size="small"
-          aria-label="Abrir ações do morador"
-          sx={{
-            color: 'text.secondary',
-            borderRadius: 1,
-            p: 0.5,
-            '&:hover': {
-              color: 'primary.main',
-              backgroundColor: actionHoverBg,
-            },
-          }}
-        >
-          <MoreVertRoundedIcon fontSize="small" />
-        </IconButton>
-      ),
-    },
-  ]
+export function ResidentsTable() {
+  const {
+    records,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch: onRetry,
+    handleClearFilters,
+  } = useResidentListContext()
 
   return (
-    <DataTable
-      data={records}
-      columns={columns}
-      emptyMessage="Nenhum morador encontrado."
-      containerSx={{
-        backgroundColor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: 2,
-        overflow: 'hidden',
-      }}
-      headerCellSx={{
-        px: '24px',
-        py: '12px',
-        backgroundColor: 'grey.50',
-        color: 'text.secondary',
-        fontSize: '0.875rem',
-        fontWeight: 500,
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        whiteSpace: 'nowrap',
-        '&:last-of-type': {
-          textAlign: 'right',
-        },
-      }}
-      bodyCellSx={{
-        px: '24px',
-        py: '12px',
-        color: 'text.primary',
-        fontSize: '0.875rem',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        '&:last-of-type': {
-          textAlign: 'right',
-        },
-      }}
-      rowSx={{
-        '&:hover': { backgroundColor: rowHoverBg },
-        '&:last-child td': { borderBottom: 'none' },
-      }}
-    />
+    <Table>
+      <TableHead>
+        <TableHeadCell>Morador</TableHeadCell>
+        <TableHeadCell>Unidade</TableHeadCell>
+        <TableHeadCell>Categoria</TableHeadCell>
+        <TableHeadCell>Veículos</TableHeadCell>
+        <TableHeadCell align="right">Ações</TableHeadCell>
+      </TableHead>
+      <TableBody
+        isEmpty={!isError && !isLoading && records.length === 0}
+        emptyState={
+          <ListEmptyState
+            title="Nenhum morador encontrado."
+            description="Nenhum registro corresponde à busca realizada. Ajuste os critérios ou cadastre um novo morador."
+            actions={
+              <>
+                <Button variant="outlined" onClick={handleClearFilters}>
+                  Limpar busca
+                </Button>
+                <RegisterResidentButton />
+              </>
+            }
+          />
+        }
+        colSpan={COLUMN_COUNT}
+      >
+        {isError ? (
+          <TableRow>
+            <TableCell colSpan={COLUMN_COUNT}>
+              <ListErrorState
+                title="Não foi possível carregar os moradores."
+                message={errorMessage}
+                onRetry={onRetry}
+              />
+            </TableCell>
+          </TableRow>
+        ) : isLoading ? (
+          Array.from({ length: SKELETON_ROW_COUNT }).map((_, index) => (
+            <ResidentsTableRowLoader key={index} />
+          ))
+        ) : (
+          records.map((record) => <ResidentsTableRow key={record.id} record={record} />)
+        )}
+      </TableBody>
+    </Table>
   )
 }
