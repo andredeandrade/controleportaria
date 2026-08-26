@@ -1,103 +1,155 @@
 'use client'
 
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import EditRoundedIcon from '@mui/icons-material/EditRounded'
-import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import Link from 'next/link'
 
-import { MobileListCard } from '@/styles/MobileList.styles'
-import { ResidentRelationEnum } from '@/types/moradores'
-import type { ResidentRecord } from '@/types/moradores'
+import { RegisterResidentButton } from '@/modules/moradores/components/RegisterResidentButton'
+import { useResidentListContext } from '@/modules/moradores/context/ResidentListContext'
+import { ResidentsMobileListLoader } from '@/modules/moradores/mobile/ResidentsMobileListLoader'
+import {
+  DEFAULT_RESIDENT_CATEGORY_CHIP_COLOR,
+  residentCategoryChipColor,
+} from '@/modules/moradores/styles/ResidentStyles'
+import { ListEmptyState } from '@/modules/table/components/ListEmptyState'
+import { ListErrorState } from '@/modules/table/components/ListErrorState'
+import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
 
-type ResidentsMobileListProps = {
-  records: ResidentRecord[]
-}
+const SKELETON_CARD_COUNT = 5
 
-function formatVehicles(vehicles: ResidentRecord['vehicles']) {
-  if (vehicles.length === 0) return 'Sem veículo'
-  return vehicles.map((v) => v.plate).join(', ')
-}
-
-const relationChipColor: Record<string, { bg: string; color: string }> = {
-  [ResidentRelationEnum.PROPRIETARIO]: { bg: 'rgba(78, 222, 163, 0.16)', color: '#4edea3' },
-  [ResidentRelationEnum.INQUILINO]: { bg: 'rgba(173, 198, 255, 0.16)', color: '#adc6ff' },
-  [ResidentRelationEnum.DEPENDENTE]: { bg: 'rgba(255, 185, 95, 0.16)', color: '#ffb95f' },
-}
-
-export function ResidentsMobileList({ records }: ResidentsMobileListProps) {
-  if (records.length === 0) {
-    return (
-      <Typography variant="body2" color="text.secondary" sx={{ px: 1 }}>
-        Nenhum morador encontrado.
-      </Typography>
-    )
-  }
+export function ResidentsMobileList() {
+  const {
+    records,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch: onRetry,
+    handleClearFilters,
+    handleOpenDeleteConfirmation,
+  } = useResidentListContext()
 
   return (
-    <Stack spacing={1.5}>
-      {records.map((record) => {
-        const chipStyle = relationChipColor[record.relation.toLowerCase()] ?? {
-          bg: 'rgba(173, 198, 255, 0.12)',
-          color: '#adc6ff',
-        }
+    <Stack spacing={3}>
+      {isError ? (
+        <ListErrorState
+          title="Não foi possível carregar os moradores."
+          message={errorMessage}
+          onRetry={onRetry}
+        />
+      ) : isLoading ? (
+        Array.from({ length: SKELETON_CARD_COUNT }).map((_, index) => (
+          <ResidentsMobileListLoader key={index} />
+        ))
+      ) : records.length === 0 ? (
+        <ListEmptyState
+          title="Nenhum morador encontrado."
+          description="Nenhum registro corresponde à busca realizada. Ajuste os critérios ou cadastre um novo morador."
+          actions={
+            <>
+              <Button variant="outlined" onClick={handleClearFilters}>
+                Limpar busca
+              </Button>
+              <RegisterResidentButton />
+            </>
+          }
+        />
+      ) : (
+        records.map((record) => {
+          const chipColor =
+            residentCategoryChipColor[record.relation.toLowerCase()] ??
+            DEFAULT_RESIDENT_CATEGORY_CHIP_COLOR
 
-        return (
-          <MobileListCard key={record.id} variant="outlined">
-            <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-              <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                <Typography variant="subtitle2" sx={{ color: '#dae2fd', mb: '4px' }}>
-                  {record.name}
-                </Typography>
-
-                <Typography variant="caption" sx={{ color: '#8c909f', display: 'block' }}>
-                  {record.unit}
-                </Typography>
-
-                <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: '8px' }}>
+          return (
+            <MobileListCard key={record.id} variant="outlined" sx={{ p: 5 }}>
+              <Stack spacing={5}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="flex-start"
+                  spacing={1}
+                >
+                  <Stack spacing={0.25} sx={{ minWidth: 0 }}>
+                    <Typography variant="body1" fontWeight={700} color="text.primary">
+                      {record.name}
+                    </Typography>
+                    {record.document ? (
+                      <Typography variant="caption" color="text.disabled">
+                        CPF: {record.document}
+                      </Typography>
+                    ) : null}
+                  </Stack>
                   <Chip
                     label={record.relation}
                     size="small"
                     sx={{
-                      height: 20,
+                      height: 22,
                       fontSize: '0.6875rem',
                       fontWeight: 600,
-                      backgroundColor: chipStyle.bg,
-                      color: chipStyle.color,
+                      backgroundColor: chipColor.bg,
+                      color: chipColor.color,
                       border: 'none',
+                      flexShrink: 0,
                     }}
                   />
                 </Stack>
 
-                {record.vehicles.length > 0 && (
-                  <Typography
-                    variant="caption"
-                    sx={{ color: '#8c909f', display: 'block', mt: '6px' }}
-                  >
-                    Veículo: {formatVehicles(record.vehicles)}
+                <Stack spacing={0.25}>
+                  <MobileFieldLabel variant="caption">Unidade</MobileFieldLabel>
+                  <Typography variant="body2" color="text.primary">
+                    {record.unit}
                   </Typography>
-                )}
-              </Box>
+                </Stack>
 
-              <IconButton
-                component={Link}
-                href={`/moradores/${record.id}/editar`}
-                size="small"
-                aria-label="Editar morador"
-                sx={{
-                  color: '#8c909f',
-                  flexShrink: 0,
-                  '&:hover': { color: '#adc6ff', backgroundColor: 'rgba(173, 198, 255, 0.08)' },
-                }}
-              >
-                <EditRoundedIcon fontSize="small" />
-              </IconButton>
-            </Stack>
-          </MobileListCard>
-        )
-      })}
+                <Stack spacing={0.5}>
+                  <MobileFieldLabel variant="caption">Veículos</MobileFieldLabel>
+                  {record.vehicles.length > 0 ? (
+                    <Stack direction="row" spacing={0.75} flexWrap="wrap">
+                      {record.vehicles.map((vehicle, index) => (
+                        <Chip
+                          key={`${record.id}-${vehicle.plate}-${index}`}
+                          label={vehicle.plate}
+                          size="small"
+                          variant="outlined"
+                          sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 600 }}
+                        />
+                      ))}
+                    </Stack>
+                  ) : (
+                    <Typography variant="body2" color="text.disabled">
+                      —
+                    </Typography>
+                  )}
+                </Stack>
+
+                <Divider sx={{ borderColor: 'divider' }} />
+
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<EditRoundedIcon fontSize="small" />}
+                    disabled
+                  >
+                    Editar
+                  </Button>
+                  <IconButton
+                    size="small"
+                    aria-label="Excluir morador"
+                    onClick={() => handleOpenDeleteConfirmation(record)}
+                  >
+                    <DeleteOutlineRoundedIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              </Stack>
+            </MobileListCard>
+          )
+        })
+      )}
     </Stack>
   )
 }

@@ -30,6 +30,22 @@ function parseCreateBody(body: unknown): CreateResidentRequest {
   }
 }
 
+type DeleteResidentBody = {
+  id: string
+}
+
+function parseDeleteBody(body: unknown): DeleteResidentBody {
+  if (!body || typeof body !== 'object') {
+    throw new Error('Corpo da requisição inválido.')
+  }
+
+  const payload = body as Record<string, unknown>
+
+  return {
+    id: String(payload['id'] ?? ''),
+  }
+}
+
 export async function GET(request: Request) {
   const cookieStore = await cookies()
   const accessToken = readAccessToken(cookieStore)
@@ -105,6 +121,50 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { message: getThrowableMessage(error, 'Falha ao cadastrar morador.') },
+      { status: 500 },
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  const cookieStore = await cookies()
+  const accessToken = readAccessToken(cookieStore)
+
+  if (!accessToken) {
+    return NextResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+  }
+
+  let body: DeleteResidentBody
+
+  try {
+    body = parseDeleteBody(await request.json())
+  } catch {
+    return NextResponse.json({ message: 'Corpo da requisição inválido.' }, { status: 400 })
+  }
+
+  const id = body.id.trim()
+
+  if (!id) {
+    return NextResponse.json({ message: 'ID do morador é obrigatório.' }, { status: 400 })
+  }
+
+  try {
+    await requestResidentsApi(`/${id}`, accessToken, {
+      method: 'DELETE',
+    })
+
+    return new NextResponse(null, { status: 204 })
+  } catch (error) {
+    if (error instanceof ResidentsApiError) {
+      if (error.clearCookie) {
+        clearAccessToken(cookieStore)
+      }
+
+      return NextResponse.json({ message: error.message }, { status: error.status })
+    }
+
+    return NextResponse.json(
+      { message: getThrowableMessage(error, 'Falha ao excluir morador.') },
       { status: 500 },
     )
   }

@@ -12,26 +12,32 @@ export const metadata: Metadata = {
 
 export default function MoradoresPage() {
   return (
-    <Stack spacing={1.5} sx={{ pt: 6 }}>
+    <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
+        spacing={4}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
         <Box>
-          <Typography variant="h2" fontWeight={600} sx={{ color: 'primary.dark' }}>
+          <Typography variant="h2" fontWeight={700} color="text.primary">
             Moradores
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>
-            Gerencie os dados e acessos de todos os residentes do condomínio.
+            Gerencie os dados dos moradores, unidades e veículos cadastrados.
           </Typography>
         </Box>
 
-        <Box sx={{ flexShrink: 0 }}>
-          <RegisterResidentButton />
-        </Box>
+        <Stack
+          direction="row"
+          justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}
+          sx={{
+            width: { xs: '100%', sm: 'auto' },
+          }}
+        >
+          <RegisterResidentButton sx={{ width: { xs: '100%', sm: 'auto' } }} />
+        </Stack>
       </Stack>
 
       <ResidentsList />

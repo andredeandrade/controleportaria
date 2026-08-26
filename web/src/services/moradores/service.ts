@@ -76,3 +76,21 @@ export async function registerResident(payload: CreateResidentRequest): Promise<
 
   return responseBody as Resident
 }
+
+export async function deleteResident(id: string): Promise<void> {
+  const response = await fetch('/api/residents', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ id }),
+  })
+
+  if (!response.ok) {
+    const payload = await safeReadJson(response)
+    throw new ResidentsServiceError(
+      getApiErrorMessage(payload, 'Não foi possível excluir o morador.'),
+    )
+  }
+}
