@@ -5,3 +5,7 @@ export type ListResidentsApiResponseBody =
   | null
 
 export type RegisterResidentApiResponseBody = ({ message?: string } & Partial<Resident>) | null
+
+export type GetResidentApiResponseBody = ({ message?: string } & Partial<Resident>) | null
+
+export type UpdateResidentApiResponseBody = ({ message?: string } & Partial<Resident>) | null
