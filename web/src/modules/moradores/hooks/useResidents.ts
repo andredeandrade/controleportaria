@@ -41,9 +41,14 @@ export function useResidents() {
     unit: item.unit,
     relation: RESIDENT_RELATION_LABEL[item.relation as ResidentRelationEnum] ?? item.relation,
     phone: item.phone ?? '-',
+    email: item.email ?? undefined,
+    observations: item.observations ?? undefined,
     vehicles: item.vehicles.map((vehicle) => ({
+      id: vehicle.id,
       type: VEHICLE_TYPE_LABEL[vehicle.type as VehicleTypeEnum] ?? vehicle.type,
       plate: vehicle.plate ?? '-',
+      color: vehicle.color ?? undefined,
+      brandModel: vehicle.brandModel ?? undefined,
     })),
   }))
 

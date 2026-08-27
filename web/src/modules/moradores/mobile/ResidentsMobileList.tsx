@@ -2,6 +2,7 @@
 
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import EditRoundedIcon from '@mui/icons-material/EditRounded'
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
@@ -33,6 +34,7 @@ export function ResidentsMobileList() {
     refetch: onRetry,
     handleClearFilters,
     handleOpenDeleteConfirmation,
+    handleOpenView,
   } = useResidentListContext()
 
   return (
@@ -131,14 +133,25 @@ export function ResidentsMobileList() {
                 <Divider sx={{ borderColor: 'divider' }} />
 
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<EditRoundedIcon fontSize="small" />}
-                    onClick={() => router.push(`/moradores/${record.id}/editar`)}
-                  >
-                    Editar
-                  </Button>
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={<VisibilityRoundedIcon fontSize="small" />}
+                      onClick={() => handleOpenView(record)}
+                    >
+                      Visualizar
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<EditRoundedIcon fontSize="small" />}
+                      onClick={() => router.push(`/moradores/${record.id}/editar`)}
+                    >
+                      Editar
+                    </Button>
+                  </Stack>
                   <IconButton
                     size="small"
                     aria-label="Excluir morador"

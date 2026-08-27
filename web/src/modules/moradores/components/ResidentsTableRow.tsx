@@ -24,7 +24,7 @@ type ResidentsTableRowProps = {
 
 export function ResidentsTableRow({ record }: ResidentsTableRowProps) {
   const router = useRouter()
-  const { handleOpenDeleteConfirmation } = useResidentListContext()
+  const { handleOpenDeleteConfirmation, handleOpenView } = useResidentListContext()
   const chipColor =
     residentCategoryChipColor[record.relation.toLowerCase()] ??
     DEFAULT_RESIDENT_CATEGORY_CHIP_COLOR
@@ -79,7 +79,11 @@ export function ResidentsTableRow({ record }: ResidentsTableRowProps) {
       </TableCell>
       <TableCell align="right">
         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-          <IconButton size="small" aria-label="Visualizar morador" disabled>
+          <IconButton
+            size="small"
+            aria-label="Visualizar morador"
+            onClick={() => handleOpenView(record)}
+          >
             <VisibilityRoundedIcon fontSize="small" />
           </IconButton>
           <IconButton

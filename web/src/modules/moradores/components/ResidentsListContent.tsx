@@ -6,6 +6,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
 
 import { ResidentDeleteConfirmationDialog } from '@/modules/moradores/components/ResidentDeleteConfirmationDialog'
+import { ResidentDetailsDialog } from '@/modules/moradores/components/ResidentDetailsDialog'
 import { ResidentsListPagination } from '@/modules/moradores/components/ResidentsListPagination'
 import { ResidentsListSearch } from '@/modules/moradores/components/ResidentsListSearch'
 import { ResidentsTable } from '@/modules/moradores/components/ResidentsTable'
@@ -43,6 +44,7 @@ export function ResidentsListContent() {
       </Stack>
 
       <ResidentDeleteConfirmationDialog />
+      <ResidentDetailsDialog />
     </>
   )
 }
