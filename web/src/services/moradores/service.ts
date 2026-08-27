@@ -5,8 +5,10 @@ import type {
 } from '@/app/api/residents/types'
 import { getApiErrorMessage, safeReadJson } from '@/services/shared/http'
 import type {
+  GetResidentApiResponseBody,
   ListResidentsApiResponseBody,
   RegisterResidentApiResponseBody,
+  UpdateResidentApiResponseBody,
 } from '@/types/services/moradores'
 
 export class ResidentsServiceError extends Error {
@@ -72,6 +74,57 @@ export async function registerResident(payload: CreateResidentRequest): Promise<
 
   if (!responseBody?.id) {
     throw new ResidentsServiceError('Resposta invalida ao cadastrar morador.')
+  }
+
+  return responseBody as Resident
+}
+
+export async function getResident(id: string): Promise<Resident> {
+  const response = await fetch(`/api/residents/${id}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  const payload = (await safeReadJson(response)) as GetResidentApiResponseBody
+
+  if (!response.ok) {
+    throw new ResidentsServiceError(
+      getApiErrorMessage(payload, 'Não foi possível carregar o morador.'),
+    )
+  }
+
+  if (!payload?.id) {
+    throw new ResidentsServiceError('Resposta inválida ao carregar morador.')
+  }
+
+  return payload as Resident
+}
+
+export async function updateResident(
+  id: string,
+  payload: CreateResidentRequest,
+): Promise<Resident> {
+  const response = await fetch(`/api/residents/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const responseBody = (await safeReadJson(response)) as UpdateResidentApiResponseBody
+
+  if (!response.ok) {
+    throw new ResidentsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível atualizar o morador.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new ResidentsServiceError('Resposta inválida ao atualizar morador.')
   }
 
   return responseBody as Resident

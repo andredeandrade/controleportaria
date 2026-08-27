@@ -8,6 +8,7 @@ import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
 import { RegisterResidentButton } from '@/modules/moradores/components/RegisterResidentButton'
 import { useResidentListContext } from '@/modules/moradores/context/ResidentListContext'
@@ -23,6 +24,7 @@ import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
 const SKELETON_CARD_COUNT = 5
 
 export function ResidentsMobileList() {
+  const router = useRouter()
   const {
     records,
     isLoading,
@@ -133,7 +135,7 @@ export function ResidentsMobileList() {
                     variant="outlined"
                     size="small"
                     startIcon={<EditRoundedIcon fontSize="small" />}
-                    disabled
+                    onClick={() => router.push(`/moradores/${record.id}/editar`)}
                   >
                     Editar
                   </Button>

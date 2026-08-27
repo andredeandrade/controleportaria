@@ -7,6 +7,7 @@ import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
 import { useResidentListContext } from '@/modules/moradores/context/ResidentListContext'
 import {
@@ -22,6 +23,7 @@ type ResidentsTableRowProps = {
 }
 
 export function ResidentsTableRow({ record }: ResidentsTableRowProps) {
+  const router = useRouter()
   const { handleOpenDeleteConfirmation } = useResidentListContext()
   const chipColor =
     residentCategoryChipColor[record.relation.toLowerCase()] ??
@@ -80,7 +82,11 @@ export function ResidentsTableRow({ record }: ResidentsTableRowProps) {
           <IconButton size="small" aria-label="Visualizar morador" disabled>
             <VisibilityRoundedIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" aria-label="Editar morador" disabled>
+          <IconButton
+            size="small"
+            aria-label="Editar morador"
+            onClick={() => router.push(`/moradores/${record.id}/editar`)}
+          >
             <EditRoundedIcon fontSize="small" />
           </IconButton>
           <IconButton
