@@ -74,6 +74,9 @@ export const visitorsController = {
       unit: String(body['unit'] ?? ''),
       authorizedBy: String(body['authorizedBy'] ?? ''),
       observations: readOptionalString(body['observations']),
+      vehiclePlate: readOptionalString(body['vehiclePlate']),
+      vehicleBrandModel: readOptionalString(body['vehicleBrandModel']),
+      vehicleColor: readOptionalString(body['vehicleColor']),
       createdByUserId: req.authUser.id,
     })
 

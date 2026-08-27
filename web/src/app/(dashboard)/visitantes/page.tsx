@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 import { VisitorsList } from '@/modules/visitantes/components/VisitorsList'
 import { RegisterVisitorButton } from '@/modules/visitantes/components/RegisterVisitorButton'
+import { Box } from '@mui/material'
 
 export const metadata: Metadata = {
   title: 'Visitantes',
@@ -12,16 +13,22 @@ export const metadata: Metadata = {
 
 export default function VisitantesPage() {
   return (
-    <Stack spacing={2}>
+    <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
+        spacing={4}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        <Typography variant="h6" fontWeight={700} sx={{ color: 'grey.900' }}>
-          Visitantes
-        </Typography>
+        <Box>
+          <Typography variant="h2" fontWeight={700} color="text.primary">
+            Visitantes
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>
+            Consulte os visitantes cadastrados, quem autorizou a entrada e os dados de contato.
+          </Typography>
+        </Box>
 
         <Stack
           direction="row"
@@ -30,7 +37,7 @@ export default function VisitantesPage() {
             width: { xs: '100%', sm: 'auto' },
           }}
         >
-          <RegisterVisitorButton />
+          <RegisterVisitorButton sx={{ width: { xs: '100%', sm: 'auto' } }} />
         </Stack>
       </Stack>
 

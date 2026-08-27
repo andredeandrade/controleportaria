@@ -72,3 +72,21 @@ export async function registerVisitor(payload: CreateVisitorRequest): Promise<Vi
 
   return responseBody as Visitor
 }
+
+export async function deleteVisitor(id: string): Promise<void> {
+  const response = await fetch('/api/visitors', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ id }),
+  })
+
+  if (!response.ok) {
+    const payload = await safeReadJson(response)
+    throw new VisitorsServiceError(
+      getApiErrorMessage(payload, 'Não foi possível excluir o visitante.'),
+    )
+  }
+}

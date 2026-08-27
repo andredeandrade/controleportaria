@@ -5,6 +5,10 @@ export type VisitorRecord = {
   unit: string
   authorizedBy: string
   phone: string
+  observations?: string
+  vehiclePlate?: string
+  vehicleBrandModel?: string
+  vehicleColor?: string
 }
 
 export type VisitorsPaginationState = {

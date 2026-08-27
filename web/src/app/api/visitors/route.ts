@@ -24,6 +24,26 @@ function parseCreateBody(body: unknown): CreateVisitorRequest {
     unit: String(payload['unit'] ?? ''),
     authorizedBy: String(payload['authorizedBy'] ?? ''),
     observations: typeof payload['observations'] === 'string' ? payload['observations'] : undefined,
+    vehiclePlate: typeof payload['vehiclePlate'] === 'string' ? payload['vehiclePlate'] : undefined,
+    vehicleBrandModel:
+      typeof payload['vehicleBrandModel'] === 'string' ? payload['vehicleBrandModel'] : undefined,
+    vehicleColor: typeof payload['vehicleColor'] === 'string' ? payload['vehicleColor'] : undefined,
+  }
+}
+
+type DeleteVisitorBody = {
+  id: string
+}
+
+function parseDeleteBody(body: unknown): DeleteVisitorBody {
+  if (!body || typeof body !== 'object') {
+    throw new Error('Corpo da requisição inválido.')
+  }
+
+  const payload = body as Record<string, unknown>
+
+  return {
+    id: String(payload['id'] ?? ''),
   }
 }
 
@@ -102,6 +122,50 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { message: getThrowableMessage(error, 'Falha ao cadastrar visitante.') },
+      { status: 500 },
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  const cookieStore = await cookies()
+  const accessToken = readAccessToken(cookieStore)
+
+  if (!accessToken) {
+    return NextResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+  }
+
+  let body: DeleteVisitorBody
+
+  try {
+    body = parseDeleteBody(await request.json())
+  } catch {
+    return NextResponse.json({ message: 'Corpo da requisição inválido.' }, { status: 400 })
+  }
+
+  const id = body.id.trim()
+
+  if (!id) {
+    return NextResponse.json({ message: 'ID do visitante é obrigatório.' }, { status: 400 })
+  }
+
+  try {
+    await requestVisitorsApi(`/${id}`, accessToken, {
+      method: 'DELETE',
+    })
+
+    return new NextResponse(null, { status: 204 })
+  } catch (error) {
+    if (error instanceof VisitorsApiError) {
+      if (error.clearCookie) {
+        clearAccessToken(cookieStore)
+      }
+
+      return NextResponse.json({ message: error.message }, { status: error.status })
+    }
+
+    return NextResponse.json(
+      { message: getThrowableMessage(error, 'Falha ao excluir visitante.') },
       { status: 500 },
     )
   }
