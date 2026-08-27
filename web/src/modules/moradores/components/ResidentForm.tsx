@@ -407,11 +407,40 @@ export function ResidentForm({
         </CardContent>
       </MuiCard>
 
-      <Stack direction="row" justifyContent="flex-end" spacing={1.5}>
-        <Button variant="outlined" color="inherit" onClick={onCancel} disabled={isSubmitting}>
+      <Stack
+        direction={{ xs: 'column-reverse', sm: 'row' }}
+        justifyContent="flex-end"
+        spacing={1.5}
+        sx={{
+          pt: 2,
+          pb: { xs: 2, sm: 0 },
+          borderTop: '1px solid',
+          borderColor: 'rgba(255, 255, 255, 0.06)',
+          position: { xs: 'sticky', sm: 'static' },
+          bottom: 0,
+          bgcolor: 'background.default',
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="inherit"
+          onClick={onCancel}
+          disabled={isSubmitting}
+          sx={{
+            color: 'text.primary',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            width: { xs: '100%', sm: 'auto' },
+          }}
+        >
           Cancelar
         </Button>
-        <Button type="submit" disabled={isSubmitting} variant="contained" color="success">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          variant="contained"
+          color="success"
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
           {isSubmitting ? 'Salvando...' : submitLabel}
         </Button>
       </Stack>
