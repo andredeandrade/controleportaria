@@ -23,8 +23,11 @@ export const VEHICLE_TYPE_LABEL: Record<VehicleTypeEnum, string> = {
 }
 
 export type ResidentVehicleRecord = {
+  id: string
   type: string
   plate: string
+  color?: string
+  brandModel?: string
 }
 
 export type ResidentRecord = {
@@ -34,6 +37,8 @@ export type ResidentRecord = {
   unit: string
   relation: string
   phone: string
+  email?: string
+  observations?: string
   vehicles: ResidentVehicleRecord[]
 }
 

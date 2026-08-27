@@ -18,6 +18,7 @@ type ResidentListProviderProps = {
 export function ResidentListProvider({ children }: ResidentListProviderProps) {
   const query = useResidents()
   const selection = useListSelection<ResidentRecord>()
+  const viewSelection = useListSelection<ResidentRecord>()
   const deleteMutation = useDeleteResident()
 
   const handleClearFilters = () => {
@@ -43,6 +44,9 @@ export function ResidentListProvider({ children }: ResidentListProviderProps) {
     handleCloseDeleteConfirmation: selection.clearSelection,
     handleConfirmDelete,
     isDeletePending: deleteMutation.isPending,
+    viewedRecord: viewSelection.selectedItem,
+    handleOpenView: viewSelection.selectItem,
+    handleCloseView: viewSelection.clearSelection,
   }
 
   return <ResidentListContext.Provider value={value}>{children}</ResidentListContext.Provider>

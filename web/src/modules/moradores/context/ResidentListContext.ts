@@ -16,6 +16,9 @@ export type ResidentListContextValue = ResidentListQueryState & {
   handleCloseDeleteConfirmation: ResidentListSelectionState['clearSelection']
   handleConfirmDelete: () => Promise<void>
   isDeletePending: boolean
+  viewedRecord: ResidentListSelectionState['selectedItem']
+  handleOpenView: ResidentListSelectionState['selectItem']
+  handleCloseView: ResidentListSelectionState['clearSelection']
 }
 
 export const ResidentListContext = createContext<ResidentListContextValue | null>(null)
