@@ -5,3 +5,7 @@ export type ListVisitorsApiResponseBody =
   | null
 
 export type RegisterVisitorApiResponseBody = ({ message?: string } & Partial<Visitor>) | null
+
+export type GetVisitorApiResponseBody = ({ message?: string } & Partial<Visitor>) | null
+
+export type UpdateVisitorApiResponseBody = ({ message?: string } & Partial<Visitor>) | null

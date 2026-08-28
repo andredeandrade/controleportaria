@@ -2,14 +2,20 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
+import { EditVisitorForm } from '@/modules/visitantes/components/EditVisitorForm'
 import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
-import { RegisterVisitorForm } from '@/modules/visitantes/components/RegisterVisitorForm'
 
 export const metadata: Metadata = {
-  title: 'Cadastrar Visitante',
+  title: 'Editar Visitante',
 }
 
-export default function CadastrarVisitantePage() {
+export default async function EditarVisitantePage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+
   return (
     <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack spacing={{ xs: 2.5, sm: 2 }}>
@@ -18,17 +24,18 @@ export default function CadastrarVisitantePage() {
             ariaLabel="Voltar para a pagina anterior"
             fallbackHref="/visitantes"
           />
+
           <Typography variant="h2" fontWeight={700} color="text.primary">
-            Cadastrar visitante
+            Editar visitante
           </Typography>
         </Stack>
 
         <Typography variant="body2" color="text.secondary">
-          Informe os dados do visitante e quem autorizou a entrada na unidade.
+          Atualize os dados do visitante para manter seu registro no sistema de acesso.
         </Typography>
       </Stack>
 
-      <RegisterVisitorForm />
+      <EditVisitorForm visitorId={id} />
     </Stack>
   )
 }
