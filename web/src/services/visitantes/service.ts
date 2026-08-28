@@ -1,8 +1,10 @@
 import type { CreateVisitorRequest, Visitor, VisitorsListResponse } from '@/app/api/visitors/types'
 import { getApiErrorMessage, safeReadJson } from '@/services/shared/http'
 import type {
+  GetVisitorApiResponseBody,
   ListVisitorsApiResponseBody,
   RegisterVisitorApiResponseBody,
+  UpdateVisitorApiResponseBody,
 } from '@/types/services/visitantes'
 
 export class VisitorsServiceError extends Error {
@@ -68,6 +70,57 @@ export async function registerVisitor(payload: CreateVisitorRequest): Promise<Vi
 
   if (!responseBody?.id) {
     throw new VisitorsServiceError('Resposta invalida ao cadastrar visitante.')
+  }
+
+  return responseBody as Visitor
+}
+
+export async function getVisitor(id: string): Promise<Visitor> {
+  const response = await fetch(`/api/visitors/${id}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  const payload = (await safeReadJson(response)) as GetVisitorApiResponseBody
+
+  if (!response.ok) {
+    throw new VisitorsServiceError(
+      getApiErrorMessage(payload, 'Não foi possível carregar o visitante.'),
+    )
+  }
+
+  if (!payload?.id) {
+    throw new VisitorsServiceError('Resposta inválida ao carregar visitante.')
+  }
+
+  return payload as Visitor
+}
+
+export async function updateVisitor(
+  id: string,
+  payload: CreateVisitorRequest,
+): Promise<Visitor> {
+  const response = await fetch(`/api/visitors/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const responseBody = (await safeReadJson(response)) as UpdateVisitorApiResponseBody
+
+  if (!response.ok) {
+    throw new VisitorsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível atualizar o visitante.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new VisitorsServiceError('Resposta inválida ao atualizar visitante.')
   }
 
   return responseBody as Visitor
