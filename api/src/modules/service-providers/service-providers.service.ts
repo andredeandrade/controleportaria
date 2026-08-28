@@ -34,6 +34,9 @@ function validateCreateInput(input: CreateServiceProviderInput): {
   serviceType: string
   unit: string | null
   observations: string | null
+  vehiclePlate: string | null
+  vehicleBrandModel: string | null
+  vehicleColor: string | null
 } {
   const companyName = input.companyName.trim()
   const responsibleName = input.responsibleName.trim()
@@ -43,6 +46,9 @@ function validateCreateInput(input: CreateServiceProviderInput): {
   const serviceType = input.serviceType.trim()
   const unit = normalizeOptionalText(input.unit)
   const observations = normalizeOptionalText(input.observations)
+  const vehiclePlate = normalizeOptionalText(input.vehiclePlate)
+  const vehicleBrandModel = normalizeOptionalText(input.vehicleBrandModel)
+  const vehicleColor = normalizeOptionalText(input.vehicleColor)
 
   if (companyName.length < 2) {
     throw new HttpError(400, 'Nome da empresa deve ter ao menos 2 caracteres.')
@@ -77,6 +83,9 @@ function validateCreateInput(input: CreateServiceProviderInput): {
     serviceType,
     unit,
     observations,
+    vehiclePlate,
+    vehicleBrandModel,
+    vehicleColor,
   }
 }
 
@@ -214,6 +223,9 @@ function toResponse(serviceProvider: {
   serviceType: string
   unit: string | null
   observationsEncrypted: string | null
+  vehiclePlateEncrypted: string | null
+  vehicleBrandModel: string | null
+  vehicleColor: string | null
   createdByUserId: string | null
   createdAt: Date
   updatedAt: Date
@@ -230,6 +242,11 @@ function toResponse(serviceProvider: {
     observations: serviceProvider.observationsEncrypted
       ? decryptText(serviceProvider.observationsEncrypted)
       : null,
+    vehiclePlate: serviceProvider.vehiclePlateEncrypted
+      ? decryptText(serviceProvider.vehiclePlateEncrypted)
+      : null,
+    vehicleBrandModel: serviceProvider.vehicleBrandModel,
+    vehicleColor: serviceProvider.vehicleColor,
     createdByUserId: serviceProvider.createdByUserId,
     createdAt: serviceProvider.createdAt,
     updatedAt: serviceProvider.updatedAt,
@@ -251,6 +268,9 @@ export const serviceProvidersService = {
         serviceType: validated.serviceType,
         unit: validated.unit,
         observationsEncrypted: validated.observations ? encryptText(validated.observations) : null,
+        vehiclePlateEncrypted: validated.vehiclePlate ? encryptText(validated.vehiclePlate) : null,
+        vehicleBrandModel: validated.vehicleBrandModel,
+        vehicleColor: validated.vehicleColor,
         createdByUserId: input.createdByUserId,
       },
     })

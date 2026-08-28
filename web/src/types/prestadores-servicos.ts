@@ -5,6 +5,12 @@ export type ServiceProviderRecord = {
   document: string
   serviceType: string
   phone: string
+  unit?: string
+  email?: string
+  observations?: string
+  vehiclePlate?: string
+  vehicleBrandModel?: string
+  vehicleColor?: string
 }
 
 export type ServiceProvidersPaginationState = {

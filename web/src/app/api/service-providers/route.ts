@@ -9,6 +9,22 @@ import type { CreateServiceProviderRequest } from './types'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
+type DeleteServiceProviderBody = {
+  id: string
+}
+
+function parseDeleteBody(body: unknown): DeleteServiceProviderBody {
+  if (!body || typeof body !== 'object') {
+    throw new Error('Corpo da requisição inválido.')
+  }
+
+  const payload = body as Record<string, unknown>
+
+  return {
+    id: String(payload['id'] ?? ''),
+  }
+}
+
 function parseCreateBody(body: unknown): CreateServiceProviderRequest {
   if (!body || typeof body !== 'object') {
     throw new Error('Corpo da requisição inválido.')
@@ -106,6 +122,53 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { message: getThrowableMessage(error, 'Falha ao cadastrar prestador de serviço.') },
+      { status: 500 },
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  const cookieStore = await cookies()
+  const accessToken = readAccessToken(cookieStore)
+
+  if (!accessToken) {
+    return NextResponse.json({ message: 'Não autenticado.' }, { status: 401 })
+  }
+
+  let body: DeleteServiceProviderBody
+
+  try {
+    body = parseDeleteBody(await request.json())
+  } catch {
+    return NextResponse.json({ message: 'Corpo da requisição inválido.' }, { status: 400 })
+  }
+
+  const id = body.id.trim()
+
+  if (!id) {
+    return NextResponse.json(
+      { message: 'ID do prestador de serviço é obrigatório.' },
+      { status: 400 },
+    )
+  }
+
+  try {
+    await requestServiceProvidersApi(`/${id}`, accessToken, {
+      method: 'DELETE',
+    })
+
+    return new NextResponse(null, { status: 204 })
+  } catch (error) {
+    if (error instanceof ServiceProvidersApiError) {
+      if (error.clearCookie) {
+        clearAccessToken(cookieStore)
+      }
+
+      return NextResponse.json({ message: error.message }, { status: error.status })
+    }
+
+    return NextResponse.json(
+      { message: getThrowableMessage(error, 'Falha ao excluir prestador de serviço.') },
       { status: 500 },
     )
   }

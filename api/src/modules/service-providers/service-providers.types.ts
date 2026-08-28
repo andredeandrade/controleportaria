@@ -8,6 +8,9 @@ export interface CreateServiceProviderInput {
   serviceType: string
   unit?: string
   observations?: string
+  vehiclePlate?: string
+  vehicleBrandModel?: string
+  vehicleColor?: string
   createdByUserId: string
 }
 
@@ -39,6 +42,9 @@ export interface ServiceProviderResponse {
   serviceType: string
   unit: string | null
   observations: string | null
+  vehiclePlate: string | null
+  vehicleBrandModel: string | null
+  vehicleColor: string | null
   createdByUserId: string | null
   createdAt: Date
   updatedAt: Date

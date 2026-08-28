@@ -78,3 +78,21 @@ export async function registerServiceProvider(
 
   return responseBody as ServiceProvider
 }
+
+export async function deleteServiceProvider(id: string): Promise<void> {
+  const response = await fetch('/api/service-providers', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ id }),
+  })
+
+  if (!response.ok) {
+    const payload = await safeReadJson(response)
+    throw new ServiceProvidersServiceError(
+      getApiErrorMessage(payload, 'Não foi possível excluir o prestador de serviço.'),
+    )
+  }
+}
