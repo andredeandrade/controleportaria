@@ -7,6 +7,9 @@ export interface CreateVisitorInput {
   unit: string
   authorizedBy: string
   observations?: string
+  vehiclePlate?: string
+  vehicleBrandModel?: string
+  vehicleColor?: string
   createdByUserId: string
 }
 
@@ -36,6 +39,9 @@ export interface VisitorResponse {
   unit: string
   authorizedBy: string
   observations: string | null
+  vehiclePlate: string | null
+  vehicleBrandModel: string | null
+  vehicleColor: string | null
   createdByUserId: string | null
   createdAt: Date
   updatedAt: Date

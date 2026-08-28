@@ -35,6 +35,10 @@ export function useVisitors() {
     unit: item.unit,
     authorizedBy: item.authorizedBy,
     phone: item.phone ?? '-',
+    observations: item.observations ?? undefined,
+    vehiclePlate: item.vehiclePlate ?? undefined,
+    vehicleBrandModel: item.vehicleBrandModel ?? undefined,
+    vehicleColor: item.vehicleColor ?? undefined,
   }))
 
   const pagination: VisitorsPaginationState = visitorsQuery.data?.pagination ?? {

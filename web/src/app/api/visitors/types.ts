@@ -7,6 +7,9 @@ export type Visitor = {
   unit: string
   authorizedBy: string
   observations: string | null
+  vehiclePlate: string | null
+  vehicleBrandModel: string | null
+  vehicleColor: string | null
   createdByUserId: string | null
   createdAt: string
   updatedAt: string
@@ -30,4 +33,7 @@ export type CreateVisitorRequest = {
   unit: string
   authorizedBy: string
   observations?: string
+  vehiclePlate?: string
+  vehicleBrandModel?: string
+  vehicleColor?: string
 }

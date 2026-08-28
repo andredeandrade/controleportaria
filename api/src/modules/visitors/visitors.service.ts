@@ -33,6 +33,9 @@ function validateCreateInput(input: CreateVisitorInput): {
   unit: string
   authorizedBy: string
   observations: string | null
+  vehiclePlate: string | null
+  vehicleBrandModel: string | null
+  vehicleColor: string | null
 } {
   const fullName = input.fullName.trim()
   const document = normalizeOptionalText(input.document)
@@ -41,6 +44,9 @@ function validateCreateInput(input: CreateVisitorInput): {
   const unit = input.unit.trim()
   const authorizedBy = input.authorizedBy.trim()
   const observations = normalizeOptionalText(input.observations)
+  const vehiclePlate = normalizeOptionalText(input.vehiclePlate)
+  const vehicleBrandModel = normalizeOptionalText(input.vehicleBrandModel)
+  const vehicleColor = normalizeOptionalText(input.vehicleColor)
 
   if (fullName.length < 3) {
     throw new HttpError(400, 'Nome deve ter ao menos 3 caracteres.')
@@ -74,6 +80,9 @@ function validateCreateInput(input: CreateVisitorInput): {
     unit,
     authorizedBy,
     observations,
+    vehiclePlate,
+    vehicleBrandModel,
+    vehicleColor,
   }
 }
 
@@ -204,6 +213,9 @@ function toResponse(visitor: {
   unit: string
   authorizedBy: string
   observationsEncrypted: string | null
+  vehiclePlateEncrypted: string | null
+  vehicleBrandModel: string | null
+  vehicleColor: string | null
   createdByUserId: string | null
   createdAt: Date
   updatedAt: Date
@@ -217,6 +229,9 @@ function toResponse(visitor: {
     unit: visitor.unit,
     authorizedBy: visitor.authorizedBy,
     observations: visitor.observationsEncrypted ? decryptText(visitor.observationsEncrypted) : null,
+    vehiclePlate: visitor.vehiclePlateEncrypted ? decryptText(visitor.vehiclePlateEncrypted) : null,
+    vehicleBrandModel: visitor.vehicleBrandModel,
+    vehicleColor: visitor.vehicleColor,
     createdByUserId: visitor.createdByUserId,
     createdAt: visitor.createdAt,
     updatedAt: visitor.updatedAt,
@@ -237,6 +252,9 @@ export const visitorsService = {
         unit: validated.unit,
         authorizedBy: validated.authorizedBy,
         observationsEncrypted: validated.observations ? encryptText(validated.observations) : null,
+        vehiclePlateEncrypted: validated.vehiclePlate ? encryptText(validated.vehiclePlate) : null,
+        vehicleBrandModel: validated.vehicleBrandModel,
+        vehicleColor: validated.vehicleColor,
         createdByUserId: input.createdByUserId,
       },
     })

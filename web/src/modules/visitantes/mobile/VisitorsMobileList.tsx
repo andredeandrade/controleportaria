@@ -1,66 +1,163 @@
 'use client'
 
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
+import EditRoundedIcon from '@mui/icons-material/EditRounded'
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
+import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
+import { RegisterVisitorButton } from '@/modules/visitantes/components/RegisterVisitorButton'
+import { useVisitorListContext } from '@/modules/visitantes/context/VisitorListContext'
+import { VisitorsMobileListLoader } from '@/modules/visitantes/mobile/VisitorsMobileListLoader'
+import { ListEmptyState } from '@/modules/table/components/ListEmptyState'
+import { ListErrorState } from '@/modules/table/components/ListErrorState'
 import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
-import type { VisitorRecord } from '@/types/visitantes'
 
-type VisitorsMobileListProps = {
-  records: VisitorRecord[]
-}
+const SKELETON_CARD_COUNT = 5
 
-export function VisitorsMobileList({ records }: VisitorsMobileListProps) {
-  if (records.length === 0) {
-    return (
-      <Typography variant="body2" color="text.secondary" sx={{ px: 1 }}>
-        Nenhum visitante encontrado.
-      </Typography>
-    )
-  }
+export function VisitorsMobileList() {
+  const router = useRouter()
+  const {
+    records,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch: onRetry,
+    handleClearFilters,
+    handleOpenDeleteConfirmation,
+    handleOpenView,
+  } = useVisitorListContext()
 
   return (
-    <Stack spacing={1.5}>
-      {records.map((record) => (
-        <MobileListCard key={record.id} variant="outlined">
-          <Stack spacing={1.5}>
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Nome</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.name}
-              </Typography>
-            </Stack>
+    <Stack spacing={3}>
+      {isError ? (
+        <ListErrorState
+          title="Não foi possível carregar os visitantes."
+          message={errorMessage}
+          onRetry={onRetry}
+        />
+      ) : isLoading ? (
+        Array.from({ length: SKELETON_CARD_COUNT }).map((_, index) => (
+          <VisitorsMobileListLoader key={index} />
+        ))
+      ) : records.length === 0 ? (
+        <ListEmptyState
+          title="Nenhum visitante encontrado."
+          description="Nenhum registro corresponde à busca realizada. Ajuste os critérios ou cadastre um novo visitante."
+          actions={
+            <>
+              <Button variant="outlined" onClick={handleClearFilters}>
+                Limpar busca
+              </Button>
+              <RegisterVisitorButton />
+            </>
+          }
+        />
+      ) : (
+        records.map((record) => {
+          const hasVehicle = Boolean(
+            record.vehiclePlate || record.vehicleBrandModel || record.vehicleColor,
+          )
+          const vehicleDescription = [record.vehicleBrandModel, record.vehicleColor]
+            .filter(Boolean)
+            .join(' ')
 
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">CPF/RG</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.document}
-              </Typography>
-            </Stack>
+          return (
+            <MobileListCard key={record.id} variant="outlined" sx={{ p: 5 }}>
+              <Stack spacing={5}>
+                <Stack spacing={0.25}>
+                  <Typography variant="body1" fontWeight={700} color="text.primary">
+                    {record.name}
+                  </Typography>
+                  {record.document ? (
+                    <Typography variant="caption" color="text.disabled">
+                      {record.document}
+                    </Typography>
+                  ) : null}
+                </Stack>
 
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Unidade</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.unit}
-              </Typography>
-            </Stack>
+                <Stack spacing={0.25}>
+                  <MobileFieldLabel variant="caption">Autorizado por</MobileFieldLabel>
+                  <Typography variant="body2" color="text.primary">
+                    {record.authorizedBy}
+                  </Typography>
+                  <Typography variant="caption" color="text.disabled">
+                    {record.unit}
+                  </Typography>
+                </Stack>
 
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Autorizado por</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.authorizedBy}
-              </Typography>
-            </Stack>
+                <Stack spacing={0.25}>
+                  <MobileFieldLabel variant="caption">Telefone</MobileFieldLabel>
+                  <Typography variant="body2" color="text.primary">
+                    {record.phone}
+                  </Typography>
+                </Stack>
 
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Telefone</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.phone}
-              </Typography>
-            </Stack>
-          </Stack>
-        </MobileListCard>
-      ))}
+                <Stack spacing={0.5}>
+                  <MobileFieldLabel variant="caption">Veículo</MobileFieldLabel>
+                  {hasVehicle ? (
+                    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
+                      {record.vehiclePlate ? (
+                        <Chip
+                          label={record.vehiclePlate}
+                          size="small"
+                          variant="outlined"
+                          sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 600 }}
+                        />
+                      ) : null}
+                      {vehicleDescription ? (
+                        <Typography variant="body2" color="text.secondary">
+                          {vehicleDescription}
+                        </Typography>
+                      ) : null}
+                    </Stack>
+                  ) : (
+                    <Typography variant="body2" color="text.disabled">
+                      Nenhum veículo cadastrado
+                    </Typography>
+                  )}
+                </Stack>
+
+                <Divider sx={{ borderColor: 'divider' }} />
+
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={<VisibilityRoundedIcon fontSize="small" />}
+                      onClick={() => handleOpenView(record)}
+                    >
+                      Visualizar
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<EditRoundedIcon fontSize="small" />}
+                      onClick={() => router.push(`/visitantes/${record.id}/editar`)}
+                    >
+                      Editar
+                    </Button>
+                  </Stack>
+                  <IconButton
+                    size="small"
+                    aria-label="Excluir visitante"
+                    onClick={() => handleOpenDeleteConfirmation(record)}
+                  >
+                    <DeleteOutlineRoundedIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              </Stack>
+            </MobileListCard>
+          )
+        })
+      )}
     </Stack>
   )
 }

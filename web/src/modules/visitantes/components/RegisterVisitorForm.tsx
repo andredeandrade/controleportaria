@@ -18,6 +18,9 @@ type RegisterVisitorFormValues = {
   unit: string
   authorizedBy: string
   observations: string
+  vehiclePlate: string
+  vehicleBrandModel: string
+  vehicleColor: string
 }
 
 export function RegisterVisitorForm() {
@@ -38,6 +41,9 @@ export function RegisterVisitorForm() {
       unit: '',
       authorizedBy: '',
       observations: '',
+      vehiclePlate: '',
+      vehicleBrandModel: '',
+      vehicleColor: '',
     },
   })
 
@@ -51,6 +57,9 @@ export function RegisterVisitorForm() {
         unit: data.unit.trim(),
         authorizedBy: data.authorizedBy.trim(),
         observations: data.observations.trim() || undefined,
+        vehiclePlate: data.vehiclePlate.trim() || undefined,
+        vehicleBrandModel: data.vehicleBrandModel.trim() || undefined,
+        vehicleColor: data.vehicleColor.trim() || undefined,
       })
 
       showSuccess('Visitante registrado com sucesso.')
@@ -152,6 +161,29 @@ export function RegisterVisitorForm() {
                   required: 'Informe o responsável pela autorização',
                 })}
               />
+            </TextFieldStack>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextFieldStack>
+              <TextFieldLabel>Placa do veículo</TextFieldLabel>
+              <TextField {...register('vehiclePlate')} />
+            </TextFieldStack>
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextFieldStack>
+              <TextFieldLabel>Modelo do veículo</TextFieldLabel>
+              <TextField {...register('vehicleBrandModel')} />
+            </TextFieldStack>
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextFieldStack>
+              <TextFieldLabel>Cor do veículo</TextFieldLabel>
+              <TextField {...register('vehicleColor')} />
             </TextFieldStack>
           </Grid>
         </Grid>

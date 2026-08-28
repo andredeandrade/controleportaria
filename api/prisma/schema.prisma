@@ -105,6 +105,9 @@ model Visitor {
   phoneEncrypted       String?
   documentEncrypted    String
   observationsEncrypted String?
+  vehiclePlateEncrypted String?
+  vehicleBrandModel    String?
+  vehicleColor         String?
   createdByUserId      String?
   createdByUser        User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
   createdAt            DateTime    @default(now())
