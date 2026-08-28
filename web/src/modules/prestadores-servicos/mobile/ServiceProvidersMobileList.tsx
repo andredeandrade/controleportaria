@@ -1,66 +1,150 @@
 'use client'
 
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
+import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { RegisterServiceProviderButton } from '@/modules/prestadores-servicos/components/RegisterServiceProviderButton'
+import { useServiceProviderListContext } from '@/modules/prestadores-servicos/context/ServiceProviderListContext'
+import { ServiceProvidersMobileListLoader } from '@/modules/prestadores-servicos/mobile/ServiceProvidersMobileListLoader'
+import { ListEmptyState } from '@/modules/table/components/ListEmptyState'
+import { ListErrorState } from '@/modules/table/components/ListErrorState'
 import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
-import type { ServiceProviderRecord } from '@/types/prestadores-servicos'
 
-type ServiceProvidersMobileListProps = {
-  records: ServiceProviderRecord[]
-}
+const SKELETON_CARD_COUNT = 5
 
-export function ServiceProvidersMobileList({ records }: ServiceProvidersMobileListProps) {
-  if (records.length === 0) {
-    return (
-      <Typography variant="body2" color="text.secondary" sx={{ px: 1 }}>
-        Nenhum prestador de serviço encontrado.
-      </Typography>
-    )
-  }
+export function ServiceProvidersMobileList() {
+  const {
+    records,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch: onRetry,
+    handleClearFilters,
+    handleOpenDeleteConfirmation,
+    handleOpenView,
+  } = useServiceProviderListContext()
 
   return (
-    <Stack spacing={1.5}>
-      {records.map((record) => (
-        <MobileListCard key={record.id} variant="outlined">
-          <Stack spacing={1.5}>
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Empresa</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.companyName}
-              </Typography>
-            </Stack>
+    <Stack spacing={3}>
+      {isError ? (
+        <ListErrorState
+          title="Não foi possível carregar os prestadores de serviço."
+          message={errorMessage}
+          onRetry={onRetry}
+        />
+      ) : isLoading ? (
+        Array.from({ length: SKELETON_CARD_COUNT }).map((_, index) => (
+          <ServiceProvidersMobileListLoader key={index} />
+        ))
+      ) : records.length === 0 ? (
+        <ListEmptyState
+          title="Nenhum prestador de serviço encontrado."
+          description="Nenhum registro corresponde à busca realizada. Ajuste os critérios ou cadastre um novo prestador."
+          actions={
+            <>
+              <Button variant="outlined" onClick={handleClearFilters}>
+                Limpar busca
+              </Button>
+              <RegisterServiceProviderButton />
+            </>
+          }
+        />
+      ) : (
+        records.map((record) => {
+          const hasVehicle = Boolean(
+            record.vehiclePlate || record.vehicleBrandModel || record.vehicleColor,
+          )
+          const vehicleDescription = [record.vehicleBrandModel, record.vehicleColor]
+            .filter(Boolean)
+            .join(' ')
 
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Responsável</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.responsibleName}
-              </Typography>
-            </Stack>
+          return (
+            <MobileListCard key={record.id} variant="outlined" sx={{ p: 5 }}>
+              <Stack spacing={5}>
+                <Stack spacing={0.25}>
+                  <Typography variant="body1" fontWeight={700} color="text.primary">
+                    {record.responsibleName}
+                  </Typography>
+                  {record.document ? (
+                    <Typography variant="caption" color="text.disabled">
+                      {record.document}
+                    </Typography>
+                  ) : null}
+                </Stack>
 
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">CNPJ/CPF</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.document}
-              </Typography>
-            </Stack>
+                <Stack spacing={0.25}>
+                  <MobileFieldLabel variant="caption">Empresa</MobileFieldLabel>
+                  <Typography variant="body2" color="text.primary">
+                    {record.companyName}
+                  </Typography>
+                  <Typography variant="caption" color="text.disabled">
+                    {record.serviceType}
+                  </Typography>
+                </Stack>
 
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Tipo de serviço</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.serviceType}
-              </Typography>
-            </Stack>
+                <Stack spacing={0.25}>
+                  <MobileFieldLabel variant="caption">Unidade</MobileFieldLabel>
+                  <Typography variant="body2" color="text.primary">
+                    {record.unit || '—'}
+                  </Typography>
+                </Stack>
 
-            <Stack spacing={0.25}>
-              <MobileFieldLabel variant="caption">Telefone</MobileFieldLabel>
-              <Typography variant="body2" color="#0F172A">
-                {record.phone}
-              </Typography>
-            </Stack>
-          </Stack>
-        </MobileListCard>
-      ))}
+                <Stack spacing={0.5}>
+                  <MobileFieldLabel variant="caption">Veículo</MobileFieldLabel>
+                  {hasVehicle ? (
+                    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
+                      {record.vehiclePlate ? (
+                        <Chip
+                          label={record.vehiclePlate}
+                          size="small"
+                          variant="outlined"
+                          sx={{ height: 22, fontSize: '0.6875rem', fontWeight: 600 }}
+                        />
+                      ) : null}
+                      {vehicleDescription ? (
+                        <Typography variant="body2" color="text.secondary">
+                          {vehicleDescription}
+                        </Typography>
+                      ) : null}
+                    </Stack>
+                  ) : (
+                    <Typography variant="body2" color="text.disabled">
+                      Nenhum veículo cadastrado
+                    </Typography>
+                  )}
+                </Stack>
+
+                <Divider sx={{ borderColor: 'divider' }} />
+
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    startIcon={<VisibilityRoundedIcon fontSize="small" />}
+                    onClick={() => handleOpenView(record)}
+                  >
+                    Visualizar
+                  </Button>
+                  <IconButton
+                    size="small"
+                    aria-label="Excluir prestador de serviço"
+                    onClick={() => handleOpenDeleteConfirmation(record)}
+                  >
+                    <DeleteOutlineRoundedIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              </Stack>
+            </MobileListCard>
+          )
+        })
+      )}
     </Stack>
   )
 }

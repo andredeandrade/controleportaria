@@ -1,81 +1,80 @@
 'use client'
 
-import type { ColumnDef } from '@tanstack/react-table'
+import Button from '@mui/material/Button'
 
-import { DataTable } from '@/modules/table/components/DataTable'
-import type { ServiceProviderRecord } from '@/types/prestadores-servicos'
+import { RegisterServiceProviderButton } from '@/modules/prestadores-servicos/components/RegisterServiceProviderButton'
+import { ServiceProvidersTableRow } from '@/modules/prestadores-servicos/components/ServiceProvidersTableRow'
+import { ServiceProvidersTableRowLoader } from '@/modules/prestadores-servicos/components/ServiceProvidersTableRowLoader'
+import { useServiceProviderListContext } from '@/modules/prestadores-servicos/context/ServiceProviderListContext'
+import { ListEmptyState } from '@/modules/table/components/ListEmptyState'
+import { ListErrorState } from '@/modules/table/components/ListErrorState'
+import { Table } from '@/modules/table/components/Table'
+import { TableBody } from '@/modules/table/components/TableBody'
+import { TableCell } from '@/modules/table/components/TableCell'
+import { TableHead } from '@/modules/table/components/TableHead'
+import { TableHeadCell } from '@/modules/table/components/TableHeadCell'
+import { TableRow } from '@/modules/table/components/TableRow'
 
-type ServiceProvidersTableProps = {
-  records: ServiceProviderRecord[]
-}
+const SKELETON_ROW_COUNT = 5
+const COLUMN_COUNT = 5
 
-export function ServiceProvidersTable({ records }: ServiceProvidersTableProps) {
-  const columns: ColumnDef<ServiceProviderRecord>[] = [
-    {
-      accessorKey: 'companyName',
-      header: 'Empresa',
-    },
-    {
-      accessorKey: 'responsibleName',
-      header: 'Responsável',
-    },
-    {
-      accessorKey: 'document',
-      header: 'CNPJ/CPF',
-    },
-    {
-      accessorKey: 'serviceType',
-      header: 'Tipo de serviço',
-    },
-    {
-      accessorKey: 'phone',
-      header: 'Telefone',
-    },
-  ]
+export function ServiceProvidersTable() {
+  const {
+    records,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch: onRetry,
+    handleClearFilters,
+  } = useServiceProviderListContext()
 
   return (
-    <DataTable
-      data={records}
-      columns={columns}
-      emptyMessage="Nenhum prestador de serviço encontrado."
-      containerSx={{
-        bgcolor: '#F8FAFC',
-        borderColor: 'rgba(203, 213, 225, 0.9)',
-        borderRadius: 3,
-        overflow: 'hidden',
-        boxShadow: '0 18px 40px rgba(15, 23, 42, 0.12)',
-      }}
-      headerCellSx={{
-        px: 3,
-        py: 2.25,
-        bgcolor: '#E2E8F0',
-        color: '#0F172A',
-        fontSize: '0.95rem',
-        fontWeight: 700,
-        borderBottom: '1px solid rgba(203, 213, 225, 0.9)',
-        whiteSpace: 'nowrap',
-      }}
-      bodyCellSx={{
-        px: 3,
-        py: 2.5,
-        color: '#0F172A',
-        fontSize: '0.95rem',
-        borderBottom: '1px solid rgba(226, 232, 240, 1)',
-      }}
-      rowSx={{
-        '&:nth-of-type(odd)': {
-          bgcolor: '#FFFFFF',
-        },
-        '&:nth-of-type(even)': {
-          bgcolor: '#F8FAFC',
-        },
-        '&:hover': {
-          bgcolor: '#EEF2FF',
-        },
-        '&:last-child td': {
-          borderBottom: 'none',
-        },
-      }}
-    />
+    <Table>
+      <TableHead>
+        <TableHeadCell>Prestador</TableHeadCell>
+        <TableHeadCell>Empresa</TableHeadCell>
+        <TableHeadCell>Unidade</TableHeadCell>
+        <TableHeadCell>Veículo</TableHeadCell>
+        <TableHeadCell align="right">Ações</TableHeadCell>
+      </TableHead>
+      <TableBody
+        isEmpty={!isError && !isLoading && records.length === 0}
+        emptyState={
+          <ListEmptyState
+            title="Nenhum prestador de serviço encontrado."
+            description="Nenhum registro corresponde à busca realizada. Ajuste os critérios ou cadastre um novo prestador."
+            actions={
+              <>
+                <Button variant="outlined" onClick={handleClearFilters}>
+                  Limpar busca
+                </Button>
+                <RegisterServiceProviderButton />
+              </>
+            }
+          />
+        }
+        colSpan={COLUMN_COUNT}
+      >
+        {isError ? (
+          <TableRow>
+            <TableCell colSpan={COLUMN_COUNT}>
+              <ListErrorState
+                title="Não foi possível carregar os prestadores de serviço."
+                message={errorMessage}
+                onRetry={onRetry}
+              />
+            </TableCell>
+          </TableRow>
+        ) : isLoading ? (
+          Array.from({ length: SKELETON_ROW_COUNT }).map((_, index) => (
+            <ServiceProvidersTableRowLoader key={index} />
+          ))
+        ) : (
+          records.map((record) => (
+            <ServiceProvidersTableRow key={record.id} record={record} />
+          ))
+        )}
+      </TableBody>
+    </Table>
   )
 }

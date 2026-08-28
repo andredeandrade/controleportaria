@@ -1,14 +1,20 @@
 'use client'
 
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import Button from '@mui/material/Button'
+import type { SxProps, Theme } from '@mui/material/styles'
 import { useRouter } from 'next/navigation'
 
 type RegisterServiceProviderButtonProps = {
   fullWidth?: boolean
+  size?: 'medium' | 'large'
+  sx?: SxProps<Theme>
 }
 
 export function RegisterServiceProviderButton({
   fullWidth = false,
+  size = 'medium',
+  sx,
 }: RegisterServiceProviderButtonProps) {
   const router = useRouter()
 
@@ -19,20 +25,14 @@ export function RegisterServiceProviderButton({
   return (
     <Button
       variant="contained"
+      color="primary"
+      size={size}
       fullWidth={fullWidth}
+      startIcon={<AddRoundedIcon fontSize="small" />}
       onClick={handleNavigateToRegister}
-      sx={{
-        bgcolor: '#16A34A',
-        color: '#FFFFFF',
-        fontWeight: 700,
-        boxShadow: 'none',
-        '&:hover': {
-          bgcolor: '#15803D',
-          boxShadow: 'none',
-        },
-      }}
+      sx={sx}
     >
-      Cadastrar
+      Adicionar prestador
     </Button>
   )
 }

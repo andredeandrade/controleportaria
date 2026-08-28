@@ -79,6 +79,9 @@ export const serviceProvidersController = {
       serviceType: String(body['serviceType'] ?? ''),
       unit: readOptionalString(body['unit']),
       observations: readOptionalString(body['observations']),
+      vehiclePlate: readOptionalString(body['vehiclePlate']),
+      vehicleBrandModel: readOptionalString(body['vehicleBrandModel']),
+      vehicleColor: readOptionalString(body['vehicleColor']),
       createdByUserId: req.authUser.id,
     })
 

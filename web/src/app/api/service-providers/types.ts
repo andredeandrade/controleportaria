@@ -8,6 +8,9 @@ export type ServiceProvider = {
   serviceType: string
   unit: string | null
   observations: string | null
+  vehiclePlate: string | null
+  vehicleBrandModel: string | null
+  vehicleColor: string | null
   createdByUserId: string | null
   createdAt: string
   updatedAt: string

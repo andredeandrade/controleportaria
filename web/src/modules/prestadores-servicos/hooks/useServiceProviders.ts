@@ -42,6 +42,12 @@ export function useServiceProviders() {
       document: item.document,
       serviceType: item.serviceType,
       phone: item.phone ?? '-',
+      unit: item.unit ?? undefined,
+      email: item.email ?? undefined,
+      observations: item.observations ?? undefined,
+      vehiclePlate: item.vehiclePlate ?? undefined,
+      vehicleBrandModel: item.vehicleBrandModel ?? undefined,
+      vehicleColor: item.vehicleColor ?? undefined,
     }),
   )
 
