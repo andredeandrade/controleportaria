@@ -7,6 +7,7 @@ export interface CreateServiceProviderInput {
   email?: string
   serviceType: string
   unit?: string
+  authorizedBy: string
   observations?: string
   vehiclePlate?: string
   vehicleBrandModel?: string
@@ -22,6 +23,7 @@ export interface UpdateServiceProviderInput {
   email?: string | null
   serviceType?: string
   unit?: string | null
+  authorizedBy?: string
   observations?: string | null
 }
 
@@ -41,6 +43,7 @@ export interface ServiceProviderResponse {
   email: string | null
   serviceType: string
   unit: string | null
+  authorizedBy: string
   observations: string | null
   vehiclePlate: string | null
   vehicleBrandModel: string | null

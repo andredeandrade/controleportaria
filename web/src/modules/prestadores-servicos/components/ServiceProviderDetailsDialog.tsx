@@ -85,6 +85,14 @@ export function ServiceProviderDetailsDialog() {
             </Grid>
             <Grid size={6}>
               <Stack spacing={0.25}>
+                <MobileFieldLabel variant="caption">Autorizado por</MobileFieldLabel>
+                <Typography variant="body2" color="text.primary">
+                  {target.authorizedBy || '-'}
+                </Typography>
+              </Stack>
+            </Grid>
+            <Grid size={6}>
+              <Stack spacing={0.25}>
                 <MobileFieldLabel variant="caption">Telefone</MobileFieldLabel>
                 <Typography variant="body2" color="text.primary">
                   {target.phone || '-'}

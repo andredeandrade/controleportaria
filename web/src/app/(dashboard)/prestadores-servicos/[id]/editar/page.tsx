@@ -2,14 +2,20 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
+import { EditServiceProviderForm } from '@/modules/prestadores-servicos/components/EditServiceProviderForm'
 import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
-import { RegisterServiceProviderForm } from '@/modules/prestadores-servicos/components/RegisterServiceProviderForm'
 
 export const metadata: Metadata = {
-  title: 'Cadastrar Prestador de Serviços',
+  title: 'Editar Prestador de Serviço',
 }
 
-export default function CadastrarPrestadorServicosPage() {
+export default async function EditarPrestadorServicoPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+
   return (
     <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack spacing={{ xs: 2.5, sm: 2 }}>
@@ -20,16 +26,16 @@ export default function CadastrarPrestadorServicosPage() {
           />
 
           <Typography variant="h2" fontWeight={700} color="text.primary">
-            Adicionar prestador de serviço
+            Editar prestador de serviço
           </Typography>
         </Stack>
 
         <Typography variant="body2" color="text.secondary">
-          Informe os dados do prestador, a empresa responsável e a unidade atendida.
+          Atualize os dados do prestador, a empresa responsável e a unidade atendida.
         </Typography>
       </Stack>
 
-      <RegisterServiceProviderForm />
+      <EditServiceProviderForm serviceProviderId={id} />
     </Stack>
   )
 }

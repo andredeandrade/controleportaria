@@ -6,6 +6,7 @@ export type ServiceProviderRecord = {
   serviceType: string
   phone: string
   unit?: string
+  authorizedBy?: string
   email?: string
   observations?: string
   vehiclePlate?: string

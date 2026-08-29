@@ -1,6 +1,7 @@
 'use client'
 
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
+import EditRoundedIcon from '@mui/icons-material/EditRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
@@ -8,6 +9,7 @@ import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
 import { RegisterServiceProviderButton } from '@/modules/prestadores-servicos/components/RegisterServiceProviderButton'
 import { useServiceProviderListContext } from '@/modules/prestadores-servicos/context/ServiceProviderListContext'
@@ -19,6 +21,7 @@ import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
 const SKELETON_CARD_COUNT = 5
 
 export function ServiceProvidersMobileList() {
+  const router = useRouter()
   const {
     records,
     isLoading,
@@ -123,15 +126,25 @@ export function ServiceProvidersMobileList() {
                 <Divider sx={{ borderColor: 'divider' }} />
 
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    startIcon={<VisibilityRoundedIcon fontSize="small" />}
-                    onClick={() => handleOpenView(record)}
-                  >
-                    Visualizar
-                  </Button>
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={<VisibilityRoundedIcon fontSize="small" />}
+                      onClick={() => handleOpenView(record)}
+                    >
+                      Visualizar
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<EditRoundedIcon fontSize="small" />}
+                      onClick={() => router.push(`/prestadores-servicos/${record.id}/editar`)}
+                    >
+                      Editar
+                    </Button>
+                  </Stack>
                   <IconButton
                     size="small"
                     aria-label="Excluir prestador de serviço"

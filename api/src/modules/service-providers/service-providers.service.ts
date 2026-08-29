@@ -33,6 +33,7 @@ function validateCreateInput(input: CreateServiceProviderInput): {
   email: string | null
   serviceType: string
   unit: string | null
+  authorizedBy: string
   observations: string | null
   vehiclePlate: string | null
   vehicleBrandModel: string | null
@@ -45,6 +46,7 @@ function validateCreateInput(input: CreateServiceProviderInput): {
   const email = normalizeOptionalText(input.email)
   const serviceType = input.serviceType.trim()
   const unit = normalizeOptionalText(input.unit)
+  const authorizedBy = input.authorizedBy.trim()
   const observations = normalizeOptionalText(input.observations)
   const vehiclePlate = normalizeOptionalText(input.vehiclePlate)
   const vehicleBrandModel = normalizeOptionalText(input.vehicleBrandModel)
@@ -74,6 +76,10 @@ function validateCreateInput(input: CreateServiceProviderInput): {
     throw new HttpError(400, 'Tipo de serviço é obrigatório.')
   }
 
+  if (authorizedBy.length < 3) {
+    throw new HttpError(400, 'Autorizado por deve ter ao menos 3 caracteres.')
+  }
+
   return {
     companyName,
     responsibleName,
@@ -82,6 +88,7 @@ function validateCreateInput(input: CreateServiceProviderInput): {
     email,
     serviceType,
     unit,
+    authorizedBy,
     observations,
     vehiclePlate,
     vehicleBrandModel,
@@ -97,6 +104,7 @@ function validateUpdateInput(input: UpdateServiceProviderInput): {
   email?: string | null
   serviceType?: string
   unit?: string | null
+  authorizedBy?: string
   observations?: string | null
 } {
   const data: {
@@ -107,6 +115,7 @@ function validateUpdateInput(input: UpdateServiceProviderInput): {
     email?: string | null
     serviceType?: string
     unit?: string | null
+    authorizedBy?: string
     observations?: string | null
   } = {}
 
@@ -172,6 +181,16 @@ function validateUpdateInput(input: UpdateServiceProviderInput): {
     data.unit = normalizeOptionalText(input.unit)
   }
 
+  if (input.authorizedBy !== undefined) {
+    const authorizedBy = input.authorizedBy.trim()
+
+    if (authorizedBy.length < 3) {
+      throw new HttpError(400, 'Autorizado por deve ter ao menos 3 caracteres.')
+    }
+
+    data.authorizedBy = authorizedBy
+  }
+
   if (input.observations !== undefined) {
     data.observations = normalizeOptionalText(input.observations)
   }
@@ -222,6 +241,7 @@ function toResponse(serviceProvider: {
   emailEncrypted: string | null
   serviceType: string
   unit: string | null
+  authorizedBy: string
   observationsEncrypted: string | null
   vehiclePlateEncrypted: string | null
   vehicleBrandModel: string | null
@@ -239,6 +259,7 @@ function toResponse(serviceProvider: {
     email: serviceProvider.emailEncrypted ? decryptText(serviceProvider.emailEncrypted) : null,
     serviceType: serviceProvider.serviceType,
     unit: serviceProvider.unit,
+    authorizedBy: serviceProvider.authorizedBy,
     observations: serviceProvider.observationsEncrypted
       ? decryptText(serviceProvider.observationsEncrypted)
       : null,
@@ -267,6 +288,7 @@ export const serviceProvidersService = {
         emailEncrypted: validated.email ? encryptText(validated.email) : null,
         serviceType: validated.serviceType,
         unit: validated.unit,
+        authorizedBy: validated.authorizedBy,
         observationsEncrypted: validated.observations ? encryptText(validated.observations) : null,
         vehiclePlateEncrypted: validated.vehiclePlate ? encryptText(validated.vehiclePlate) : null,
         vehicleBrandModel: validated.vehicleBrandModel,
@@ -290,6 +312,7 @@ export const serviceProvidersService = {
               { responsibleName: { contains: search, mode: 'insensitive' as const } },
               { serviceType: { contains: search, mode: 'insensitive' as const } },
               { unit: { contains: search, mode: 'insensitive' as const } },
+              { authorizedBy: { contains: search, mode: 'insensitive' as const } },
             ],
           }
         : {}),
@@ -383,6 +406,7 @@ export const serviceProvidersService = {
               : null,
         serviceType: validated.serviceType,
         unit: validated.unit,
+        authorizedBy: validated.authorizedBy,
         observationsEncrypted:
           validated.observations === undefined
             ? undefined

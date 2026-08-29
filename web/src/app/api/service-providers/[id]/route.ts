@@ -4,28 +4,12 @@ import {
   getThrowableMessage,
   readAccessToken,
   requestServiceProvidersApi,
-} from './helpers'
-import type { CreateServiceProviderRequest } from './types'
+} from '../helpers'
+import type { CreateServiceProviderRequest } from '../types'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-type DeleteServiceProviderBody = {
-  id: string
-}
-
-function parseDeleteBody(body: unknown): DeleteServiceProviderBody {
-  if (!body || typeof body !== 'object') {
-    throw new Error('Corpo da requisição inválido.')
-  }
-
-  const payload = body as Record<string, unknown>
-
-  return {
-    id: String(payload['id'] ?? ''),
-  }
-}
-
-function parseCreateBody(body: unknown): CreateServiceProviderRequest {
+function parseUpdateBody(body: unknown): CreateServiceProviderRequest {
   if (!body || typeof body !== 'object') {
     throw new Error('Corpo da requisição inválido.')
   }
@@ -49,7 +33,8 @@ function parseCreateBody(body: unknown): CreateServiceProviderRequest {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const cookieStore = await cookies()
   const accessToken = readAccessToken(cookieStore)
 
@@ -58,18 +43,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const requestUrl = new URL(request.url)
-    const page = requestUrl.searchParams.get('page') ?? '1'
-    const pageSize = requestUrl.searchParams.get('pageSize') ?? '10'
-    const search = requestUrl.searchParams.get('search')?.trim() ?? ''
-
-    const params = new URLSearchParams({ page, pageSize })
-
-    if (search) {
-      params.set('search', search)
-    }
-
-    const payload = await requestServiceProvidersApi(`?${params.toString()}`, accessToken, {
+    const payload = await requestServiceProvidersApi(`/${id}`, accessToken, {
       method: 'GET',
     })
 
@@ -84,13 +58,14 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json(
-      { message: 'Falha ao listar prestadores de serviço.' },
+      { message: getThrowableMessage(error, 'Falha ao consultar prestador de serviço.') },
       { status: 500 },
     )
   }
 }
 
-export async function POST(request: Request) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const cookieStore = await cookies()
   const accessToken = readAccessToken(cookieStore)
 
@@ -101,21 +76,21 @@ export async function POST(request: Request) {
   let body: CreateServiceProviderRequest
 
   try {
-    body = parseCreateBody(await request.json())
+    body = parseUpdateBody(await request.json())
   } catch {
     return NextResponse.json({ message: 'Corpo da requisição inválido.' }, { status: 400 })
   }
 
   try {
-    const payload = await requestServiceProvidersApi('', accessToken, {
-      method: 'POST',
+    const payload = await requestServiceProvidersApi(`/${id}`, accessToken, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
     })
 
-    return NextResponse.json(payload, { status: 201 })
+    return NextResponse.json(payload, { status: 200 })
   } catch (error) {
     if (error instanceof ServiceProvidersApiError) {
       if (error.clearCookie) {
@@ -126,54 +101,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { message: getThrowableMessage(error, 'Falha ao cadastrar prestador de serviço.') },
-      { status: 500 },
-    )
-  }
-}
-
-export async function DELETE(request: Request) {
-  const cookieStore = await cookies()
-  const accessToken = readAccessToken(cookieStore)
-
-  if (!accessToken) {
-    return NextResponse.json({ message: 'Não autenticado.' }, { status: 401 })
-  }
-
-  let body: DeleteServiceProviderBody
-
-  try {
-    body = parseDeleteBody(await request.json())
-  } catch {
-    return NextResponse.json({ message: 'Corpo da requisição inválido.' }, { status: 400 })
-  }
-
-  const id = body.id.trim()
-
-  if (!id) {
-    return NextResponse.json(
-      { message: 'ID do prestador de serviço é obrigatório.' },
-      { status: 400 },
-    )
-  }
-
-  try {
-    await requestServiceProvidersApi(`/${id}`, accessToken, {
-      method: 'DELETE',
-    })
-
-    return new NextResponse(null, { status: 204 })
-  } catch (error) {
-    if (error instanceof ServiceProvidersApiError) {
-      if (error.clearCookie) {
-        clearAccessToken(cookieStore)
-      }
-
-      return NextResponse.json({ message: error.message }, { status: error.status })
-    }
-
-    return NextResponse.json(
-      { message: getThrowableMessage(error, 'Falha ao excluir prestador de serviço.') },
+      { message: getThrowableMessage(error, 'Falha ao atualizar prestador de serviço.') },
       { status: 500 },
     )
   }
