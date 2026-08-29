@@ -127,6 +127,7 @@ model ServiceProvider {
   responsibleName      String
   serviceType          String
   unit                 String?
+  authorizedBy         String
   emailEncrypted       String?
   phoneEncrypted       String?
   documentEncrypted    String

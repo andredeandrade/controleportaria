@@ -43,6 +43,7 @@ export function useServiceProviders() {
       serviceType: item.serviceType,
       phone: item.phone ?? '-',
       unit: item.unit ?? undefined,
+      authorizedBy: item.authorizedBy,
       email: item.email ?? undefined,
       observations: item.observations ?? undefined,
       vehiclePlate: item.vehiclePlate ?? undefined,

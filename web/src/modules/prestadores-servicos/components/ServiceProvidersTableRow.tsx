@@ -1,11 +1,13 @@
 'use client'
 
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
+import EditRoundedIcon from '@mui/icons-material/EditRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
 import { useServiceProviderListContext } from '@/modules/prestadores-servicos/context/ServiceProviderListContext'
 import { TableCell } from '@/modules/table/components/TableCell'
@@ -17,6 +19,7 @@ type ServiceProvidersTableRowProps = {
 }
 
 export function ServiceProvidersTableRow({ record }: ServiceProvidersTableRowProps) {
+  const router = useRouter()
   const { handleOpenDeleteConfirmation, handleOpenView } = useServiceProviderListContext()
   const hasVehicle = Boolean(
     record.vehiclePlate || record.vehicleBrandModel || record.vehicleColor,
@@ -85,6 +88,13 @@ export function ServiceProvidersTableRow({ record }: ServiceProvidersTableRowPro
             onClick={() => handleOpenView(record)}
           >
             <VisibilityRoundedIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            aria-label="Editar prestador de serviço"
+            onClick={() => router.push(`/prestadores-servicos/${record.id}/editar`)}
+          >
+            <EditRoundedIcon fontSize="small" />
           </IconButton>
           <IconButton
             size="small"

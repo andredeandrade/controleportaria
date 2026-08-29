@@ -5,8 +5,10 @@ import type {
 } from '@/app/api/service-providers/types'
 import { getApiErrorMessage, safeReadJson } from '@/services/shared/http'
 import type {
+  GetServiceProviderApiResponseBody,
   ListServiceProvidersApiResponseBody,
   RegisterServiceProviderApiResponseBody,
+  UpdateServiceProviderApiResponseBody,
 } from '@/types/services/prestadores-servicos'
 
 export class ServiceProvidersServiceError extends Error {
@@ -74,6 +76,57 @@ export async function registerServiceProvider(
 
   if (!responseBody?.id) {
     throw new ServiceProvidersServiceError('Resposta invalida ao cadastrar prestador.')
+  }
+
+  return responseBody as ServiceProvider
+}
+
+export async function getServiceProvider(id: string): Promise<ServiceProvider> {
+  const response = await fetch(`/api/service-providers/${id}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  const payload = (await safeReadJson(response)) as GetServiceProviderApiResponseBody
+
+  if (!response.ok) {
+    throw new ServiceProvidersServiceError(
+      getApiErrorMessage(payload, 'Não foi possível carregar o prestador de serviço.'),
+    )
+  }
+
+  if (!payload?.id) {
+    throw new ServiceProvidersServiceError('Resposta inválida ao carregar prestador de serviço.')
+  }
+
+  return payload as ServiceProvider
+}
+
+export async function updateServiceProvider(
+  id: string,
+  payload: CreateServiceProviderRequest,
+): Promise<ServiceProvider> {
+  const response = await fetch(`/api/service-providers/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const responseBody = (await safeReadJson(response)) as UpdateServiceProviderApiResponseBody
+
+  if (!response.ok) {
+    throw new ServiceProvidersServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível atualizar o prestador de serviço.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new ServiceProvidersServiceError('Resposta inválida ao atualizar prestador de serviço.')
   }
 
   return responseBody as ServiceProvider

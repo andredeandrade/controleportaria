@@ -54,6 +54,10 @@ function parseUpdateInput(body: Record<string, unknown>): UpdateServiceProviderI
     input.unit = readOptionalString(body['unit']) ?? null
   }
 
+  if ('authorizedBy' in body) {
+    input.authorizedBy = String(body['authorizedBy'] ?? '')
+  }
+
   if ('observations' in body) {
     input.observations = readOptionalString(body['observations']) ?? null
   }
@@ -78,6 +82,7 @@ export const serviceProvidersController = {
       email: readOptionalString(body['email']),
       serviceType: String(body['serviceType'] ?? ''),
       unit: readOptionalString(body['unit']),
+      authorizedBy: String(body['authorizedBy'] ?? ''),
       observations: readOptionalString(body['observations']),
       vehiclePlate: readOptionalString(body['vehiclePlate']),
       vehicleBrandModel: readOptionalString(body['vehicleBrandModel']),

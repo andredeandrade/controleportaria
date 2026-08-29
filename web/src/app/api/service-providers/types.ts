@@ -7,6 +7,7 @@ export type ServiceProvider = {
   email: string | null
   serviceType: string
   unit: string | null
+  authorizedBy: string
   observations: string | null
   vehiclePlate: string | null
   vehicleBrandModel: string | null
@@ -34,5 +35,9 @@ export type CreateServiceProviderRequest = {
   email?: string
   serviceType: string
   unit?: string
+  authorizedBy: string
   observations?: string
+  vehiclePlate?: string
+  vehicleBrandModel?: string
+  vehicleColor?: string
 }
