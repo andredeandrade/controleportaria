@@ -52,6 +52,7 @@ export function useEvents() {
     date: formatDate(item.date),
     time: formatTimeRange(item.startTime, item.endTime),
     unit: item.unit,
+    space: item.space ?? '',
     responsibleName: item.responsibleName,
     guestsCount: item.guests.length,
   }))

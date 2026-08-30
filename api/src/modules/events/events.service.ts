@@ -71,6 +71,7 @@ function validateCreateInput(input: CreateEventInput): {
   startTime: string
   endTime: string | null
   unit: string
+  space: string | null
   responsibleName: string
   guests: Array<{ name: string; document: string | null }>
   observations: string | null
@@ -80,6 +81,7 @@ function validateCreateInput(input: CreateEventInput): {
   const startTime = validateTime(input.startTime, 'Hora inicial')
   const endTime = normalizeOptionalText(input.endTime)
   const unit = input.unit.trim()
+  const space = normalizeOptionalText(input.space)
   const responsibleName = input.responsibleName.trim()
   const guests = validateGuests(input.guests)
   const observations = normalizeOptionalText(input.observations)
@@ -110,6 +112,7 @@ function validateCreateInput(input: CreateEventInput): {
     startTime,
     endTime,
     unit,
+    space,
     responsibleName,
     guests,
     observations,
@@ -122,6 +125,7 @@ function validateUpdateInput(input: UpdateEventInput): {
   startTime?: string
   endTime?: string | null
   unit?: string
+  space?: string | null
   responsibleName?: string
   guests?: Array<{ name: string; document: string | null }>
   observations?: string | null
@@ -132,6 +136,7 @@ function validateUpdateInput(input: UpdateEventInput): {
     startTime?: string
     endTime?: string | null
     unit?: string
+    space?: string | null
     responsibleName?: string
     guests?: Array<{ name: string; document: string | null }>
     observations?: string | null
@@ -173,6 +178,10 @@ function validateUpdateInput(input: UpdateEventInput): {
     }
 
     data.unit = unit
+  }
+
+  if (input.space !== undefined) {
+    data.space = normalizeOptionalText(input.space)
   }
 
   if (input.responsibleName !== undefined) {
@@ -246,6 +255,7 @@ function toResponse(event: {
   startTime: string
   endTime: string | null
   unit: string
+  space: string | null
   responsibleName: string
   observationsEncrypted: string | null
   createdByUserId: string | null
@@ -264,6 +274,7 @@ function toResponse(event: {
     startTime: event.startTime,
     endTime: event.endTime,
     unit: event.unit,
+    space: event.space,
     responsibleName: event.responsibleName,
     guests: event.guests.map((guest) => ({
       id: guest.id,
@@ -289,6 +300,7 @@ export const eventsService = {
         startTime: validated.startTime,
         endTime: validated.endTime,
         unit: validated.unit,
+        space: validated.space,
         responsibleName: validated.responsibleName,
         observationsEncrypted: validated.observations ? encryptText(validated.observations) : null,
         createdByUserId: input.createdByUserId,
@@ -403,6 +415,7 @@ export const eventsService = {
         startTime: validated.startTime,
         endTime: validated.endTime,
         unit: validated.unit,
+        space: validated.space,
         responsibleName: validated.responsibleName,
         observationsEncrypted:
           validated.observations === undefined

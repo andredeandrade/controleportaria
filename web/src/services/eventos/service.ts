@@ -72,3 +72,19 @@ export async function registerEvent(payload: CreateEventRequest): Promise<Event>
 
   return responseBody as Event
 }
+
+export async function deleteEvent(id: string): Promise<void> {
+  const response = await fetch('/api/events', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ id }),
+  })
+
+  if (!response.ok) {
+    const payload = await safeReadJson(response)
+    throw new EventsServiceError(getApiErrorMessage(payload, 'Não foi possível excluir o evento.'))
+  }
+}

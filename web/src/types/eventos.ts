@@ -4,6 +4,7 @@ export type EventRecord = {
   date: string
   time: string
   unit: string
+  space: string
   responsibleName: string
   guestsCount: number
 }
