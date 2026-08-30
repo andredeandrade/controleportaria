@@ -1,10 +1,10 @@
+import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { RegisterEventButton } from '@/modules/eventos/components/RegisterEventButton'
 import { EventsList } from '@/modules/eventos/components/EventsList'
-import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
+import { RegisterEventButton } from '@/modules/eventos/components/RegisterEventButton'
 
 export const metadata: Metadata = {
   title: 'Eventos',
@@ -12,16 +12,23 @@ export const metadata: Metadata = {
 
 export default function EventosPage() {
   return (
-    <Stack spacing={2}>
+    <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
+        spacing={4}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        <Typography variant="h6" fontWeight={700} sx={{ color: 'grey.900' }}>
-          Eventos
-        </Typography>
+        <Box>
+          <Typography variant="h2" fontWeight={700} color="text.primary">
+            Eventos
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>
+            Consulte os eventos agendados nas áreas comuns, o responsável e o número de
+            convidados.
+          </Typography>
+        </Box>
 
         <Stack
           direction="row"
@@ -30,7 +37,7 @@ export default function EventosPage() {
             width: { xs: '100%', sm: 'auto' },
           }}
         >
-          <RegisterEventButton />
+          <RegisterEventButton sx={{ width: { xs: '100%', sm: 'auto' } }} />
         </Stack>
       </Stack>
 

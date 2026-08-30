@@ -65,6 +65,10 @@ function parseUpdateInput(body: Record<string, unknown>): UpdateEventInput {
     input.unit = String(body['unit'] ?? '')
   }
 
+  if ('space' in body) {
+    input.space = readOptionalString(body['space']) ?? null
+  }
+
   if ('responsibleName' in body) {
     input.responsibleName = String(body['responsibleName'] ?? '')
   }
@@ -95,6 +99,7 @@ export const eventsController = {
       startTime: String(body['startTime'] ?? ''),
       endTime: readOptionalString(body['endTime']),
       unit: String(body['unit'] ?? ''),
+      space: readOptionalString(body['space']),
       responsibleName: String(body['responsibleName'] ?? ''),
       guests: parseGuests(body['guests']),
       observations: readOptionalString(body['observations']),

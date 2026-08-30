@@ -10,6 +10,7 @@ export interface CreateEventInput {
   startTime: string
   endTime?: string
   unit: string
+  space?: string
   responsibleName: string
   guests: EventGuestInput[]
   observations?: string
@@ -22,6 +23,7 @@ export interface UpdateEventInput {
   startTime?: string
   endTime?: string | null
   unit?: string
+  space?: string | null
   responsibleName?: string
   guests?: EventGuestInput[]
   observations?: string | null
@@ -47,6 +49,7 @@ export interface EventResponse {
   startTime: string
   endTime: string | null
   unit: string
+  space: string | null
   responsibleName: string
   guests: EventGuestResponse[]
   observations: string | null

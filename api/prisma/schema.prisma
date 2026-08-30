@@ -234,6 +234,7 @@ model Event {
   startTime             String
   endTime               String?
   unit                  String
+  space                 String?
   responsibleName       String
   observationsEncrypted String?
   createdByUserId       String?

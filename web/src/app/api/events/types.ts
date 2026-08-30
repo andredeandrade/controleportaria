@@ -11,6 +11,7 @@ export type Event = {
   startTime: string
   endTime: string | null
   unit: string
+  space: string | null
   responsibleName: string
   guests: EventGuest[]
   observations: string | null
