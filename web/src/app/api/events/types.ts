@@ -36,8 +36,24 @@ export type CreateEventRequest = {
   startTime: string
   endTime?: string
   unit: string
+  space?: string
   responsibleName: string
   guests: {
+    name: string
+    document?: string
+  }[]
+  observations?: string
+}
+
+export type UpdateEventRequest = {
+  title?: string
+  date?: string
+  startTime?: string
+  endTime?: string
+  unit?: string
+  space?: string
+  responsibleName?: string
+  guests?: {
     name: string
     document?: string
   }[]

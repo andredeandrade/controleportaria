@@ -1,8 +1,6 @@
 'use client'
 
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
-import EditRoundedIcon from '@mui/icons-material/EditRounded'
-import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
@@ -134,26 +132,21 @@ export function ResidentsMobileList() {
 
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Stack direction="row" spacing={1}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      startIcon={<VisibilityRoundedIcon fontSize="small" />}
-                      onClick={() => handleOpenView(record)}
-                    >
+                    <Button variant="contained" color="primary" onClick={() => handleOpenView(record)}>
                       Visualizar
                     </Button>
                     <Button
                       variant="outlined"
-                      size="small"
-                      startIcon={<EditRoundedIcon fontSize="small" />}
+                      color="inherit"
                       onClick={() => router.push(`/moradores/${record.id}/editar`)}
+                      sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
                     >
                       Editar
                     </Button>
                   </Stack>
                   <IconButton
                     size="small"
+                    color="error"
                     aria-label="Excluir morador"
                     onClick={() => handleOpenDeleteConfirmation(record)}
                   >

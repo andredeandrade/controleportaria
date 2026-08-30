@@ -2,14 +2,16 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { RegisterEventForm } from '@/modules/eventos/components/RegisterEventForm'
+import { EditEventForm } from '@/modules/eventos/components/EditEventForm'
 import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
-  title: 'Agendar Evento',
+  title: 'Editar Evento',
 }
 
-export default function CadastrarEventoPage() {
+export default async function EditarEventoPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+
   return (
     <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack spacing={{ xs: 2.5, sm: 2 }}>
@@ -20,17 +22,16 @@ export default function CadastrarEventoPage() {
           />
 
           <Typography variant="h2" fontWeight={700} color="text.primary">
-            Agendar Evento
+            Editar Evento
           </Typography>
         </Stack>
 
         <Typography variant="body2" color="text.secondary">
-          Reserve o espaço, informe o responsável e cadastre a lista de convidados que a portaria
-          vai liberar.
+          Atualize os dados do evento e a lista de convidados liberados pela portaria.
         </Typography>
       </Stack>
 
-      <RegisterEventForm />
+      <EditEventForm eventId={id} />
     </Stack>
   )
 }
