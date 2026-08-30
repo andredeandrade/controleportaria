@@ -1,14 +1,13 @@
 'use client'
 
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
-import EditRoundedIcon from '@mui/icons-material/EditRounded'
-import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
-import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
 import { RegisterEventButton } from '@/modules/eventos/components/RegisterEventButton'
 import { useEventListContext } from '@/modules/eventos/context/EventListContext'
@@ -20,6 +19,7 @@ import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
 const SKELETON_CARD_COUNT = 5
 
 export function EventsMobileList() {
+  const router = useRouter()
   const {
     records,
     isLoading,
@@ -70,26 +70,43 @@ export function EventsMobileList() {
                 ) : null}
               </Stack>
 
-              <Stack spacing={0.25}>
-                <MobileFieldLabel variant="caption">Data</MobileFieldLabel>
-                <Typography variant="body2" color="text.primary">
-                  {record.date}
-                </Typography>
-              </Stack>
+              <Grid container spacing={3}>
+                <Grid size={6}>
+                  <Stack spacing={0.25}>
+                    <MobileFieldLabel variant="caption">Data</MobileFieldLabel>
+                    <Typography variant="body2" color="text.primary">
+                      {record.date}
+                    </Typography>
+                  </Stack>
+                </Grid>
 
-              <Stack spacing={0.25}>
-                <MobileFieldLabel variant="caption">Horário</MobileFieldLabel>
-                <Typography variant="body2" color="text.primary">
-                  {record.time}
-                </Typography>
-              </Stack>
+                <Grid size={6}>
+                  <Stack spacing={0.25}>
+                    <MobileFieldLabel variant="caption">Horário</MobileFieldLabel>
+                    <Typography variant="body2" color="text.primary">
+                      {record.time}
+                    </Typography>
+                  </Stack>
+                </Grid>
 
-              <Stack spacing={0.25}>
-                <MobileFieldLabel variant="caption">Unidade</MobileFieldLabel>
-                <Typography variant="body2" color="text.primary">
-                  {record.unit}
-                </Typography>
-              </Stack>
+                <Grid size={6}>
+                  <Stack spacing={0.25}>
+                    <MobileFieldLabel variant="caption">Unidade</MobileFieldLabel>
+                    <Typography variant="body2" color="text.primary">
+                      {record.unit}
+                    </Typography>
+                  </Stack>
+                </Grid>
+
+                <Grid size={6}>
+                  <Stack spacing={0.25}>
+                    <MobileFieldLabel variant="caption">Convidados</MobileFieldLabel>
+                    <Typography variant="body2" color="text.primary">
+                      {record.guestsCount} convidado{record.guestsCount === 1 ? '' : 's'}
+                    </Typography>
+                  </Stack>
+                </Grid>
+              </Grid>
 
               <Stack spacing={0.25}>
                 <MobileFieldLabel variant="caption">Responsável</MobileFieldLabel>
@@ -98,37 +115,25 @@ export function EventsMobileList() {
                 </Typography>
               </Stack>
 
-              <Stack spacing={0.25}>
-                <MobileFieldLabel variant="caption">Convidados</MobileFieldLabel>
-                <Stack direction="row" spacing={0.5} alignItems="center">
-                  <GroupsRoundedIcon fontSize="small" sx={{ color: 'text.disabled' }} />
-                  <Typography variant="body2" color="text.primary">
-                    {record.guestsCount}
-                  </Typography>
-                </Stack>
-              </Stack>
-
               <Divider sx={{ borderColor: 'divider' }} />
 
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<VisibilityRoundedIcon fontSize="small" />}
-                  >
+                  <Button variant="contained" color="primary">
                     Visualizar
                   </Button>
                   <Button
                     variant="outlined"
-                    size="small"
-                    startIcon={<EditRoundedIcon fontSize="small" />}
+                    color="inherit"
+                    onClick={() => router.push(`/eventos/${record.id}/editar`)}
+                    sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
                   >
                     Editar
                   </Button>
                 </Stack>
                 <IconButton
                   size="small"
+                  color="error"
                   aria-label="Excluir evento"
                   onClick={() => handleOpenDeleteConfirmation(record)}
                 >

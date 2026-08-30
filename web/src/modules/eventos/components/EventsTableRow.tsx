@@ -7,6 +7,7 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
 import { useEventListContext } from '@/modules/eventos/context/EventListContext'
 import { TableCell } from '@/modules/table/components/TableCell'
@@ -18,6 +19,7 @@ type EventsTableRowProps = {
 }
 
 export function EventsTableRow({ record }: EventsTableRowProps) {
+  const router = useRouter()
   const { handleOpenDeleteConfirmation } = useEventListContext()
 
   return (
@@ -67,7 +69,11 @@ export function EventsTableRow({ record }: EventsTableRowProps) {
           <IconButton size="small" aria-label="Visualizar evento">
             <VisibilityRoundedIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" aria-label="Editar evento">
+          <IconButton
+            size="small"
+            aria-label="Editar evento"
+            onClick={() => router.push(`/eventos/${record.id}/editar`)}
+          >
             <EditRoundedIcon fontSize="small" />
           </IconButton>
           <IconButton

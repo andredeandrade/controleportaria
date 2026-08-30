@@ -38,6 +38,7 @@ function parseCreateBody(body: unknown): CreateEventRequest {
     startTime: String(payload['startTime'] ?? ''),
     endTime: typeof payload['endTime'] === 'string' ? payload['endTime'] : undefined,
     unit: String(payload['unit'] ?? ''),
+    space: typeof payload['space'] === 'string' ? payload['space'] : undefined,
     responsibleName: String(payload['responsibleName'] ?? ''),
     guests: Array.isArray(payload['guests'])
       ? (payload['guests'] as CreateEventRequest['guests'])

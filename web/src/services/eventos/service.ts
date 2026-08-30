@@ -1,8 +1,15 @@
-import type { CreateEventRequest, Event, EventsListResponse } from '@/app/api/events/types'
+import type {
+  CreateEventRequest,
+  Event,
+  EventsListResponse,
+  UpdateEventRequest,
+} from '@/app/api/events/types'
 import { getApiErrorMessage, safeReadJson } from '@/services/shared/http'
 import type {
+  GetEventApiResponseBody,
   ListEventsApiResponseBody,
   RegisterEventApiResponseBody,
+  UpdateEventApiResponseBody,
 } from '@/types/services/eventos'
 
 export class EventsServiceError extends Error {
@@ -68,6 +75,52 @@ export async function registerEvent(payload: CreateEventRequest): Promise<Event>
 
   if (!responseBody?.id) {
     throw new EventsServiceError('Resposta invalida ao cadastrar evento.')
+  }
+
+  return responseBody as Event
+}
+
+export async function getEvent(id: string): Promise<Event> {
+  const response = await fetch(`/api/events/${id}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  const payload = (await safeReadJson(response)) as GetEventApiResponseBody
+
+  if (!response.ok) {
+    throw new EventsServiceError(getApiErrorMessage(payload, 'Não foi possível carregar o evento.'))
+  }
+
+  if (!payload?.id) {
+    throw new EventsServiceError('Resposta inválida ao carregar evento.')
+  }
+
+  return payload as Event
+}
+
+export async function updateEvent(id: string, payload: UpdateEventRequest): Promise<Event> {
+  const response = await fetch(`/api/events/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const responseBody = (await safeReadJson(response)) as UpdateEventApiResponseBody
+
+  if (!response.ok) {
+    throw new EventsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível atualizar o evento.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new EventsServiceError('Resposta inválida ao atualizar evento.')
   }
 
   return responseBody as Event
