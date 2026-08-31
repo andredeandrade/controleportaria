@@ -21,6 +21,7 @@ function parseCreateBody(body: unknown): CreateIncidentRequest {
     date: String(payload['date'] ?? ''),
     time: String(payload['time'] ?? ''),
     report: String(payload['report'] ?? ''),
+    place: String(payload['place'] ?? ''),
   }
 }
 

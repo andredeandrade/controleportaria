@@ -42,6 +42,10 @@ function parseUpdateInput(body: Record<string, unknown>): UpdateIncidentInput {
     input.report = readOptionalString(body['report']) ?? null
   }
 
+  if ('place' in body) {
+    input.place = readOptionalString(body['place'])
+  }
+
   return input
 }
 
@@ -59,6 +63,7 @@ export const incidentsController = {
       date: String(body['date'] ?? ''),
       time: String(body['time'] ?? ''),
       report: String(body['report'] ?? ''),
+      place: String(body['place'] ?? ''),
       createdByUserId: req.authUser.id,
     })
 

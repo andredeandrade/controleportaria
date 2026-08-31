@@ -49,8 +49,9 @@ export type OccurrenceRecord = {
   occurrenceTypeLabel: string
   date: string
   time: string
+  place: string
   report: string
-  responsible: string
+  createdByUserName: string
 }
 
 export type OccurrencesPaginationState = {

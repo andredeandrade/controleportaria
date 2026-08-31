@@ -4,6 +4,7 @@ export interface CreateIncidentInput {
   date: string
   time: string
   report: string
+  place: string
   createdByUserId: string
 }
 
@@ -12,6 +13,7 @@ export interface UpdateIncidentInput {
   date?: string
   time?: string
   report?: string | null
+  place?: string
 }
 
 export interface ListIncidentsInput {
@@ -27,7 +29,9 @@ export interface IncidentResponse {
   date: string
   time: string
   report: string
+  place: string | null
   createdByUserId: string | null
+  createdByUserName: string | null
   createdAt: Date
   updatedAt: Date
 }

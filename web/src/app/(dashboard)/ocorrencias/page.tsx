@@ -1,11 +1,10 @@
+import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
-import { RegisterOccurrenceButton } from '@/modules/ocorrencias/components/RegisterOccurrenceButton'
-
 import { OccurrencesList } from '@/modules/ocorrencias/components/OccurrencesList'
+import { RegisterOccurrenceButton } from '@/modules/ocorrencias/components/RegisterOccurrenceButton'
 
 export const metadata: Metadata = {
   title: 'Ocorrências',
@@ -13,16 +12,22 @@ export const metadata: Metadata = {
 
 export default function OcorrenciasPage() {
   return (
-    <Stack spacing={2}>
+    <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
+        spacing={4}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        <Typography variant="h6" fontWeight={700} sx={{ color: 'grey.900' }}>
-          Ocorrências
-        </Typography>
+        <Box>
+          <Typography variant="h2" fontWeight={700} color="text.primary">
+            Ocorrências
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>
+            Histórico de ocorrências registradas pela portaria.
+          </Typography>
+        </Box>
 
         <Stack
           direction="row"
@@ -31,7 +36,7 @@ export default function OcorrenciasPage() {
             width: { xs: '100%', sm: 'auto' },
           }}
         >
-          <RegisterOccurrenceButton />
+          <RegisterOccurrenceButton sx={{ width: { xs: '100%', sm: 'auto' } }} />
         </Stack>
       </Stack>
 

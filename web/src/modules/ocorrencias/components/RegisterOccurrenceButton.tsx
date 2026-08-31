@@ -1,13 +1,21 @@
 'use client'
 
+import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import Button from '@mui/material/Button'
+import type { SxProps, Theme } from '@mui/material/styles'
 import { useRouter } from 'next/navigation'
 
 type RegisterOccurrenceButtonProps = {
   fullWidth?: boolean
+  size?: 'medium' | 'large'
+  sx?: SxProps<Theme>
 }
 
-export function RegisterOccurrenceButton({ fullWidth = false }: RegisterOccurrenceButtonProps) {
+export function RegisterOccurrenceButton({
+  fullWidth = false,
+  size = 'medium',
+  sx,
+}: RegisterOccurrenceButtonProps) {
   const router = useRouter()
 
   const handleNavigateToRegister = () => {
@@ -17,20 +25,14 @@ export function RegisterOccurrenceButton({ fullWidth = false }: RegisterOccurren
   return (
     <Button
       variant="contained"
+      color="primary"
+      size={size}
       fullWidth={fullWidth}
+      startIcon={<AddRoundedIcon fontSize="small" />}
       onClick={handleNavigateToRegister}
-      sx={{
-        bgcolor: '#16A34A',
-        color: '#FFFFFF',
-        fontWeight: 700,
-        boxShadow: 'none',
-        '&:hover': {
-          bgcolor: '#15803D',
-          boxShadow: 'none',
-        },
-      }}
+      sx={sx}
     >
-      Registrar
+      Registrar ocorrência
     </Button>
   )
 }

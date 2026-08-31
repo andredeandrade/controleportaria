@@ -76,3 +76,19 @@ export async function registerIncident(payload: CreateIncidentRequest): Promise<
 
   return responseBody as Incident
 }
+
+export async function deleteIncident(id: string): Promise<void> {
+  const response = await fetch(`/api/incidents/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    const payload = await safeReadJson(response)
+    throw new IncidentsServiceError(
+      getApiErrorMessage(payload, 'Nao foi possivel excluir a ocorrencia.'),
+    )
+  }
+}
