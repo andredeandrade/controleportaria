@@ -5,8 +5,10 @@ import type {
 } from '@/app/api/incidents/types'
 import { getApiErrorMessage, safeReadJson } from '@/services/shared/http'
 import type {
+  GetIncidentApiResponseBody,
   ListIncidentsApiResponseBody,
   RegisterIncidentApiResponseBody,
+  UpdateIncidentApiResponseBody,
 } from '@/types/services/ocorrencias'
 
 export class IncidentsServiceError extends Error {
@@ -72,6 +74,57 @@ export async function registerIncident(payload: CreateIncidentRequest): Promise<
 
   if (!responseBody?.id) {
     throw new IncidentsServiceError('Resposta invalida ao cadastrar ocorrencia.')
+  }
+
+  return responseBody as Incident
+}
+
+export async function getIncident(id: string): Promise<Incident> {
+  const response = await fetch(`/api/incidents/${id}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  })
+
+  const payload = (await safeReadJson(response)) as GetIncidentApiResponseBody
+
+  if (!response.ok) {
+    throw new IncidentsServiceError(
+      getApiErrorMessage(payload, 'Não foi possível carregar a ocorrência.'),
+    )
+  }
+
+  if (!payload?.id) {
+    throw new IncidentsServiceError('Resposta inválida ao carregar ocorrência.')
+  }
+
+  return payload as Incident
+}
+
+export async function updateIncident(
+  id: string,
+  payload: CreateIncidentRequest,
+): Promise<Incident> {
+  const response = await fetch(`/api/incidents/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const responseBody = (await safeReadJson(response)) as UpdateIncidentApiResponseBody
+
+  if (!response.ok) {
+    throw new IncidentsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível atualizar a ocorrência.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new IncidentsServiceError('Resposta inválida ao atualizar ocorrência.')
   }
 
   return responseBody as Incident

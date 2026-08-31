@@ -6,9 +6,9 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
 import { useOccurrenceListContext } from '@/modules/ocorrencias/context/OccurrenceListContext'
-import { useAppSnackbar } from '@/providers'
 import { TableCell } from '@/modules/table/components/TableCell'
 import { TableRow } from '@/modules/table/components/TableRow'
 import type { OccurrenceRecord } from '@/types/ocorrencias'
@@ -18,11 +18,11 @@ type OccurrencesTableRowProps = {
 }
 
 export function OccurrencesTableRow({ record }: OccurrencesTableRowProps) {
-  const { showInfo } = useAppSnackbar()
+  const router = useRouter()
   const { handleOpenDeleteConfirmation, handleOpenView } = useOccurrenceListContext()
 
   const handleEdit = () => {
-    showInfo('Edição de ocorrências estará disponível em breve.')
+    router.push(`/ocorrencias/${record.id}/editar`)
   }
 
   return (

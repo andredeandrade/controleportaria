@@ -6,19 +6,19 @@ import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
 import { RegisterOccurrenceButton } from '@/modules/ocorrencias/components/RegisterOccurrenceButton'
 import { useOccurrenceListContext } from '@/modules/ocorrencias/context/OccurrenceListContext'
 import { OccurrencesMobileListLoader } from '@/modules/ocorrencias/mobile/OccurrencesMobileListLoader'
 import { ListEmptyState } from '@/modules/table/components/ListEmptyState'
 import { ListErrorState } from '@/modules/table/components/ListErrorState'
-import { useAppSnackbar } from '@/providers'
 import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
 
 const SKELETON_CARD_COUNT = 5
 
 export function OccurrencesMobileList() {
-  const { showInfo } = useAppSnackbar()
+  const router = useRouter()
   const {
     records,
     isLoading,
@@ -30,8 +30,8 @@ export function OccurrencesMobileList() {
     handleOpenView,
   } = useOccurrenceListContext()
 
-  const handleEdit = () => {
-    showInfo('Edição de ocorrências estará disponível em breve.')
+  const handleEdit = (id: string) => {
+    router.push(`/ocorrencias/${id}/editar`)
   }
 
   return (
@@ -108,7 +108,7 @@ export function OccurrencesMobileList() {
                   <Button
                     variant="outlined"
                     color="inherit"
-                    onClick={handleEdit}
+                    onClick={() => handleEdit(record.id)}
                     sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
                   >
                     Editar
