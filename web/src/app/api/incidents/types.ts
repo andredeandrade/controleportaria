@@ -4,7 +4,9 @@ export type Incident = {
   date: string
   time: string
   report: string
+  place: string | null
   createdByUserId: string | null
+  createdByUserName: string | null
   createdAt: string
   updatedAt: string
 }
@@ -24,4 +26,5 @@ export type CreateIncidentRequest = {
   date: string
   time: string
   report: string
+  place: string
 }

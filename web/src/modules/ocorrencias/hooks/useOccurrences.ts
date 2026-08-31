@@ -54,8 +54,9 @@ export function useOccurrences() {
       occurrenceTypeLabel,
       date: formatDate(item.date),
       time: item.time,
+      place: item.place ?? '—',
       report: item.report,
-      responsible: item.createdByUserId ?? '-',
+      createdByUserName: item.createdByUserName ?? '—',
     }
   })
 

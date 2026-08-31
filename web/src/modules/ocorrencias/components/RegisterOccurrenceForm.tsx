@@ -16,6 +16,7 @@ type RegisterOccurrenceFormValues = {
   occurrenceType: OccurrenceTypeEnum | ''
   date: string
   time: string
+  place: string
   report: string
 }
 
@@ -34,6 +35,7 @@ export function RegisterOccurrenceForm() {
       occurrenceType: '',
       date: '',
       time: '',
+      place: '',
       report: '',
     },
   })
@@ -44,6 +46,7 @@ export function RegisterOccurrenceForm() {
         occurrenceType: data.occurrenceType,
         date: data.date,
         time: data.time,
+        place: data.place.trim(),
         report: data.report.trim(),
       })
 
@@ -117,6 +120,22 @@ export function RegisterOccurrenceForm() {
                 slotProps={{ inputLabel: { shrink: true } }}
                 {...register('time', {
                   required: 'Informe a hora',
+                })}
+              />
+            </TextFieldStack>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextFieldStack>
+              <TextFieldLabel required>Local</TextFieldLabel>
+              <TextField
+                required
+                error={Boolean(errors.place)}
+                helperText={errors.place?.message}
+                {...register('place', {
+                  required: 'Informe o local da ocorrência',
                 })}
               />
             </TextFieldStack>

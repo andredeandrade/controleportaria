@@ -309,6 +309,7 @@ model Incident {
   date            String
   time            String
   reportEncrypted String
+  placeEncrypted  String?
   createdByUserId String?
   createdByUser   User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
   createdAt       DateTime    @default(now())

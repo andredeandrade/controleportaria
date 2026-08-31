@@ -1,52 +1,78 @@
-// Tabela de ocorrências para desktop
 'use client'
 
-import type { ColumnDef } from '@tanstack/react-table'
-import { DataTable } from '@/modules/table/components/DataTable'
-import type { OccurrenceRecord } from '@/types/ocorrencias'
+import Button from '@mui/material/Button'
 
-export type OccurrencesTableProps = {
-  records: OccurrenceRecord[]
-}
+import { OccurrencesTableRow } from '@/modules/ocorrencias/components/OccurrencesTableRow'
+import { OccurrencesTableRowLoader } from '@/modules/ocorrencias/components/OccurrencesTableRowLoader'
+import { RegisterOccurrenceButton } from '@/modules/ocorrencias/components/RegisterOccurrenceButton'
+import { useOccurrenceListContext } from '@/modules/ocorrencias/context/OccurrenceListContext'
+import { ListEmptyState } from '@/modules/table/components/ListEmptyState'
+import { ListErrorState } from '@/modules/table/components/ListErrorState'
+import { Table } from '@/modules/table/components/Table'
+import { TableBody } from '@/modules/table/components/TableBody'
+import { TableCell } from '@/modules/table/components/TableCell'
+import { TableHead } from '@/modules/table/components/TableHead'
+import { TableHeadCell } from '@/modules/table/components/TableHeadCell'
+import { TableRow } from '@/modules/table/components/TableRow'
 
-export function OccurrencesTable({ records }: OccurrencesTableProps) {
-  const columns: ColumnDef<OccurrenceRecord>[] = [
-    { accessorKey: 'occurrenceTypeLabel', header: 'Tipo' },
-    { accessorKey: 'date', header: 'Data' },
-    { accessorKey: 'time', header: 'Hora' },
-    { accessorKey: 'responsible', header: 'Responsável' },
-    { accessorKey: 'report', header: 'Relato' },
-  ]
+const SKELETON_ROW_COUNT = 5
+const COLUMN_COUNT = 5
+
+export function OccurrencesTable() {
+  const {
+    records,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch: onRetry,
+    handleClearFilters,
+  } = useOccurrenceListContext()
 
   return (
-    <DataTable
-      data={records}
-      columns={columns}
-      emptyMessage="Nenhuma ocorrência encontrada."
-      containerSx={{
-        bgcolor: '#F8FAFC',
-        borderColor: 'rgba(203, 213, 225, 0.9)',
-        borderRadius: 3,
-        overflow: 'hidden',
-        boxShadow: '0 18px 40px rgba(15, 23, 42, 0.12)',
-      }}
-      headerCellSx={{
-        px: 3,
-        py: 2.25,
-        bgcolor: '#E2E8F0',
-        color: '#0F172A',
-        fontSize: '0.95rem',
-        fontWeight: 700,
-        borderBottom: '1px solid rgba(203, 213, 225, 0.9)',
-        whiteSpace: 'nowrap',
-      }}
-      bodyCellSx={{
-        px: 3,
-        py: 2.5,
-        color: '#0F172A',
-        fontSize: '0.97rem',
-        borderBottom: '1px solid rgba(226, 232, 240, 0.7)',
-      }}
-    />
+    <Table>
+      <TableHead>
+        <TableHeadCell>Tipo</TableHeadCell>
+        <TableHeadCell>Data</TableHeadCell>
+        <TableHeadCell>Hora</TableHeadCell>
+        <TableHeadCell>Local</TableHeadCell>
+        <TableHeadCell align="right">Ações</TableHeadCell>
+      </TableHead>
+      <TableBody
+        isEmpty={!isError && !isLoading && records.length === 0}
+        emptyState={
+          <ListEmptyState
+            title="Nenhuma ocorrência encontrada."
+            description="Nenhum registro corresponde à busca realizada. Ajuste os critérios ou registre uma nova ocorrência."
+            actions={
+              <>
+                <Button variant="outlined" onClick={handleClearFilters}>
+                  Limpar busca
+                </Button>
+                <RegisterOccurrenceButton />
+              </>
+            }
+          />
+        }
+        colSpan={COLUMN_COUNT}
+      >
+        {isError ? (
+          <TableRow>
+            <TableCell colSpan={COLUMN_COUNT}>
+              <ListErrorState
+                title="Não foi possível carregar as ocorrências."
+                message={errorMessage}
+                onRetry={onRetry}
+              />
+            </TableCell>
+          </TableRow>
+        ) : isLoading ? (
+          Array.from({ length: SKELETON_ROW_COUNT }).map((_, index) => (
+            <OccurrencesTableRowLoader key={index} />
+          ))
+        ) : (
+          records.map((record) => <OccurrencesTableRow key={record.id} record={record} />)
+        )}
+      </TableBody>
+    </Table>
   )
 }

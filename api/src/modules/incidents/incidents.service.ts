@@ -76,6 +76,7 @@ function validateCreateInput(input: CreateIncidentInput): {
   date: string
   time: string
   report: string
+  place: string
 } {
   const occurrenceType = validateOccurrenceType(input.occurrenceType)
   const date = validateDate(input.date)
@@ -86,11 +87,18 @@ function validateCreateInput(input: CreateIncidentInput): {
     throw new HttpError(400, 'Relato da ocorrência deve ter ao menos 5 caracteres.')
   }
 
+  const place = input.place.trim()
+
+  if (!place) {
+    throw new HttpError(400, 'Local da ocorrência é obrigatório.')
+  }
+
   return {
     occurrenceType,
     date,
     time,
     report,
+    place,
   }
 }
 
@@ -99,12 +107,14 @@ function validateUpdateInput(input: UpdateIncidentInput): {
   date?: string
   time?: string
   report?: string
+  place?: string
 } {
   const data: {
     occurrenceType?: string
     date?: string
     time?: string
     report?: string
+    place?: string
   } = {}
 
   if (input.occurrenceType !== undefined) {
@@ -131,6 +141,16 @@ function validateUpdateInput(input: UpdateIncidentInput): {
     }
 
     data.report = report
+  }
+
+  if (input.place !== undefined) {
+    const place = normalizeOptionalText(input.place)
+
+    if (!place) {
+      throw new HttpError(400, 'Local da ocorrência é obrigatório.')
+    }
+
+    data.place = place
   }
 
   if (Object.keys(data).length === 0) {
@@ -176,7 +196,9 @@ function toResponse(incident: {
   date: string
   time: string
   reportEncrypted: string
+  placeEncrypted: string | null
   createdByUserId: string | null
+  createdByUser: { name: string } | null
   createdAt: Date
   updatedAt: Date
 }): IncidentResponse {
@@ -186,7 +208,9 @@ function toResponse(incident: {
     date: incident.date,
     time: incident.time,
     report: decryptText(incident.reportEncrypted),
+    place: incident.placeEncrypted ? decryptText(incident.placeEncrypted) : null,
     createdByUserId: incident.createdByUserId,
+    createdByUserName: incident.createdByUser?.name ?? null,
     createdAt: incident.createdAt,
     updatedAt: incident.updatedAt,
   }
@@ -203,8 +227,10 @@ export const incidentsService = {
         date: validated.date,
         time: validated.time,
         reportEncrypted: encryptText(validated.report),
+        placeEncrypted: encryptText(validated.place),
         createdByUserId: input.createdByUserId,
       },
+      include: { createdByUser: { select: { name: true } } },
     })
 
     return toResponse(incident)
@@ -232,6 +258,7 @@ export const incidentsService = {
         skip,
         take: pageSize,
         orderBy: [{ date: 'desc' }, { time: 'desc' }, { createdAt: 'desc' }],
+        include: { createdByUser: { select: { name: true } } },
       }),
       prisma.incident.count({ where }),
     ])
@@ -259,6 +286,7 @@ export const incidentsService = {
         id: incidentId,
         condominiumId,
       },
+      include: { createdByUser: { select: { name: true } } },
     })
 
     if (!incident) {
@@ -300,7 +328,9 @@ export const incidentsService = {
         date: validated.date,
         time: validated.time,
         reportEncrypted: validated.report === undefined ? undefined : encryptText(validated.report),
+        placeEncrypted: validated.place === undefined ? undefined : encryptText(validated.place),
       },
+      include: { createdByUser: { select: { name: true } } },
     })
 
     return toResponse(incident)
