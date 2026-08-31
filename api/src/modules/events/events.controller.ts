@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import { HttpError } from '../../lib/http-error.js'
 import { eventsService } from './events.service.js'
-import type { EventGuestInput, UpdateEventInput } from './events.types.js'
+import type { CreateEventVehicleInput, EventGuestInput, UpdateEventInput } from './events.types.js'
 
 function getBodyAsRecord(body: unknown): Record<string, unknown> {
   if (!body || typeof body !== 'object') {
@@ -36,10 +36,20 @@ function parseGuests(value: unknown): EventGuestInput[] {
     const guestRecord = guest as Record<string, unknown>
 
     return {
+      id: readOptionalString(guestRecord['id']) || undefined,
       name: String(guestRecord['name'] ?? ''),
       document: readOptionalString(guestRecord['document']),
     }
   })
+}
+
+function parseCreateVehicleInput(body: Record<string, unknown>): CreateEventVehicleInput {
+  return {
+    plate: String(body['plate'] ?? ''),
+    brandModel: readOptionalString(body['brandModel']),
+    driverName: readOptionalString(body['driverName']),
+    color: readOptionalString(body['color']),
+  }
 }
 
 function parseUpdateInput(body: Record<string, unknown>): UpdateEventInput {
@@ -161,5 +171,81 @@ export const eventsController = {
     await eventsService.remove(String(req.params['id'] ?? ''), req.authUser.condominiumId)
 
     res.status(204).send()
+  },
+
+  async checkInGuest(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const event = await eventsService.checkInGuest(
+      String(req.params['id'] ?? ''),
+      String(req.params['guestId'] ?? ''),
+      req.authUser.condominiumId,
+      req.authUser.id,
+    )
+
+    res.json(event)
+  },
+
+  async checkOutGuest(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const event = await eventsService.checkOutGuest(
+      String(req.params['id'] ?? ''),
+      String(req.params['guestId'] ?? ''),
+      req.authUser.condominiumId,
+      req.authUser.id,
+    )
+
+    res.json(event)
+  },
+
+  async createVehicle(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const body = getBodyAsRecord(req.body)
+
+    const event = await eventsService.createVehicle(
+      String(req.params['id'] ?? ''),
+      req.authUser.condominiumId,
+      req.authUser.id,
+      parseCreateVehicleInput(body),
+    )
+
+    res.status(201).json(event)
+  },
+
+  async checkOutVehicle(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const event = await eventsService.checkOutVehicle(
+      String(req.params['id'] ?? ''),
+      String(req.params['vehicleId'] ?? ''),
+      req.authUser.condominiumId,
+      req.authUser.id,
+    )
+
+    res.json(event)
+  },
+
+  async deleteVehicle(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const event = await eventsService.deleteVehicle(
+      String(req.params['id'] ?? ''),
+      String(req.params['vehicleId'] ?? ''),
+      req.authUser.condominiumId,
+    )
+
+    res.json(event)
   },
 }

@@ -47,7 +47,11 @@ export function EditEventForm({ eventId }: EditEventFormProps) {
     space: event.space ?? '',
     responsibleName: event.responsibleName,
     guests: event.guests.length
-      ? event.guests.map((guest) => ({ name: guest.name, document: guest.document ?? '' }))
+      ? event.guests.map((guest) => ({
+          id: guest.id,
+          name: guest.name,
+          document: guest.document ?? '',
+        }))
       : [{ name: '', document: '' }],
     observations: event.observations ?? '',
   }

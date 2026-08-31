@@ -1,4 +1,5 @@
 export interface EventGuestInput {
+  id?: string
   name: string
   document?: string
 }
@@ -40,6 +41,25 @@ export interface EventGuestResponse {
   id: string
   name: string
   document: string | null
+  checkInAt: Date | null
+  checkOutAt: Date | null
+}
+
+export interface EventVehicleResponse {
+  id: string
+  plate: string | null
+  brandModel: string | null
+  driverName: string | null
+  color: string | null
+  checkInAt: Date
+  checkOutAt: Date | null
+}
+
+export interface CreateEventVehicleInput {
+  plate: string
+  brandModel?: string
+  driverName?: string
+  color?: string
 }
 
 export interface EventResponse {
@@ -52,6 +72,7 @@ export interface EventResponse {
   space: string | null
   responsibleName: string
   guests: EventGuestResponse[]
+  vehicles: EventVehicleResponse[]
   observations: string | null
   createdByUserId: string | null
   createdAt: Date

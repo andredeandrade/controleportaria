@@ -66,7 +66,11 @@ export function EventsTableRow({ record }: EventsTableRowProps) {
       </TableCell>
       <TableCell align="right">
         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-          <IconButton size="small" aria-label="Visualizar evento">
+          <IconButton
+            size="small"
+            aria-label="Visualizar evento"
+            onClick={() => router.push(`/eventos/${record.id}`)}
+          >
             <VisibilityRoundedIcon fontSize="small" />
           </IconButton>
           <IconButton

@@ -23,6 +23,7 @@ import type { CreateEventRequest } from '@/app/api/events/types'
 import { TextField, TextFieldLabel, TextFieldStack } from '@/modules/form'
 
 export type EventGuestFormValues = {
+  id?: string
   name: string
   document: string
 }
@@ -63,6 +64,7 @@ export function mapEventFormValuesToPayload(values: EventFormValues): CreateEven
     guests: values.guests
       .filter((guest) => guest.name.trim() !== '')
       .map((guest) => ({
+        id: guest.id || undefined,
         name: guest.name.trim(),
         document: guest.document.trim() || undefined,
       })),

@@ -46,6 +46,10 @@ model User {
   accessRecordsCheckIn AccessRecord[] @relation("AccessRecordCheckInUser")
   accessRecordsCheckOut AccessRecord[] @relation("AccessRecordCheckOutUser")
   accessRecordPeopleCheckOut AccessRecordPerson[] @relation("AccessRecordPersonCheckOutUser")
+  eventGuestsCheckedIn EventGuest[] @relation("EventGuestCheckInUser")
+  eventGuestsCheckedOut EventGuest[] @relation("EventGuestCheckOutUser")
+  eventVehiclesCheckedIn EventVehicle[] @relation("EventVehicleCheckInUser")
+  eventVehiclesCheckedOut EventVehicle[] @relation("EventVehicleCheckOutUser")
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 
@@ -240,6 +244,7 @@ model Event {
   createdByUserId       String?
   createdByUser         User?       @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
   guests                EventGuest[]
+  vehicles              EventVehicle[]
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
 
@@ -251,15 +256,49 @@ model Event {
 }
 
 model EventGuest {
-  id                String   @id @default(uuid())
-  eventId           String
-  event             Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  name              String
-  documentEncrypted String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                 String    @id @default(uuid())
+  eventId            String
+  event              Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name               String
+  documentEncrypted  String?
+  checkInAt          DateTime?
+  checkOutAt         DateTime?
+  checkedInByUserId  String?
+  checkedInByUser    User?     @relation("EventGuestCheckInUser", fields: [checkedInByUserId], references: [id], onDelete: SetNull)
+  checkedOutByUserId String?
+  checkedOutByUser   User?     @relation("EventGuestCheckOutUser", fields: [checkedOutByUserId], references: [id], onDelete: SetNull)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   @@index([eventId])
+  @@index([checkInAt])
+  @@index([checkOutAt])
+  @@index([checkedInByUserId])
+  @@index([checkedOutByUserId])
+}
+
+model EventVehicle {
+  id                 String    @id @default(uuid())
+  eventId            String
+  event              Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  plateEncrypted     String?
+  brandModel         String?
+  driverName         String?
+  color              String?
+  checkInAt          DateTime  @default(now())
+  checkOutAt         DateTime?
+  checkedInByUserId  String?
+  checkedInByUser    User?     @relation("EventVehicleCheckInUser", fields: [checkedInByUserId], references: [id], onDelete: SetNull)
+  checkedOutByUserId String?
+  checkedOutByUser   User?     @relation("EventVehicleCheckOutUser", fields: [checkedOutByUserId], references: [id], onDelete: SetNull)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([eventId])
+  @@index([checkInAt])
+  @@index([checkOutAt])
+  @@index([checkedInByUserId])
+  @@index([checkedOutByUserId])
 }
 
 model Incident {

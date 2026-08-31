@@ -1,11 +1,17 @@
 import type {
   CreateEventRequest,
+  CreateEventVehicleRequest,
   Event,
   EventsListResponse,
   UpdateEventRequest,
 } from '@/app/api/events/types'
 import { getApiErrorMessage, safeReadJson } from '@/services/shared/http'
 import type {
+  CheckInEventGuestApiResponseBody,
+  CheckOutEventGuestApiResponseBody,
+  CheckOutEventVehicleApiResponseBody,
+  CreateEventVehicleApiResponseBody,
+  DeleteEventVehicleApiResponseBody,
   GetEventApiResponseBody,
   ListEventsApiResponseBody,
   RegisterEventApiResponseBody,
@@ -140,4 +146,156 @@ export async function deleteEvent(id: string): Promise<void> {
     const payload = await safeReadJson(response)
     throw new EventsServiceError(getApiErrorMessage(payload, 'Não foi possível excluir o evento.'))
   }
+}
+
+export async function checkInEventGuest({
+  eventId,
+  guestId,
+}: {
+  eventId: string
+  guestId: string
+}): Promise<Event> {
+  const response = await fetch('/api/events/guests/check-in', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ eventId, guestId }),
+  })
+
+  const responseBody = (await safeReadJson(response)) as CheckInEventGuestApiResponseBody
+
+  if (!response.ok) {
+    throw new EventsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível registrar a entrada do convidado.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new EventsServiceError('Resposta inválida ao registrar a entrada do convidado.')
+  }
+
+  return responseBody as Event
+}
+
+export async function checkOutEventGuest({
+  eventId,
+  guestId,
+}: {
+  eventId: string
+  guestId: string
+}): Promise<Event> {
+  const response = await fetch('/api/events/guests/check-out', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ eventId, guestId }),
+  })
+
+  const responseBody = (await safeReadJson(response)) as CheckOutEventGuestApiResponseBody
+
+  if (!response.ok) {
+    throw new EventsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível registrar a saída do convidado.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new EventsServiceError('Resposta inválida ao registrar a saída do convidado.')
+  }
+
+  return responseBody as Event
+}
+
+export async function createEventVehicle({
+  eventId,
+  ...payload
+}: { eventId: string } & CreateEventVehicleRequest): Promise<Event> {
+  const response = await fetch('/api/events/vehicles', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ eventId, ...payload }),
+  })
+
+  const responseBody = (await safeReadJson(response)) as CreateEventVehicleApiResponseBody
+
+  if (!response.ok) {
+    throw new EventsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível adicionar o veículo.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new EventsServiceError('Resposta inválida ao adicionar o veículo.')
+  }
+
+  return responseBody as Event
+}
+
+export async function checkOutEventVehicle({
+  eventId,
+  vehicleId,
+}: {
+  eventId: string
+  vehicleId: string
+}): Promise<Event> {
+  const response = await fetch('/api/events/vehicles/check-out', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ eventId, vehicleId }),
+  })
+
+  const responseBody = (await safeReadJson(response)) as CheckOutEventVehicleApiResponseBody
+
+  if (!response.ok) {
+    throw new EventsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível registrar a saída do veículo.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new EventsServiceError('Resposta inválida ao registrar a saída do veículo.')
+  }
+
+  return responseBody as Event
+}
+
+export async function deleteEventVehicle({
+  eventId,
+  vehicleId,
+}: {
+  eventId: string
+  vehicleId: string
+}): Promise<Event> {
+  const response = await fetch('/api/events/vehicles', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ eventId, vehicleId }),
+  })
+
+  const responseBody = (await safeReadJson(response)) as DeleteEventVehicleApiResponseBody
+
+  if (!response.ok) {
+    throw new EventsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível remover o veículo.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new EventsServiceError('Resposta inválida ao remover o veículo.')
+  }
+
+  return responseBody as Event
 }
