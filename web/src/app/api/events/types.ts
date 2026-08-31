@@ -2,6 +2,18 @@ export type EventGuest = {
   id: string
   name: string
   document: string | null
+  checkInAt: string | null
+  checkOutAt: string | null
+}
+
+export type EventVehicle = {
+  id: string
+  plate: string | null
+  brandModel: string | null
+  driverName: string | null
+  color: string | null
+  checkInAt: string
+  checkOutAt: string | null
 }
 
 export type Event = {
@@ -14,6 +26,7 @@ export type Event = {
   space: string | null
   responsibleName: string
   guests: EventGuest[]
+  vehicles: EventVehicle[]
   observations: string | null
   createdByUserId: string | null
   createdAt: string
@@ -54,8 +67,16 @@ export type UpdateEventRequest = {
   space?: string
   responsibleName?: string
   guests?: {
+    id?: string
     name: string
     document?: string
   }[]
   observations?: string
+}
+
+export type CreateEventVehicleRequest = {
+  plate: string
+  brandModel?: string
+  driverName?: string
+  color?: string
 }

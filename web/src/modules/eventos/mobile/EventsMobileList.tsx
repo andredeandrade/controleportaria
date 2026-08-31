@@ -119,7 +119,11 @@ export function EventsMobileList() {
 
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Stack direction="row" spacing={1}>
-                  <Button variant="contained" color="primary">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => router.push(`/eventos/${record.id}`)}
+                  >
                     Visualizar
                   </Button>
                   <Button

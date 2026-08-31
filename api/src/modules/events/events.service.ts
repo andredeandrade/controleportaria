@@ -3,6 +3,7 @@ import { HttpError } from '../../lib/http-error.js'
 import { prisma } from '../../lib/prisma.js'
 import type {
   CreateEventInput,
+  CreateEventVehicleInput,
   EventGuestInput,
   EventResponse,
   ListEventsInput,
@@ -44,9 +45,10 @@ function validateTime(time: string, fieldLabel: string): string {
 
 function validateGuests(
   guests: EventGuestInput[] | undefined,
-): Array<{ name: string; document: string | null }> {
+): Array<{ id?: string; name: string; document: string | null }> {
   const normalizedGuests = (guests ?? [])
     .map((guest) => ({
+      id: guest.id,
       name: guest.name.trim(),
       document: normalizeOptionalText(guest.document),
     }))
@@ -73,7 +75,7 @@ function validateCreateInput(input: CreateEventInput): {
   unit: string
   space: string | null
   responsibleName: string
-  guests: Array<{ name: string; document: string | null }>
+  guests: Array<{ id?: string; name: string; document: string | null }>
   observations: string | null
 } {
   const title = input.title.trim()
@@ -127,7 +129,7 @@ function validateUpdateInput(input: UpdateEventInput): {
   unit?: string
   space?: string | null
   responsibleName?: string
-  guests?: Array<{ name: string; document: string | null }>
+  guests?: Array<{ id?: string; name: string; document: string | null }>
   observations?: string | null
 } {
   const data: {
@@ -138,7 +140,7 @@ function validateUpdateInput(input: UpdateEventInput): {
     unit?: string
     space?: string | null
     responsibleName?: string
-    guests?: Array<{ name: string; document: string | null }>
+    guests?: Array<{ id?: string; name: string; document: string | null }>
     observations?: string | null
   } = {}
 
@@ -265,6 +267,17 @@ function toResponse(event: {
     id: string
     name: string
     documentEncrypted: string | null
+    checkInAt: Date | null
+    checkOutAt: Date | null
+  }>
+  vehicles: Array<{
+    id: string
+    plateEncrypted: string | null
+    brandModel: string | null
+    driverName: string | null
+    color: string | null
+    checkInAt: Date
+    checkOutAt: Date | null
   }>
 }): EventResponse {
   return {
@@ -280,12 +293,42 @@ function toResponse(event: {
       id: guest.id,
       name: guest.name,
       document: guest.documentEncrypted ? decryptText(guest.documentEncrypted) : null,
+      checkInAt: guest.checkInAt,
+      checkOutAt: guest.checkOutAt,
+    })),
+    vehicles: event.vehicles.map((vehicle) => ({
+      id: vehicle.id,
+      plate: vehicle.plateEncrypted ? decryptText(vehicle.plateEncrypted) : null,
+      brandModel: vehicle.brandModel,
+      driverName: vehicle.driverName,
+      color: vehicle.color,
+      checkInAt: vehicle.checkInAt,
+      checkOutAt: vehicle.checkOutAt,
     })),
     observations: event.observationsEncrypted ? decryptText(event.observationsEncrypted) : null,
     createdByUserId: event.createdByUserId,
     createdAt: event.createdAt,
     updatedAt: event.updatedAt,
   }
+}
+
+async function loadEventOrThrow(eventId: string, condominiumId: string) {
+  const event = await prisma.event.findFirst({
+    where: {
+      id: eventId,
+      condominiumId,
+    },
+    include: {
+      guests: true,
+      vehicles: true,
+    },
+  })
+
+  if (!event) {
+    throw new HttpError(404, 'Evento não encontrado.')
+  }
+
+  return event
 }
 
 export const eventsService = {
@@ -313,6 +356,7 @@ export const eventsService = {
       },
       include: {
         guests: true,
+        vehicles: true,
       },
     })
 
@@ -341,6 +385,7 @@ export const eventsService = {
         where,
         include: {
           guests: true,
+          vehicles: true,
         },
         skip,
         take: pageSize,
@@ -374,6 +419,7 @@ export const eventsService = {
       },
       include: {
         guests: true,
+        vehicles: true,
       },
     })
 
@@ -398,6 +444,11 @@ export const eventsService = {
       },
       select: {
         id: true,
+        guests: {
+          select: {
+            id: true,
+          },
+        },
       },
     })
 
@@ -406,6 +457,51 @@ export const eventsService = {
     }
 
     const validated = validateUpdateInput(input)
+
+    let guestsWrite:
+      | {
+          update: Array<{ where: { id: string }; data: { name: string; documentEncrypted: string | null } }>
+          create: Array<{ name: string; documentEncrypted: string | null }>
+          deleteMany?: { id: { in: string[] } }
+        }
+      | undefined
+
+    if (validated.guests) {
+      const existingGuestIds = new Set(existingEvent.guests.map((guest) => guest.id))
+      const payloadGuestIds = new Set(
+        validated.guests
+          .map((guest) => guest.id)
+          .filter((guestId): guestId is string => Boolean(guestId) && existingGuestIds.has(guestId as string)),
+      )
+
+      const guestsToUpdate = validated.guests.filter(
+        (guest): guest is { id: string; name: string; document: string | null } =>
+          Boolean(guest.id) && existingGuestIds.has(guest.id as string),
+      )
+      const guestsToCreate = validated.guests.filter(
+        (guest) => !guest.id || !existingGuestIds.has(guest.id),
+      )
+      const guestIdsToDelete = existingEvent.guests
+        .map((guest) => guest.id)
+        .filter((guestId) => !payloadGuestIds.has(guestId))
+
+      guestsWrite = {
+        update: guestsToUpdate.map((guest) => ({
+          where: { id: guest.id },
+          data: {
+            name: guest.name,
+            documentEncrypted: guest.document ? encryptText(guest.document) : null,
+          },
+        })),
+        create: guestsToCreate.map((guest) => ({
+          name: guest.name,
+          documentEncrypted: guest.document ? encryptText(guest.document) : null,
+        })),
+        ...(guestIdsToDelete.length > 0
+          ? { deleteMany: { id: { in: guestIdsToDelete } } }
+          : {}),
+      }
+    }
 
     const event = await prisma.event.update({
       where: { id: eventId },
@@ -423,20 +519,15 @@ export const eventsService = {
             : validated.observations
               ? encryptText(validated.observations)
               : null,
-        ...(validated.guests
+        ...(guestsWrite
           ? {
-              guests: {
-                deleteMany: {},
-                create: validated.guests.map((guest) => ({
-                  name: guest.name,
-                  documentEncrypted: guest.document ? encryptText(guest.document) : null,
-                })),
-              },
+              guests: guestsWrite,
             }
           : {}),
       },
       include: {
         guests: true,
+        vehicles: true,
       },
     })
 
@@ -467,5 +558,195 @@ export const eventsService = {
     await prisma.event.delete({
       where: { id: eventId },
     })
+  },
+
+  async checkInGuest(
+    eventId: string,
+    guestId: string,
+    condominiumId: string,
+    userId: string,
+  ): Promise<EventResponse> {
+    const trimmedEventId = eventId.trim()
+    const trimmedGuestId = guestId.trim()
+
+    if (!trimmedEventId) {
+      throw new HttpError(400, 'ID do evento é obrigatório.')
+    }
+
+    if (!trimmedGuestId) {
+      throw new HttpError(400, 'ID do convidado é obrigatório.')
+    }
+
+    const event = await loadEventOrThrow(trimmedEventId, condominiumId)
+    const guest = event.guests.find((item) => item.id === trimmedGuestId)
+
+    if (!guest) {
+      throw new HttpError(404, 'Convidado não encontrado.')
+    }
+
+    if (guest.checkInAt) {
+      throw new HttpError(400, 'Convidado já registrou entrada.')
+    }
+
+    await prisma.eventGuest.update({
+      where: { id: trimmedGuestId },
+      data: {
+        checkInAt: new Date(),
+        checkedInByUserId: userId,
+      },
+    })
+
+    return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))
+  },
+
+  async checkOutGuest(
+    eventId: string,
+    guestId: string,
+    condominiumId: string,
+    userId: string,
+  ): Promise<EventResponse> {
+    const trimmedEventId = eventId.trim()
+    const trimmedGuestId = guestId.trim()
+
+    if (!trimmedEventId) {
+      throw new HttpError(400, 'ID do evento é obrigatório.')
+    }
+
+    if (!trimmedGuestId) {
+      throw new HttpError(400, 'ID do convidado é obrigatório.')
+    }
+
+    const event = await loadEventOrThrow(trimmedEventId, condominiumId)
+    const guest = event.guests.find((item) => item.id === trimmedGuestId)
+
+    if (!guest) {
+      throw new HttpError(404, 'Convidado não encontrado.')
+    }
+
+    if (!guest.checkInAt) {
+      throw new HttpError(400, 'Convidado ainda não registrou entrada.')
+    }
+
+    if (guest.checkOutAt) {
+      throw new HttpError(400, 'Convidado já registrou saída.')
+    }
+
+    await prisma.eventGuest.update({
+      where: { id: trimmedGuestId },
+      data: {
+        checkOutAt: new Date(),
+        checkedOutByUserId: userId,
+      },
+    })
+
+    return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))
+  },
+
+  async createVehicle(
+    eventId: string,
+    condominiumId: string,
+    userId: string,
+    input: CreateEventVehicleInput,
+  ): Promise<EventResponse> {
+    const trimmedEventId = eventId.trim()
+
+    if (!trimmedEventId) {
+      throw new HttpError(400, 'ID do evento é obrigatório.')
+    }
+
+    await loadEventOrThrow(trimmedEventId, condominiumId)
+
+    const plate = input.plate.trim()
+
+    if (!plate) {
+      throw new HttpError(400, 'Placa do veículo é obrigatória.')
+    }
+
+    const brandModel = normalizeOptionalText(input.brandModel)
+    const driverName = normalizeOptionalText(input.driverName)
+    const color = normalizeOptionalText(input.color)
+
+    await prisma.eventVehicle.create({
+      data: {
+        eventId: trimmedEventId,
+        plateEncrypted: encryptText(plate),
+        brandModel,
+        driverName,
+        color,
+        checkInAt: new Date(),
+        checkedInByUserId: userId,
+      },
+    })
+
+    return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))
+  },
+
+  async checkOutVehicle(
+    eventId: string,
+    vehicleId: string,
+    condominiumId: string,
+    userId: string,
+  ): Promise<EventResponse> {
+    const trimmedEventId = eventId.trim()
+    const trimmedVehicleId = vehicleId.trim()
+
+    if (!trimmedEventId) {
+      throw new HttpError(400, 'ID do evento é obrigatório.')
+    }
+
+    if (!trimmedVehicleId) {
+      throw new HttpError(400, 'ID do veículo é obrigatório.')
+    }
+
+    const event = await loadEventOrThrow(trimmedEventId, condominiumId)
+    const vehicle = event.vehicles.find((item) => item.id === trimmedVehicleId)
+
+    if (!vehicle) {
+      throw new HttpError(404, 'Veículo não encontrado.')
+    }
+
+    if (vehicle.checkOutAt) {
+      throw new HttpError(400, 'Veículo já registrou saída.')
+    }
+
+    await prisma.eventVehicle.update({
+      where: { id: trimmedVehicleId },
+      data: {
+        checkOutAt: new Date(),
+        checkedOutByUserId: userId,
+      },
+    })
+
+    return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))
+  },
+
+  async deleteVehicle(
+    eventId: string,
+    vehicleId: string,
+    condominiumId: string,
+  ): Promise<EventResponse> {
+    const trimmedEventId = eventId.trim()
+    const trimmedVehicleId = vehicleId.trim()
+
+    if (!trimmedEventId) {
+      throw new HttpError(400, 'ID do evento é obrigatório.')
+    }
+
+    if (!trimmedVehicleId) {
+      throw new HttpError(400, 'ID do veículo é obrigatório.')
+    }
+
+    const event = await loadEventOrThrow(trimmedEventId, condominiumId)
+    const vehicle = event.vehicles.find((item) => item.id === trimmedVehicleId)
+
+    if (!vehicle) {
+      throw new HttpError(404, 'Veículo não encontrado.')
+    }
+
+    await prisma.eventVehicle.delete({
+      where: { id: trimmedVehicleId },
+    })
+
+    return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))
   },
 }
