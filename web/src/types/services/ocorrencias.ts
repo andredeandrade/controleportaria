@@ -5,3 +5,7 @@ export type ListIncidentsApiResponseBody =
   | null
 
 export type RegisterIncidentApiResponseBody = ({ message?: string } & Partial<Incident>) | null
+
+export type GetIncidentApiResponseBody = ({ message?: string } & Partial<Incident>) | null
+
+export type UpdateIncidentApiResponseBody = ({ message?: string } & Partial<Incident>) | null

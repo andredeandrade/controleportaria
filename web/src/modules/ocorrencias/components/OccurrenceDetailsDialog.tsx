@@ -13,15 +13,15 @@ import { useTheme } from '@mui/material/styles'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
+import { useRouter } from 'next/navigation'
 
 import { useOccurrenceListContext } from '@/modules/ocorrencias/context/OccurrenceListContext'
-import { useAppSnackbar } from '@/providers'
 import { MobileFieldLabel } from '@/styles/MobileList.styles'
 
 export function OccurrenceDetailsDialog() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const { showInfo } = useAppSnackbar()
+  const router = useRouter()
   const { viewedRecord: target, handleCloseView: onClose } = useOccurrenceListContext()
 
   if (!target) {
@@ -29,7 +29,8 @@ export function OccurrenceDetailsDialog() {
   }
 
   const handleEdit = () => {
-    showInfo('Edição de ocorrências estará disponível em breve.')
+    onClose()
+    router.push(`/ocorrencias/${target.id}/editar`)
   }
 
   return (
