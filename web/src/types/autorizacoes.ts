@@ -6,8 +6,13 @@ export type AuthorizationRecord = {
   personType: string
   personTypeLabel: string
   document: string
+  phone?: string
+  company?: string
+  observations?: string
   validFromDate: string
+  validFromTime: string
   validToDate: string
+  validToTime: string
   unit: string
   authorizedBy: string
 }

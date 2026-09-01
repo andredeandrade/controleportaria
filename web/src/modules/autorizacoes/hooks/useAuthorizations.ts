@@ -53,8 +53,13 @@ export function useAuthorizations() {
       personType: item.personType,
       personTypeLabel: PERSON_TYPE_LABEL[personType] ?? item.personType,
       document: item.document,
+      phone: item.phone ?? undefined,
+      company: item.company ?? undefined,
+      observations: item.observations ?? undefined,
       validFromDate: formatDate(item.validFromDate),
+      validFromTime: item.validFromTime,
       validToDate: formatDate(item.validToDate),
+      validToTime: item.validToTime,
       unit: item.unit,
       authorizedBy: item.authorizedBy,
     }

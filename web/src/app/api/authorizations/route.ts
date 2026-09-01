@@ -32,6 +32,22 @@ function parseCreateBody(body: unknown): CreateAuthorizationRequest {
   }
 }
 
+type DeleteAuthorizationBody = {
+  id: string
+}
+
+function parseDeleteBody(body: unknown): DeleteAuthorizationBody {
+  if (!body || typeof body !== 'object') {
+    throw new Error('Corpo da requisicao invalido.')
+  }
+
+  const payload = body as Record<string, unknown>
+
+  return {
+    id: String(payload['id'] ?? ''),
+  }
+}
+
 export async function GET(request: Request) {
   const cookieStore = await cookies()
   const accessToken = readAccessToken(cookieStore)
@@ -107,6 +123,50 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { message: getThrowableMessage(error, 'Falha ao cadastrar autorizacao.') },
+      { status: 500 },
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  const cookieStore = await cookies()
+  const accessToken = readAccessToken(cookieStore)
+
+  if (!accessToken) {
+    return NextResponse.json({ message: 'Nao autenticado.' }, { status: 401 })
+  }
+
+  let body: DeleteAuthorizationBody
+
+  try {
+    body = parseDeleteBody(await request.json())
+  } catch {
+    return NextResponse.json({ message: 'Corpo da requisicao invalido.' }, { status: 400 })
+  }
+
+  const id = body.id.trim()
+
+  if (!id) {
+    return NextResponse.json({ message: 'ID da autorizacao e obrigatorio.' }, { status: 400 })
+  }
+
+  try {
+    await requestAuthorizationsApi(`/${id}`, accessToken, {
+      method: 'DELETE',
+    })
+
+    return new NextResponse(null, { status: 204 })
+  } catch (error) {
+    if (error instanceof AuthorizationsApiError) {
+      if (error.clearCookie) {
+        clearAccessToken(cookieStore)
+      }
+
+      return NextResponse.json({ message: error.message }, { status: error.status })
+    }
+
+    return NextResponse.json(
+      { message: getThrowableMessage(error, 'Falha ao excluir autorizacao.') },
       { status: 500 },
     )
   }

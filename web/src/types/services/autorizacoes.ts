@@ -7,3 +7,11 @@ export type ListAuthorizationsApiResponseBody =
 export type RegisterAuthorizationApiResponseBody =
   | ({ message?: string } & Partial<Authorization>)
   | null
+
+export type GetAuthorizationApiResponseBody =
+  | ({ message?: string } & Partial<Authorization>)
+  | null
+
+export type UpdateAuthorizationApiResponseBody =
+  | ({ message?: string } & Partial<Authorization>)
+  | null

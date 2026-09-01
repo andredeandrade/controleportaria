@@ -2,14 +2,20 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
 
-import { RegisterAuthorizationForm } from '@/modules/autorizacoes/components/RegisterAuthorizationForm'
+import { EditAuthorizationForm } from '@/modules/autorizacoes/components/EditAuthorizationForm'
 import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
-  title: 'Cadastrar Autorização',
+  title: 'Editar Autorização',
 }
 
-export default function CadastrarAutorizacaoPage() {
+export default async function EditarAutorizacaoPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+
   return (
     <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack spacing={{ xs: 2.5, sm: 2 }}>
@@ -20,16 +26,16 @@ export default function CadastrarAutorizacaoPage() {
           />
 
           <Typography variant="h2" fontWeight={700} color="text.primary">
-            Cadastrar autorização
+            Editar autorização
           </Typography>
         </Stack>
 
         <Typography variant="body2" color="text.secondary">
-          Insira os dados da nova autorização para registro no sistema de acesso.
+          Atualize os dados da autorização para manter o registro no sistema de acesso.
         </Typography>
       </Stack>
 
-      <RegisterAuthorizationForm />
+      <EditAuthorizationForm authorizationId={id} />
     </Stack>
   )
 }
