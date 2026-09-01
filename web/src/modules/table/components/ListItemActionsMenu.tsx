@@ -1,11 +1,12 @@
 'use client'
 
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
+import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import type { MouseEvent, ReactNode } from 'react'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 
 export type ListItemActionMenuOption = {
   id: string
@@ -13,6 +14,8 @@ export type ListItemActionMenuOption = {
   onClick: () => void
   disabled?: boolean
   icon?: ReactNode
+  dividerBefore?: boolean
+  tone?: 'default' | 'danger'
 }
 
 type ListItemActionsMenuProps = {
@@ -52,10 +55,10 @@ export function ListItemActionsMenu({
         onClick={handleOpen}
         size="small"
         sx={{
-          color: '#475569',
+          color: 'text.secondary',
           borderRadius: 2,
           '&:hover': {
-            bgcolor: 'rgba(148, 163, 184, 0.12)',
+            bgcolor: 'action.hover',
           },
         }}
       >
@@ -69,28 +72,41 @@ export function ListItemActionsMenu({
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{
+          list: {
+            sx: { py: 0.75 },
+          },
           paper: {
             elevation: 4,
             sx: {
               mt: 0.5,
-              minWidth: 180,
+              minWidth: 216,
               borderRadius: 2,
-              border: '1px solid rgba(226, 232, 240, 1)',
-              boxShadow: '0 16px 32px rgba(15, 23, 42, 0.14)',
+              border: '1px solid',
+              borderColor: 'divider',
             },
           },
         }}
       >
         {items.map((item) => (
-          <MenuItem
-            key={item.id}
-            onClick={() => handleItemClick(item.onClick)}
-            disabled={item.disabled}
-            sx={{ gap: 1.25, py: 1.1 }}
-          >
-            {item.icon}
-            {item.label}
-          </MenuItem>
+          <Fragment key={item.id}>
+            {item.dividerBefore ? <Divider sx={{ my: 0.75 }} /> : null}
+            <MenuItem
+              onClick={() => handleItemClick(item.onClick)}
+              disabled={item.disabled}
+              sx={{
+                gap: 1.5,
+                px: 2,
+                py: 1.25,
+                color: item.tone === 'danger' ? 'error.main' : 'text.primary',
+                '& .MuiSvgIcon-root': {
+                  fontSize: '1.125rem',
+                },
+              }}
+            >
+              {item.icon}
+              {item.label}
+            </MenuItem>
+          </Fragment>
         ))}
       </Menu>
     </>

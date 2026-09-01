@@ -1,9 +1,10 @@
+import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import type { Metadata } from 'next'
-import { RegisterAuthorizationButton } from '@/modules/autorizacoes/components/RegisterAuthorizationButton'
+
 import { AuthorizationsList } from '@/modules/autorizacoes/components/AuthorizationsList'
-import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
+import { RegisterAuthorizationButton } from '@/modules/autorizacoes/components/RegisterAuthorizationButton'
 
 export const metadata: Metadata = {
   title: 'Autorizações',
@@ -11,25 +12,35 @@ export const metadata: Metadata = {
 
 export default function AutorizacoesPage() {
   return (
-    <Stack spacing={2}>
+    <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
+        spacing={4}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
-        <Typography variant="h6" fontWeight={700} sx={{ color: 'grey.900' }}>
-          Autorizações
-        </Typography>
+        <Box>
+          <Typography variant="h2" fontWeight={700} color="text.primary">
+            Autorizações
+          </Typography>
+
+          <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>
+            Pessoas autorizadas a entrar no condomínio, com período de validade e responsável pela
+            autorização.
+          </Typography>
+        </Box>
 
         <Stack
           direction="row"
           justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}
-          sx={{ width: { xs: '100%', sm: 'auto' } }}
+          sx={{
+            width: { xs: '100%', sm: 'auto' },
+          }}
         >
-          <RegisterAuthorizationButton />
+          <RegisterAuthorizationButton sx={{ width: { xs: '100%', sm: 'auto' } }} />
         </Stack>
       </Stack>
+
       <AuthorizationsList />
     </Stack>
   )
