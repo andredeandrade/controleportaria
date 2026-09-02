@@ -140,3 +140,77 @@ export interface IncidentReportItem {
   createdAt: Date
   updatedAt: Date
 }
+
+export interface ListResidentsReportInput {
+  condominiumId: string
+  page: number
+  pageSize: number
+  startDate?: Date
+  endDate?: Date
+}
+
+export type ResidentReportRelation = 'proprietario' | 'inquilino' | 'dependente'
+
+export interface ResidentReportItem {
+  id: string
+  fullName: string
+  unit: string
+  relation: ResidentReportRelation
+  email: string | null
+  phone: string | null
+  document: string | null
+  observations: string | null
+  createdByUserId: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ListEventsReportInput {
+  condominiumId: string
+  page: number
+  pageSize: number
+  startDate?: Date
+  endDate?: Date
+}
+
+export interface EventReportItem {
+  id: string
+  title: string
+  date: string
+  startTime: string
+  endTime: string | null
+  unit: string
+  space: string | null
+  responsibleName: string
+  observations: string | null
+  createdByUserId: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ListAuthorizationsReportInput {
+  condominiumId: string
+  page: number
+  pageSize: number
+  startDate?: Date
+  endDate?: Date
+}
+
+export interface AuthorizationReportItem {
+  id: string
+  authorizedName: string
+  personType: string
+  document: string
+  phone: string | null
+  company: string | null
+  unit: string
+  authorizedBy: string
+  validFromDate: string
+  validFromTime: string
+  validToDate: string
+  validToTime: string
+  observations: string | null
+  createdByUserId: string | null
+  createdAt: Date
+  updatedAt: Date
+}
