@@ -350,4 +350,79 @@ export const reportsController = {
 
     res.json(result)
   },
+
+  async listResidentsReport(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const customRange = parseCustomRange(req)
+    const period = parsePeriod(req.query['period'])
+
+    if (customRange && period) {
+      throw new HttpError(400, 'Não combine period com day, month ou from/to.')
+    }
+
+    const periodRange = getRangeFromPeriod(period)
+
+    const result = await reportsService.listResidentsReport({
+      condominiumId: req.authUser.condominiumId,
+      page: parsePositiveInteger(req.query['page'], 'Parâmetro page', 1),
+      pageSize: parsePositiveInteger(req.query['pageSize'], 'Parâmetro pageSize', 10),
+      startDate: customRange?.startDate ?? periodRange?.startDate,
+      endDate: customRange?.endDate ?? periodRange?.endDate,
+    })
+
+    res.json(result)
+  },
+
+  async listEventsReport(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const customRange = parseCustomRange(req)
+    const period = parsePeriod(req.query['period'])
+
+    if (customRange && period) {
+      throw new HttpError(400, 'Não combine period com day, month ou from/to.')
+    }
+
+    const periodRange = getRangeFromPeriod(period)
+
+    const result = await reportsService.listEventsReport({
+      condominiumId: req.authUser.condominiumId,
+      page: parsePositiveInteger(req.query['page'], 'Parâmetro page', 1),
+      pageSize: parsePositiveInteger(req.query['pageSize'], 'Parâmetro pageSize', 10),
+      startDate: customRange?.startDate ?? periodRange?.startDate,
+      endDate: customRange?.endDate ?? periodRange?.endDate,
+    })
+
+    res.json(result)
+  },
+
+  async listAuthorizationsReport(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const customRange = parseCustomRange(req)
+    const period = parsePeriod(req.query['period'])
+
+    if (customRange && period) {
+      throw new HttpError(400, 'Não combine period com day, month ou from/to.')
+    }
+
+    const periodRange = getRangeFromPeriod(period)
+
+    const result = await reportsService.listAuthorizationsReport({
+      condominiumId: req.authUser.condominiumId,
+      page: parsePositiveInteger(req.query['page'], 'Parâmetro page', 1),
+      pageSize: parsePositiveInteger(req.query['pageSize'], 'Parâmetro pageSize', 10),
+      startDate: customRange?.startDate ?? periodRange?.startDate,
+      endDate: customRange?.endDate ?? periodRange?.endDate,
+    })
+
+    res.json(result)
+  },
 }

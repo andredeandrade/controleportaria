@@ -4,15 +4,22 @@ import { prisma } from '../../lib/prisma.js'
 import type {
   AccessReportItem,
   AccessReportStatus,
+  AuthorizationReportItem,
   DashboardSummaryPeriod,
   DashboardSummaryResponse,
+  EventReportItem,
   GetDashboardSummaryInput,
   IncidentReportItem,
   ListAccessReportInput,
+  ListAuthorizationsReportInput,
+  ListEventsReportInput,
   ListIncidentsReportInput,
+  ListResidentsReportInput,
   ListServiceProvidersReportInput,
   ListVisitorsReportInput,
   PaginatedResponse,
+  ResidentReportItem,
+  ResidentReportRelation,
   ServiceProviderReportItem,
   VisitorReportItem,
 } from './reports.types.js'
@@ -235,6 +242,114 @@ function toIncidentReportItem(incident: {
     createdByUserId: incident.createdByUserId,
     createdAt: incident.createdAt,
     updatedAt: incident.updatedAt,
+  }
+}
+
+type DbResidentRelation = 'PROPRIETARIO' | 'INQUILINO' | 'DEPENDENTE'
+
+const RESIDENT_RELATION_FROM_DB: Record<DbResidentRelation, ResidentReportRelation> = {
+  PROPRIETARIO: 'proprietario',
+  INQUILINO: 'inquilino',
+  DEPENDENTE: 'dependente',
+}
+
+function toResidentReportItem(resident: {
+  id: string
+  fullName: string
+  unit: string
+  relation: DbResidentRelation
+  emailEncrypted: string | null
+  phoneEncrypted: string | null
+  documentEncrypted: string | null
+  observationsEncrypted: string | null
+  createdByUserId: string | null
+  createdAt: Date
+  updatedAt: Date
+}): ResidentReportItem {
+  return {
+    id: resident.id,
+    fullName: resident.fullName,
+    unit: resident.unit,
+    relation: RESIDENT_RELATION_FROM_DB[resident.relation],
+    email: resident.emailEncrypted ? decryptText(resident.emailEncrypted) : null,
+    phone: resident.phoneEncrypted ? decryptText(resident.phoneEncrypted) : null,
+    document: resident.documentEncrypted ? decryptText(resident.documentEncrypted) : null,
+    observations: resident.observationsEncrypted
+      ? decryptText(resident.observationsEncrypted)
+      : null,
+    createdByUserId: resident.createdByUserId,
+    createdAt: resident.createdAt,
+    updatedAt: resident.updatedAt,
+  }
+}
+
+function toEventReportItem(event: {
+  id: string
+  title: string
+  date: string
+  startTime: string
+  endTime: string | null
+  unit: string
+  space: string | null
+  responsibleName: string
+  observationsEncrypted: string | null
+  createdByUserId: string | null
+  createdAt: Date
+  updatedAt: Date
+}): EventReportItem {
+  return {
+    id: event.id,
+    title: event.title,
+    date: event.date,
+    startTime: event.startTime,
+    endTime: event.endTime,
+    unit: event.unit,
+    space: event.space,
+    responsibleName: event.responsibleName,
+    observations: event.observationsEncrypted ? decryptText(event.observationsEncrypted) : null,
+    createdByUserId: event.createdByUserId,
+    createdAt: event.createdAt,
+    updatedAt: event.updatedAt,
+  }
+}
+
+function toAuthorizationReportItem(authorization: {
+  id: string
+  authorizedName: string
+  personType: string
+  documentEncrypted: string
+  phoneEncrypted: string | null
+  company: string | null
+  unit: string
+  authorizedBy: string
+  validFromDate: string
+  validFromTime: string
+  validToDate: string
+  validToTime: string
+  observationsEncrypted: string | null
+  createdByUserId: string | null
+  createdAt: Date
+  updatedAt: Date
+}): AuthorizationReportItem {
+  return {
+    id: authorization.id,
+    authorizedName: authorization.authorizedName,
+    personType: authorization.personType,
+    document: decryptText(authorization.documentEncrypted),
+    phone: authorization.phoneEncrypted ? decryptText(authorization.phoneEncrypted) : null,
+    company: authorization.company,
+    unit: authorization.unit,
+    authorizedBy: authorization.authorizedBy,
+    validFromDate: authorization.validFromDate,
+    validFromTime: authorization.validFromTime,
+    validToDate: authorization.validToDate,
+    validToTime: authorization.validToTime,
+    observations: authorization.observationsEncrypted
+      ? decryptText(authorization.observationsEncrypted)
+      : null,
+    createdByUserId: authorization.createdByUserId,
+    createdAt: authorization.createdAt,
+    updatedAt: authorization.updatedAt,
   }
 }
 
@@ -598,6 +713,109 @@ export const reportsService = {
 
     return toPaginatedResponse(
       items.map((item) => toIncidentReportItem(item)),
+      page,
+      pageSize,
+      total,
+    )
+  },
+
+  async listResidentsReport(
+    input: ListResidentsReportInput,
+  ): Promise<PaginatedResponse<ResidentReportItem>> {
+    const { page, pageSize, skip } = parsePagination(input.page, input.pageSize)
+
+    const where = {
+      condominiumId: input.condominiumId,
+      ...(input.startDate && input.endDate
+        ? {
+            createdAt: {
+              gte: input.startDate,
+              lte: input.endDate,
+            },
+          }
+        : {}),
+    }
+
+    const [items, total] = await prisma.$transaction([
+      prisma.resident.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.resident.count({ where }),
+    ])
+
+    return toPaginatedResponse(
+      items.map((item) => toResidentReportItem(item)),
+      page,
+      pageSize,
+      total,
+    )
+  },
+
+  async listEventsReport(input: ListEventsReportInput): Promise<PaginatedResponse<EventReportItem>> {
+    const { page, pageSize, skip } = parsePagination(input.page, input.pageSize)
+
+    const where = {
+      condominiumId: input.condominiumId,
+      ...(input.startDate && input.endDate
+        ? {
+            date: {
+              gte: toDateString(input.startDate),
+              lte: toDateString(input.endDate),
+            },
+          }
+        : {}),
+    }
+
+    const [items, total] = await prisma.$transaction([
+      prisma.event.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: [{ date: 'desc' }, { startTime: 'desc' }, { createdAt: 'desc' }],
+      }),
+      prisma.event.count({ where }),
+    ])
+
+    return toPaginatedResponse(
+      items.map((item) => toEventReportItem(item)),
+      page,
+      pageSize,
+      total,
+    )
+  },
+
+  async listAuthorizationsReport(
+    input: ListAuthorizationsReportInput,
+  ): Promise<PaginatedResponse<AuthorizationReportItem>> {
+    const { page, pageSize, skip } = parsePagination(input.page, input.pageSize)
+
+    const where = {
+      condominiumId: input.condominiumId,
+      ...(input.startDate && input.endDate
+        ? {
+            createdAt: {
+              gte: input.startDate,
+              lte: input.endDate,
+            },
+          }
+        : {}),
+    }
+
+    const [items, total] = await prisma.$transaction([
+      prisma.authorization.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.authorization.count({ where }),
+    ])
+
+    return toPaginatedResponse(
+      items.map((item) => toAuthorizationReportItem(item)),
       page,
       pageSize,
       total,
