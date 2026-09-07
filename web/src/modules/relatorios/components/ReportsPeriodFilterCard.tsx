@@ -1,10 +1,9 @@
 'use client'
 
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import DateRangeIcon from '@mui/icons-material/DateRange'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
-import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -12,7 +11,7 @@ import { useState } from 'react'
 
 import { TextField } from '@/modules/form'
 import { useAppSnackbar } from '@/providers/AppSnackbarProvider'
-import type { ReportFormat, ReportPeriodShortcut, ReportsPeriodFilter } from '@/types/relatorios'
+import type { ReportPeriodShortcut, ReportsPeriodFilter } from '@/types/relatorios'
 
 const SHORTCUTS: Array<{ value: ReportPeriodShortcut; label: string }> = [
   { value: 'hoje', label: 'Hoje' },
@@ -20,12 +19,6 @@ const SHORTCUTS: Array<{ value: ReportPeriodShortcut; label: string }> = [
   { value: '30', label: 'Últimos 30 dias' },
   { value: 'mes', label: 'Este mês' },
   { value: 'todos', label: 'Todo o período' },
-]
-
-const FORMAT_OPTIONS: Array<{ value: ReportFormat; label: string }> = [
-  { value: 'CSV', label: 'CSV' },
-  { value: 'XLSX', label: 'XLSX' },
-  { value: 'PDF', label: 'PDF' },
 ]
 
 function toIsoDate(date: Date): string {
@@ -65,16 +58,9 @@ const EMPTY_FILTER: ReportsPeriodFilter = { from: '', to: '', shortcut: 'todos' 
 type ReportsPeriodFilterCardProps = {
   filter: ReportsPeriodFilter
   onChange: (filter: ReportsPeriodFilter) => void
-  format: ReportFormat
-  onFormatChange: (format: ReportFormat) => void
 }
 
-export function ReportsPeriodFilterCard({
-  filter,
-  onChange,
-  format,
-  onFormatChange,
-}: ReportsPeriodFilterCardProps) {
+export function ReportsPeriodFilterCard({ filter, onChange }: ReportsPeriodFilterCardProps) {
   const { showSuccess } = useAppSnackbar()
   // Rascunho local: o filtro só é propagado ao clicar em "Aplicar", para permitir
   // ajustar data inicial/final sem disparar buscas a cada tecla digitada.
@@ -96,10 +82,10 @@ export function ReportsPeriodFilterCard({
   }
 
   return (
-    <Paper sx={{ p: 3, borderRadius: 3 }}>
-      <Stack spacing={2.5}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <CalendarMonthIcon fontSize="small" color="action" />
+    <Paper sx={{ p: 5, borderRadius: 2 }}>
+      <Stack spacing={3}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <DateRangeIcon fontSize="small" color="primary" />
           <Typography variant="subtitle1" fontWeight={700}>
             Filtro de Período
           </Typography>
@@ -109,8 +95,9 @@ export function ReportsPeriodFilterCard({
           sx={{
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
-            gap: 2,
+            gap: 3,
             alignItems: { xs: 'stretch', sm: 'flex-end' },
+            flexWrap: 'wrap',
           }}
         >
           <Stack spacing={1} sx={{ width: { xs: '100%', sm: 180 } }}>
@@ -135,25 +122,34 @@ export function ReportsPeriodFilterCard({
             />
           </Stack>
 
-          <Stack spacing={1} sx={{ width: { xs: '100%', sm: 160 } }}>
-            <Typography variant="body2" color="text.secondary" fontWeight={500}>
-              Formato de exportação
-            </Typography>
-            <TextField
-              select
-              value={format}
-              onChange={(e) => onFormatChange(e.target.value as ReportFormat)}
+          <Stack direction="row" spacing={2} sx={{ pb: '2px', width: { xs: '100%', sm: 'auto' } }}>
+            <Button
+              variant="outlined"
+              onClick={handleClear}
+              sx={{ flex: { xs: 1, sm: 'initial' } }}
             >
-              {FORMAT_OPTIONS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+              Limpar
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleApply}
+              sx={{ flex: { xs: 1, sm: 'initial' } }}
+            >
+              Aplicar
+            </Button>
           </Stack>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 3,
+            flexWrap: 'wrap',
+            pt: 4,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
           {SHORTCUTS.map((shortcut) => (
             <Chip
               key={shortcut.value}
@@ -163,15 +159,6 @@ export function ReportsPeriodFilterCard({
               onClick={() => handleShortcutClick(shortcut.value)}
             />
           ))}
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'flex-end' }}>
-          <Button variant="outlined" onClick={handleClear}>
-            Limpar
-          </Button>
-          <Button variant="contained" onClick={handleApply}>
-            Aplicar
-          </Button>
         </Box>
       </Stack>
     </Paper>

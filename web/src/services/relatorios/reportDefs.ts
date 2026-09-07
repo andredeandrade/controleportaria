@@ -103,6 +103,10 @@ export type ReportModuleDef = {
   key: ReportModuleKey
   label: string
   descricao: string
+  /** Rótulo curto exibido no card do grid de relatórios (título do export é mais descritivo). */
+  cardLabel: string
+  /** Descrição curta exibida no card do grid de relatórios. */
+  cardDescricao: string
   icon: SvgIconComponent
   color: string
   route: string
@@ -116,6 +120,8 @@ export const REPORT_MODULES: Record<ReportModuleKey, ReportModuleDef> = {
     key: 'acessos',
     label: 'Registro de acessos',
     descricao: 'Histórico completo de entradas e saídas pela portaria.',
+    cardLabel: 'Acessos',
+    cardDescricao: 'Entradas e saídas registradas',
     icon: AccessTimeIcon,
     color: 'success.main',
     route: '/acessos',
@@ -137,6 +143,8 @@ export const REPORT_MODULES: Record<ReportModuleKey, ReportModuleDef> = {
     key: 'moradores',
     label: 'Registro de moradores',
     descricao: 'Cadastro completo dos moradores do condomínio.',
+    cardLabel: 'Moradores',
+    cardDescricao: 'Cadastro de residentes',
     icon: HomeIcon,
     color: 'primary.main',
     route: '/moradores',
@@ -151,6 +159,8 @@ export const REPORT_MODULES: Record<ReportModuleKey, ReportModuleDef> = {
     key: 'visitantes',
     label: 'Registro de visitantes',
     descricao: 'Cadastro de visitantes registrados no sistema.',
+    cardLabel: 'Visitantes',
+    cardDescricao: 'Visitas cadastradas',
     icon: PeopleIcon,
     color: 'info.main',
     route: '/visitantes',
@@ -171,6 +181,8 @@ export const REPORT_MODULES: Record<ReportModuleKey, ReportModuleDef> = {
     key: 'prestadores',
     label: 'Registro de prestadores de serviço',
     descricao: 'Cadastro de prestadores de serviço e empresas terceirizadas.',
+    cardLabel: 'Prestadores de Serviços',
+    cardDescricao: 'Empresas e profissionais',
     icon: BusinessCenterIcon,
     color: 'warning.main',
     route: '/prestadores-servicos',
@@ -192,6 +204,8 @@ export const REPORT_MODULES: Record<ReportModuleKey, ReportModuleDef> = {
     key: 'eventos',
     label: 'Registro de eventos',
     descricao: 'Eventos e reservas de espaços cadastrados no condomínio.',
+    cardLabel: 'Eventos',
+    cardDescricao: 'Reservas e confraternizações',
     icon: EventIcon,
     color: 'secondary.main',
     route: '/eventos',
@@ -213,6 +227,8 @@ export const REPORT_MODULES: Record<ReportModuleKey, ReportModuleDef> = {
     key: 'ocorrencias',
     label: 'Registro de ocorrências',
     descricao: 'Ocorrências e incidentes registrados na portaria.',
+    cardLabel: 'Ocorrências',
+    cardDescricao: 'Registros de incidentes',
     icon: ReportProblemIcon,
     color: 'error.main',
     route: '/ocorrencias',
@@ -232,6 +248,8 @@ export const REPORT_MODULES: Record<ReportModuleKey, ReportModuleDef> = {
     key: 'autorizacoes',
     label: 'Registro de autorizações',
     descricao: 'Autorizações de entrada emitidas para visitantes e prestadores.',
+    cardLabel: 'Autorizações',
+    cardDescricao: 'Liberações de acesso vigentes',
     icon: AssignmentIndIcon,
     color: 'secondary.main',
     route: '/autorizacoes',

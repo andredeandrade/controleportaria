@@ -5,11 +5,10 @@ import Box from '@mui/material/Box'
 
 import { ReportModuleCard } from './ReportModuleCard'
 import { REPORT_MODULES } from '@/services/relatorios/reportDefs'
-import type { ReportModuleKey, ReportFormat, ReportsPeriodFilter } from '@/types/relatorios'
+import type { ReportModuleKey, ReportsPeriodFilter } from '@/types/relatorios'
 
 type ReportModuleCardsGridProps = {
   filter: ReportsPeriodFilter
-  format: ReportFormat
   counts: Partial<Record<ReportModuleKey, number>>
   isLoading: boolean
   isError: boolean
@@ -17,7 +16,6 @@ type ReportModuleCardsGridProps = {
 
 export function ReportModuleCardsGrid({
   filter,
-  format,
   counts,
   isLoading,
   isError,
@@ -34,8 +32,8 @@ export function ReportModuleCardsGrid({
     <Box
       sx={{
         display: 'grid',
-        gap: 2,
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: 4,
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
       }}
     >
       {Object.values(REPORT_MODULES).map((def) => (
@@ -44,7 +42,6 @@ export function ReportModuleCardsGrid({
           def={def}
           total={counts[def.key]}
           isLoading={isLoading}
-          format={format}
           filter={filter}
         />
       ))}

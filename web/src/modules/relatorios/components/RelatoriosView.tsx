@@ -1,6 +1,5 @@
 'use client'
 
-import DownloadIcon from '@mui/icons-material/Download'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -14,13 +13,12 @@ import { useReportCounts } from '../hooks/useReportCounts'
 import { getPeriodLabel } from '../utils/periodLabel'
 import { exportAllReports } from '@/services/relatorios/export'
 import { useAppSnackbar } from '@/providers/AppSnackbarProvider'
-import type { ReportFormat, ReportsPeriodFilter } from '@/types/relatorios'
+import type { ReportsPeriodFilter } from '@/types/relatorios'
 
 const DEFAULT_FILTER: ReportsPeriodFilter = { from: '', to: '', shortcut: 'todos' }
 
 export function RelatoriosView() {
   const [filter, setFilter] = useState<ReportsPeriodFilter>(DEFAULT_FILTER)
-  const [format, setFormat] = useState<ReportFormat>('CSV')
   const [exportingAll, setExportingAll] = useState(false)
 
   const { showSuccess, showError } = useAppSnackbar()
@@ -32,7 +30,7 @@ export function RelatoriosView() {
     setExportingAll(true)
 
     try {
-      await exportAllReports(format, filter)
+      await exportAllReports(filter)
       showSuccess('Relatórios exportados com sucesso.')
     } catch {
       showError('Não foi possível exportar todos os relatórios.')
@@ -42,51 +40,58 @@ export function RelatoriosView() {
   }
 
   return (
-    <Stack spacing={3}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          alignItems: { xs: 'flex-start', sm: 'center' },
-          justifyContent: 'space-between',
-          gap: 2,
-        }}
+    <Stack spacing={5}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={4}
+        justifyContent="space-between"
+        alignItems={{ xs: 'flex-start', sm: 'center' }}
       >
         <Box>
-          <Typography variant="h5" fontWeight={700}>
+          <Typography variant="h2" fontWeight={700} color="text.primary">
             Relatórios
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Consulte, filtre e exporte os dados operacionais do condomínio por módulo.
+          <Typography variant="body2" color="text.secondary" sx={{ mt: '4px' }}>
+            Volume de registros por módulo no período selecionado. Exporte cada base individualmente
+            ou todas de uma vez.
           </Typography>
         </Box>
 
         <Button
           variant="contained"
-          startIcon={
-            exportingAll ? <CircularProgress size={16} color="inherit" /> : <DownloadIcon />
-          }
+          startIcon={exportingAll ? <CircularProgress size={16} color="inherit" /> : undefined}
           disabled={exportingAll}
           onClick={handleExportAll}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Exportar todos
         </Button>
+      </Stack>
+
+      <ReportsPeriodFilterCard filter={filter} onChange={setFilter} />
+
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          gap: 1.5,
+          flexWrap: 'wrap',
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          Período:{' '}
+          <Box component="span" sx={{ fontFamily: 'monospace', color: 'text.primary' }}>
+            {getPeriodLabel(filter)}
+          </Box>
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {totalGeral} registros no total
+        </Typography>
       </Box>
-
-      <ReportsPeriodFilterCard
-        filter={filter}
-        onChange={setFilter}
-        format={format}
-        onFormatChange={setFormat}
-      />
-
-      <Typography variant="body2" color="text.secondary">
-        Período: {getPeriodLabel(filter)} · {totalGeral} registros no total
-      </Typography>
 
       <ReportModuleCardsGrid
         filter={filter}
-        format={format}
         counts={counts}
         isLoading={isLoading}
         isError={isError}
