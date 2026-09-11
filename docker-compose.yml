@@ -32,6 +32,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-controleportaria-dev-jwt-secret-2026-change-me}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
       DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:-controleportaria-dev-data-encryption-key-2026-change-me}
+      PLATFORM_SETUP_SECRET: ${PLATFORM_SETUP_SECRET:-controleportaria-dev-platform-setup-secret-2026-change-me}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
     depends_on:
       postgres:

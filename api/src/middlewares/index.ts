@@ -10,3 +10,4 @@
 
 export { authenticate } from './authenticate.js'
 export { authorizeRoles } from './authorize.js'
+export { requirePlatformSecret } from './platform-secret.js'

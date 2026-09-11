@@ -13,7 +13,7 @@ This file complements the repository root `CLAUDE.md`. It documents backend-spec
 
 - Layering is `*.routes.ts` → `*.controller.ts` → `*.service.ts` → Prisma. **No repository layer** — Prisma is only ever called from `*.service.ts` files.
 - Controllers do manual request parsing/coercion (`getBodyAsRecord`, `readOptionalString`, per-field parse helpers) before calling the service — keep new endpoints consistent with this instead of parsing/coercing inline in the service.
-- `auth` is the only module with public routes: `POST /register` and `POST /login` skip `authenticate`; `GET /me` requires `authenticate`; `GET /admin-area` requires `authenticate` + `authorizeRoles('ADMIN')`.
+- `POST /auth/login` is fully public (skips `authenticate`). `POST /auth/register` has two modes via the `registerGate` middleware in `auth.routes.ts`: a valid `x-platform-setup-secret` header bypasses `authenticate` entirely (bootstrap of a new tenant's first user, `condominiumId` read from the body); otherwise it requires `authenticate` + `authorizeRoles('ADMIN')`, and the controller then forces `condominiumId` from `req.authUser.condominiumId` (never the body) so an authenticated ADMIN can only create users in their own tenant. `GET /me` requires `authenticate`; `GET /admin-area` requires `authenticate` + `authorizeRoles('ADMIN')`. `POST /condominiums` similarly requires the `x-platform-setup-secret` header (`middlewares/platform-secret.ts`) — there is no authenticated path to create a new tenant.
 - `modules/auth/index.ts` has a stale doc comment describing a planned `auth.schema.ts` with Zod validation — **zod is not installed or used anywhere in this repo**; don't assume it exists.
 
 ## Prisma schema
@@ -37,7 +37,7 @@ This file complements the repository root `CLAUDE.md`. It documents backend-spec
 
 ## Role-based authorization
 
-- `middlewares/authorize.ts` exports `authorizeRoles(...roles)`. **Only two routes in the entire API use it**: `POST /auth/admin-area` and `PATCH /condominiums/me`. Every other domain module (residents, visitors, service-providers, authorizations, events, incidents, access-records, reports) only requires `authenticate` — any authenticated user, `ADMIN` or `PORTARIA`, can fully CRUD those resources today. This is current behavior, not necessarily the intended long-term state — if a task asks you to restrict an action to admins, confirm scope rather than assuming today's open access elsewhere is deliberate.
+- `middlewares/authorize.ts` exports `authorizeRoles(...roles)`. **Only three routes in the entire API use it**: `POST /auth/admin-area`, `PATCH /condominiums/me`, and the authenticated (non-bootstrap) mode of `POST /auth/register`. Every other domain module (residents, visitors, service-providers, authorizations, events, incidents, access-records, reports) only requires `authenticate` — any authenticated user, `ADMIN` or `PORTARIA`, can fully CRUD those resources today. This is current behavior, not necessarily the intended long-term state — if a task asks you to restrict an action to admins, confirm scope rather than assuming today's open access elsewhere is deliberate.
 
 ## Input validation
 
@@ -81,7 +81,7 @@ bcrypt, `SALT_ROUNDS = 10` (`lib/password.ts`).
 
 ## Env config
 
-`config/env.ts` does manual required-var checks (no schema library) that throw synchronously at module load — fail-fast on boot, not at request time — if `DATABASE_URL`, `JWT_SECRET`, or `DATA_ENCRYPTION_KEY` are missing. Optional vars with defaults: `PORT` (3333), `CORS_ORIGIN`, `JWT_EXPIRES_IN` (`1d`), `NODE_ENV`.
+`config/env.ts` does manual required-var checks (no schema library) that throw synchronously at module load — fail-fast on boot, not at request time — if `DATABASE_URL`, `JWT_SECRET`, `DATA_ENCRYPTION_KEY`, or `PLATFORM_SETUP_SECRET` are missing. Optional vars with defaults: `PORT` (3333), `CORS_ORIGIN`, `JWT_EXPIRES_IN` (`1d`), `NODE_ENV`. `PLATFORM_SETUP_SECRET` gates `POST /condominiums` and the bootstrap mode of `POST /auth/register` (`lib/platform-secret.ts`, `middlewares/platform-secret.ts`) — it is a shared operator secret, not tied to any tenant.
 
 ## TypeScript
 
@@ -93,4 +93,4 @@ bcrypt, `SALT_ROUNDS = 10` (`lib/password.ts`).
 Not necessarily bugs to fix opportunistically — flag with the user if a task touches these rather than silently changing scope:
 - No `helmet` or manual security headers (CSP, X-Frame-Options, etc.) anywhere in `app.ts`.
 - No input validation library — validation rigor varies by module.
-- Role-based authorization (`authorizeRoles`) is applied to only 2 of ~30+ routes (see above).
+- Role-based authorization (`authorizeRoles`) is applied to only 3 of ~30+ routes (see above).
