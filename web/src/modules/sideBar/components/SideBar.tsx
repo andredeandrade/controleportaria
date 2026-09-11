@@ -1,7 +1,6 @@
 'use client'
 
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
@@ -40,7 +39,7 @@ export default function SideBar({ onItemClick }: SideBarProps) {
     setIsLoggingOut(true)
     try {
       await logout()
-      router.push('/login')
+      router.push('/')
     } finally {
       setIsLoggingOut(false)
     }
@@ -217,15 +216,6 @@ export default function SideBar({ onItemClick }: SideBarProps) {
       {/* Ações de rodapé */}
       <Divider sx={{ mx: 2 }} />
       <List sx={{ px: '8px', py: '8px' }}>
-        <ListItem disablePadding sx={{ mb: '2px' }}>
-          <ListItemButton component={Link} href="/configuracoes" sx={itemButtonSx}>
-            <ListItemIcon>
-              <SettingsRoundedIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText primary="Configurações" slotProps={{ primary: { variant: 'body2' } }} />
-          </ListItemButton>
-        </ListItem>
-
         <ListItem disablePadding>
           <ListItemButton
             onClick={handleLogout}

@@ -1,11 +1,9 @@
 'use client'
 
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
-import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded'
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
 import AppBar from '@mui/material/AppBar'
 import Avatar from '@mui/material/Avatar'
-import Badge from '@mui/material/Badge'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
@@ -59,66 +57,38 @@ export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
         {/* Empurra os ícones para a direita */}
         <Box sx={{ flexGrow: 1 }} />
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <IconButton
-            color="inherit"
-            aria-label="Notificações"
+        <Stack direction="row" spacing="12px" alignItems="center">
+          <Avatar
             sx={{
+              width: 32,
+              height: 32,
+              bgcolor: 'background.paper',
               color: 'text.secondary',
-              '&:hover': {
-                color: 'primary.main',
-                backgroundColor: 'action.hover',
-              },
+              border: '1px solid',
+              borderColor: 'divider',
             }}
           >
-            <Badge
-              variant="dot"
-              sx={{
-                '& .MuiBadge-dot': {
-                  backgroundColor: 'success.main',
-                  width: 7,
-                  height: 7,
-                  borderRadius: '50%',
-                },
-              }}
-            >
-              <NotificationsNoneRoundedIcon fontSize="small" />
-            </Badge>
-          </IconButton>
+            <PersonRoundedIcon sx={{ fontSize: 18 }} />
+          </Avatar>
 
-          <Stack direction="row" spacing="12px" alignItems="center">
-            <Avatar
-              sx={{
-                width: 32,
-                height: 32,
-                bgcolor: 'background.paper',
-                color: 'text.secondary',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
+          <Box sx={{ minWidth: 0, display: { xs: 'none', sm: 'block' } }}>
+            <Typography
+              variant="subtitle2"
+              noWrap
+              sx={{ color: 'text.primary', fontWeight: 600, fontSize: '0.875rem' }}
             >
-              <PersonRoundedIcon sx={{ fontSize: 18 }} />
-            </Avatar>
-
-            <Box sx={{ minWidth: 0, display: { xs: 'none', sm: 'block' } }}>
-              <Typography
-                variant="subtitle2"
-                noWrap
-                sx={{ color: 'text.primary', fontWeight: 600, fontSize: '0.875rem' }}
-              >
-                {userName}
-              </Typography>
-              <Typography
-                variant="caption"
-                noWrap
-                sx={{ color: 'text.secondary', fontWeight: 400, lineHeight: 1.4 }}
-                component="p"
-              >
-                {roleLabel}
-              </Typography>
-            </Box>
-          </Stack>
-        </Box>
+              {userName}
+            </Typography>
+            <Typography
+              variant="caption"
+              noWrap
+              sx={{ color: 'text.secondary', fontWeight: 400, lineHeight: 1.4 }}
+              component="p"
+            >
+              {roleLabel}
+            </Typography>
+          </Box>
+        </Stack>
       </Toolbar>
     </AppBar>
   )
