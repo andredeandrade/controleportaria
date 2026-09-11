@@ -1,6 +1,8 @@
 export enum UserRole {
   ADMIN = 'ADMIN',
-  PORTARIA = 'PORTARIA',
+  GESTOR = 'GESTOR',
+  SINDICO = 'SINDICO',
+  SEGURANCA = 'SEGURANCA',
 }
 
 export type AuthenticatedUser = {

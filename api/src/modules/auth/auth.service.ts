@@ -4,7 +4,7 @@ import { comparePassword, hashPassword } from '../../lib/password.js'
 import { signAccessToken, type UserRole } from '../../lib/jwt.js'
 import type { LoginInput, RegisterInput } from './auth.types.js'
 
-const ALLOWED_ROLES: readonly UserRole[] = ['ADMIN', 'PORTARIA']
+const ALLOWED_ROLES: readonly UserRole[] = ['ADMIN', 'GESTOR', 'SINDICO', 'SEGURANCA']
 
 function normalizeEmail(email: string): string {
   return email.trim().toLowerCase()
@@ -75,7 +75,7 @@ export const authService = {
         name,
         email,
         passwordHash,
-        role: role ?? 'PORTARIA',
+        role: role ?? 'SEGURANCA',
       },
     })
 

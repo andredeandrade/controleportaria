@@ -2,7 +2,7 @@ import jwt, { type SignOptions } from 'jsonwebtoken'
 import { env } from '../config/env.js'
 import { HttpError } from './http-error.js'
 
-export type UserRole = 'ADMIN' | 'PORTARIA'
+export type UserRole = 'ADMIN' | 'GESTOR' | 'SINDICO' | 'SEGURANCA'
 
 export interface AuthTokenPayload {
   sub: string
@@ -33,7 +33,12 @@ export function verifyAccessToken(token: string): AuthTokenPayload {
       throw new HttpError(401, 'Token inválido.')
     }
 
-    if (payload.role !== 'ADMIN' && payload.role !== 'PORTARIA') {
+    if (
+      payload.role !== 'ADMIN' &&
+      payload.role !== 'GESTOR' &&
+      payload.role !== 'SINDICO' &&
+      payload.role !== 'SEGURANCA'
+    ) {
       throw new HttpError(401, 'Token inválido.')
     }
 

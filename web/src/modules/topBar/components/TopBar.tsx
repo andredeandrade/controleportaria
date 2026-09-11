@@ -19,11 +19,16 @@ type TopBarProps = {
 }
 
 function getRoleLabel(role: UserRole): string {
-  if (role === UserRole.ADMIN) {
-    return 'Administrador'
+  switch (role) {
+    case UserRole.ADMIN:
+      return 'Administrador'
+    case UserRole.GESTOR:
+      return 'Gestor'
+    case UserRole.SINDICO:
+      return 'Síndico'
+    case UserRole.SEGURANCA:
+      return 'Segurança'
   }
-
-  return 'Segurança'
 }
 
 export default function TopBar({ drawerWidth, onOpenMenu }: TopBarProps) {
