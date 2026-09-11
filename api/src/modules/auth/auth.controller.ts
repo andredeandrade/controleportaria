@@ -23,7 +23,13 @@ export const authController = {
       name: String(body['name'] ?? ''),
       email: String(body['email'] ?? ''),
       password: String(body['password'] ?? ''),
-      role: body['role'] === 'ADMIN' || body['role'] === 'PORTARIA' ? body['role'] : undefined,
+      role:
+        body['role'] === 'ADMIN' ||
+        body['role'] === 'GESTOR' ||
+        body['role'] === 'SINDICO' ||
+        body['role'] === 'SEGURANCA'
+          ? body['role']
+          : undefined,
     })
 
     res.status(201).json(result)

@@ -16,8 +16,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { useSidebarRoutes } from '@/hooks/useSidebarRoutes'
-import { logout } from '@/services/auth/service'
-import { useState } from 'react'
+import { useLogout } from '@/modules/topBar/hooks/useLogout'
 
 type SideBarProps = {
   onItemClick?: () => void
@@ -33,16 +32,12 @@ export default function SideBar({ onItemClick }: SideBarProps) {
   const pathname = usePathname() ?? ''
   const router = useRouter()
   const menuItems = useSidebarRoutes()
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const logoutMutation = useLogout()
+  const isLoggingOut = logoutMutation.isPending
 
   async function handleLogout() {
-    setIsLoggingOut(true)
-    try {
-      await logout()
-      router.push('/')
-    } finally {
-      setIsLoggingOut(false)
-    }
+    await logoutMutation.mutateAsync()
+    router.push('/')
   }
 
   const itemButtonSx = {
