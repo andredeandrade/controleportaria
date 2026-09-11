@@ -14,8 +14,12 @@ export const authController = {
   async register(req: Request, res: Response) {
     const body = getBodyAsRecord(req.body)
 
+    const condominiumId = req.authUser
+      ? req.authUser.condominiumId
+      : String(body['condominiumId'] ?? '')
+
     const result = await authService.register({
-      condominiumId: String(body['condominiumId'] ?? ''),
+      condominiumId,
       name: String(body['name'] ?? ''),
       email: String(body['email'] ?? ''),
       password: String(body['password'] ?? ''),

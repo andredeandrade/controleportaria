@@ -20,4 +20,5 @@ export const env = {
   dataEncryptionKey: required('DATA_ENCRYPTION_KEY'),
   jwtExpiresIn: process.env['JWT_EXPIRES_IN'] ?? '1d',
   nodeEnv: process.env['NODE_ENV'] ?? 'development',
+  platformSetupSecret: required('PLATFORM_SETUP_SECRET'),
 } as const

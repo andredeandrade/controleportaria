@@ -14,8 +14,10 @@ Fluxo recomendado:
 
 Endpoints de autenticação:
 
-- `POST /api/auth/register`: `condominiumId`, `name`, `email`, `password`, `role` (opcional)
+- `POST /api/auth/register`: `condominiumId`, `name`, `email`, `password`, `role` (opcional). Requer header `x-platform-setup-secret` (bootstrap do primeiro usuário de um condomínio) OU `Authorization: Bearer <token>` de um ADMIN já autenticado (que só cria usuários no próprio tenant — `condominiumId` do body é ignorado nesse caso).
 - `POST /api/auth/login`: `condominiumId`, `email`, `password`
+
+Criação de condomínio (`POST /api/condominiums`) também exige o header `x-platform-setup-secret` — ver `api/README.md` para o fluxo completo de onboarding.
 
 ## Stack
 
