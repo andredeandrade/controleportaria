@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { RegisterVisitorButton } from '@/modules/visitantes/components/RegisterVisitorButton'
 import { useVisitorListContext } from '@/modules/visitantes/context/VisitorListContext'
 import { VisitorsMobileListLoader } from '@/modules/visitantes/mobile/VisitorsMobileListLoader'
@@ -30,6 +31,8 @@ export function VisitorsMobileList() {
     handleOpenDeleteConfirmation,
     handleOpenView,
   } = useVisitorListContext()
+  const canUpdate = useCan('visitors', 'update')
+  const canRemove = useCan('visitors', 'remove')
 
   return (
     <Stack spacing={3}>
@@ -128,23 +131,27 @@ export function VisitorsMobileList() {
                     <Button variant="contained" color="primary" onClick={() => handleOpenView(record)}>
                       Visualizar
                     </Button>
-                    <Button
-                      variant="outlined"
-                      color="inherit"
-                      onClick={() => router.push(`/visitantes/${record.id}/editar`)}
-                      sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
-                    >
-                      Editar
-                    </Button>
+                    {canUpdate ? (
+                      <Button
+                        variant="outlined"
+                        color="inherit"
+                        onClick={() => router.push(`/visitantes/${record.id}/editar`)}
+                        sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+                      >
+                        Editar
+                      </Button>
+                    ) : null}
                   </Stack>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    aria-label="Excluir visitante"
-                    onClick={() => handleOpenDeleteConfirmation(record)}
-                  >
-                    <DeleteOutlineRoundedIcon fontSize="small" />
-                  </IconButton>
+                  {canRemove ? (
+                    <IconButton
+                      size="small"
+                      color="error"
+                      aria-label="Excluir visitante"
+                      onClick={() => handleOpenDeleteConfirmation(record)}
+                    >
+                      <DeleteOutlineRoundedIcon fontSize="small" />
+                    </IconButton>
+                  ) : null}
                 </Stack>
               </Stack>
             </MobileListCard>

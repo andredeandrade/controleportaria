@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { RegisterEventButton } from '@/modules/eventos/components/RegisterEventButton'
 import { useEventListContext } from '@/modules/eventos/context/EventListContext'
 import { EventsMobileListLoader } from '@/modules/eventos/mobile/EventsMobileListLoader'
@@ -29,6 +30,8 @@ export function EventsMobileList() {
     handleClearFilters,
     handleOpenDeleteConfirmation,
   } = useEventListContext()
+  const canUpdate = useCan('events', 'update')
+  const canRemove = useCan('events', 'remove')
 
   return (
     <Stack spacing={3}>
@@ -126,23 +129,27 @@ export function EventsMobileList() {
                   >
                     Visualizar
                   </Button>
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    onClick={() => router.push(`/eventos/${record.id}/editar`)}
-                    sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
-                  >
-                    Editar
-                  </Button>
+                  {canUpdate ? (
+                    <Button
+                      variant="outlined"
+                      color="inherit"
+                      onClick={() => router.push(`/eventos/${record.id}/editar`)}
+                      sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+                    >
+                      Editar
+                    </Button>
+                  ) : null}
                 </Stack>
-                <IconButton
-                  size="small"
-                  color="error"
-                  aria-label="Excluir evento"
-                  onClick={() => handleOpenDeleteConfirmation(record)}
-                >
-                  <DeleteOutlineRoundedIcon fontSize="small" />
-                </IconButton>
+                {canRemove ? (
+                  <IconButton
+                    size="small"
+                    color="error"
+                    aria-label="Excluir evento"
+                    onClick={() => handleOpenDeleteConfirmation(record)}
+                  >
+                    <DeleteOutlineRoundedIcon fontSize="small" />
+                  </IconButton>
+                ) : null}
               </Stack>
             </Stack>
           </MobileListCard>

@@ -14,6 +14,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { useState } from 'react'
 
 import type { Event, EventVehicle } from '@/app/api/events/types'
+import { useCan } from '@/hooks/useCan'
 import { EventAddVehicleDialog } from '@/modules/eventos/components/EventAddVehicleDialog'
 import { useCheckOutEventVehicle } from '@/modules/eventos/hooks/useCheckOutEventVehicle'
 import { useDeleteEventVehicle } from '@/modules/eventos/hooks/useDeleteEventVehicle'
@@ -41,6 +42,7 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [addVehicleOpen, setAddVehicleOpen] = useState(false)
   const { showSuccess, showError } = useAppSnackbar()
+  const canUpdate = useCan('events', 'update')
   const checkOutMutation = useCheckOutEventVehicle()
   const deleteMutation = useDeleteEventVehicle()
 
@@ -79,6 +81,10 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
   }
 
   const renderAction = (vehicle: EventVehicle, fullWidth: boolean) => {
+    if (!canUpdate) {
+      return null
+    }
+
     if (!vehicle.checkOutAt) {
       return (
         <Button
@@ -139,7 +145,7 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
               <Typography variant="h4">Veículos no Evento</Typography>
             </Stack>
 
-            {!isMobile ? (
+            {!isMobile && canUpdate ? (
               <Button
                 variant="contained"
                 color="primary"
@@ -242,7 +248,7 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
             </Table>
           )}
 
-          {isMobile ? (
+          {isMobile && canUpdate ? (
             <Button variant="contained" color="primary" fullWidth onClick={() => setAddVehicleOpen(true)}>
               + Adicionar veículo
             </Button>

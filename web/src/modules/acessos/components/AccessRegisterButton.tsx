@@ -5,6 +5,8 @@ import Button from '@mui/material/Button'
 import type { SxProps, Theme } from '@mui/material/styles'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
+
 type AccessRegisterButtonProps = {
   fullWidth?: boolean
   size?: 'medium' | 'large'
@@ -17,6 +19,11 @@ export function AccessRegisterButton({
   sx,
 }: AccessRegisterButtonProps) {
   const router = useRouter()
+  const canCheckIn = useCan('access-records', 'checkIn')
+
+  if (!canCheckIn) {
+    return null
+  }
 
   const handleNavigateToRegister = () => {
     router.push('/acessos/registrar')

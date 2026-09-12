@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { useServiceProviderListContext } from '@/modules/prestadores-servicos/context/ServiceProviderListContext'
 import { TableCell } from '@/modules/table/components/TableCell'
 import { TableRow } from '@/modules/table/components/TableRow'
@@ -21,6 +22,8 @@ type ServiceProvidersTableRowProps = {
 export function ServiceProvidersTableRow({ record }: ServiceProvidersTableRowProps) {
   const router = useRouter()
   const { handleOpenDeleteConfirmation, handleOpenView } = useServiceProviderListContext()
+  const canUpdate = useCan('service-providers', 'update')
+  const canRemove = useCan('service-providers', 'remove')
   const hasVehicle = Boolean(
     record.vehiclePlate || record.vehicleBrandModel || record.vehicleColor,
   )
@@ -89,20 +92,24 @@ export function ServiceProvidersTableRow({ record }: ServiceProvidersTableRowPro
           >
             <VisibilityRoundedIcon fontSize="small" />
           </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Editar prestador de serviço"
-            onClick={() => router.push(`/prestadores-servicos/${record.id}/editar`)}
-          >
-            <EditRoundedIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Excluir prestador de serviço"
-            onClick={() => handleOpenDeleteConfirmation(record)}
-          >
-            <DeleteOutlineRoundedIcon fontSize="small" />
-          </IconButton>
+          {canUpdate ? (
+            <IconButton
+              size="small"
+              aria-label="Editar prestador de serviço"
+              onClick={() => router.push(`/prestadores-servicos/${record.id}/editar`)}
+            >
+              <EditRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
+          {canRemove ? (
+            <IconButton
+              size="small"
+              aria-label="Excluir prestador de serviço"
+              onClick={() => handleOpenDeleteConfirmation(record)}
+            >
+              <DeleteOutlineRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
         </Stack>
       </TableCell>
     </TableRow>

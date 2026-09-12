@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { RegisterResidentButton } from '@/modules/moradores/components/RegisterResidentButton'
 import { useResidentListContext } from '@/modules/moradores/context/ResidentListContext'
 import { ResidentsMobileListLoader } from '@/modules/moradores/mobile/ResidentsMobileListLoader'
@@ -34,6 +35,8 @@ export function ResidentsMobileList() {
     handleOpenDeleteConfirmation,
     handleOpenView,
   } = useResidentListContext()
+  const canUpdate = useCan('residents', 'update')
+  const canRemove = useCan('residents', 'remove')
 
   return (
     <Stack spacing={3}>
@@ -135,23 +138,27 @@ export function ResidentsMobileList() {
                     <Button variant="contained" color="primary" onClick={() => handleOpenView(record)}>
                       Visualizar
                     </Button>
-                    <Button
-                      variant="outlined"
-                      color="inherit"
-                      onClick={() => router.push(`/moradores/${record.id}/editar`)}
-                      sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
-                    >
-                      Editar
-                    </Button>
+                    {canUpdate ? (
+                      <Button
+                        variant="outlined"
+                        color="inherit"
+                        onClick={() => router.push(`/moradores/${record.id}/editar`)}
+                        sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+                      >
+                        Editar
+                      </Button>
+                    ) : null}
                   </Stack>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    aria-label="Excluir morador"
-                    onClick={() => handleOpenDeleteConfirmation(record)}
-                  >
-                    <DeleteOutlineRoundedIcon fontSize="small" />
-                  </IconButton>
+                  {canRemove ? (
+                    <IconButton
+                      size="small"
+                      color="error"
+                      aria-label="Excluir morador"
+                      onClick={() => handleOpenDeleteConfirmation(record)}
+                    >
+                      <DeleteOutlineRoundedIcon fontSize="small" />
+                    </IconButton>
+                  ) : null}
                 </Stack>
               </Stack>
             </MobileListCard>

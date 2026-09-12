@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { RegisterOccurrenceButton } from '@/modules/ocorrencias/components/RegisterOccurrenceButton'
 import { useOccurrenceListContext } from '@/modules/ocorrencias/context/OccurrenceListContext'
 import { OccurrencesMobileListLoader } from '@/modules/ocorrencias/mobile/OccurrencesMobileListLoader'
@@ -29,6 +30,8 @@ export function OccurrencesMobileList() {
     handleOpenDeleteConfirmation,
     handleOpenView,
   } = useOccurrenceListContext()
+  const canUpdate = useCan('incidents', 'update')
+  const canRemove = useCan('incidents', 'remove')
 
   const handleEdit = (id: string) => {
     router.push(`/ocorrencias/${id}/editar`)
@@ -105,23 +108,27 @@ export function OccurrencesMobileList() {
                   >
                     Visualizar
                   </Button>
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    onClick={() => handleEdit(record.id)}
-                    sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
-                  >
-                    Editar
-                  </Button>
+                  {canUpdate ? (
+                    <Button
+                      variant="outlined"
+                      color="inherit"
+                      onClick={() => handleEdit(record.id)}
+                      sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+                    >
+                      Editar
+                    </Button>
+                  ) : null}
                 </Stack>
-                <IconButton
-                  size="small"
-                  color="error"
-                  aria-label="Excluir ocorrência"
-                  onClick={() => handleOpenDeleteConfirmation(record)}
-                >
-                  <DeleteOutlineRoundedIcon fontSize="small" />
-                </IconButton>
+                {canRemove ? (
+                  <IconButton
+                    size="small"
+                    color="error"
+                    aria-label="Excluir ocorrência"
+                    onClick={() => handleOpenDeleteConfirmation(record)}
+                  >
+                    <DeleteOutlineRoundedIcon fontSize="small" />
+                  </IconButton>
+                ) : null}
               </Stack>
             </Stack>
           </MobileListCard>

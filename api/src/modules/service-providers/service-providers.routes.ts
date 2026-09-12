@@ -1,13 +1,34 @@
 import { Router } from 'express'
 import { authenticate } from '../../middlewares/authenticate.js'
+import { authorizePermission } from '../../middlewares/authorize.js'
 import { serviceProvidersController } from './service-providers.controller.js'
 
 export const serviceProvidersRouter = Router()
 
 serviceProvidersRouter.use(authenticate)
 
-serviceProvidersRouter.post('/', serviceProvidersController.create)
-serviceProvidersRouter.get('/', serviceProvidersController.list)
-serviceProvidersRouter.get('/:id', serviceProvidersController.getById)
-serviceProvidersRouter.patch('/:id', serviceProvidersController.update)
-serviceProvidersRouter.delete('/:id', serviceProvidersController.remove)
+serviceProvidersRouter.post(
+  '/',
+  authorizePermission('service-providers', 'create'),
+  serviceProvidersController.create,
+)
+serviceProvidersRouter.get(
+  '/',
+  authorizePermission('service-providers', 'view'),
+  serviceProvidersController.list,
+)
+serviceProvidersRouter.get(
+  '/:id',
+  authorizePermission('service-providers', 'view'),
+  serviceProvidersController.getById,
+)
+serviceProvidersRouter.patch(
+  '/:id',
+  authorizePermission('service-providers', 'update'),
+  serviceProvidersController.update,
+)
+serviceProvidersRouter.delete(
+  '/:id',
+  authorizePermission('service-providers', 'remove'),
+  serviceProvidersController.remove,
+)

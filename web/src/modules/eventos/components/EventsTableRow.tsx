@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { useEventListContext } from '@/modules/eventos/context/EventListContext'
 import { TableCell } from '@/modules/table/components/TableCell'
 import { TableRow } from '@/modules/table/components/TableRow'
@@ -21,6 +22,8 @@ type EventsTableRowProps = {
 export function EventsTableRow({ record }: EventsTableRowProps) {
   const router = useRouter()
   const { handleOpenDeleteConfirmation } = useEventListContext()
+  const canUpdate = useCan('events', 'update')
+  const canRemove = useCan('events', 'remove')
 
   return (
     <TableRow>
@@ -73,20 +76,24 @@ export function EventsTableRow({ record }: EventsTableRowProps) {
           >
             <VisibilityRoundedIcon fontSize="small" />
           </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Editar evento"
-            onClick={() => router.push(`/eventos/${record.id}/editar`)}
-          >
-            <EditRoundedIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Excluir evento"
-            onClick={() => handleOpenDeleteConfirmation(record)}
-          >
-            <DeleteOutlineRoundedIcon fontSize="small" />
-          </IconButton>
+          {canUpdate ? (
+            <IconButton
+              size="small"
+              aria-label="Editar evento"
+              onClick={() => router.push(`/eventos/${record.id}/editar`)}
+            >
+              <EditRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
+          {canRemove ? (
+            <IconButton
+              size="small"
+              aria-label="Excluir evento"
+              onClick={() => handleOpenDeleteConfirmation(record)}
+            >
+              <DeleteOutlineRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
         </Stack>
       </TableCell>
     </TableRow>

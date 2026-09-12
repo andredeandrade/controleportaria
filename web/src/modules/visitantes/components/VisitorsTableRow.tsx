@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { useVisitorListContext } from '@/modules/visitantes/context/VisitorListContext'
 import { TableCell } from '@/modules/table/components/TableCell'
 import { TableRow } from '@/modules/table/components/TableRow'
@@ -21,6 +22,8 @@ type VisitorsTableRowProps = {
 export function VisitorsTableRow({ record }: VisitorsTableRowProps) {
   const router = useRouter()
   const { handleOpenDeleteConfirmation, handleOpenView } = useVisitorListContext()
+  const canUpdate = useCan('visitors', 'update')
+  const canRemove = useCan('visitors', 'remove')
   const hasVehicle = Boolean(record.vehiclePlate || record.vehicleBrandModel || record.vehicleColor)
   const vehicleDescription = [record.vehicleBrandModel, record.vehicleColor]
     .filter(Boolean)
@@ -83,20 +86,24 @@ export function VisitorsTableRow({ record }: VisitorsTableRowProps) {
           >
             <VisibilityRoundedIcon fontSize="small" />
           </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Editar visitante"
-            onClick={() => router.push(`/visitantes/${record.id}/editar`)}
-          >
-            <EditRoundedIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Excluir visitante"
-            onClick={() => handleOpenDeleteConfirmation(record)}
-          >
-            <DeleteOutlineRoundedIcon fontSize="small" />
-          </IconButton>
+          {canUpdate ? (
+            <IconButton
+              size="small"
+              aria-label="Editar visitante"
+              onClick={() => router.push(`/visitantes/${record.id}/editar`)}
+            >
+              <EditRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
+          {canRemove ? (
+            <IconButton
+              size="small"
+              aria-label="Excluir visitante"
+              onClick={() => handleOpenDeleteConfirmation(record)}
+            >
+              <DeleteOutlineRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
         </Stack>
       </TableCell>
     </TableRow>

@@ -9,8 +9,10 @@ import Groups2RoundedIcon from '@mui/icons-material/Groups2Rounded'
 import HistoryRoundedIcon from '@mui/icons-material/HistoryRounded'
 import ReportProblemRoundedIcon from '@mui/icons-material/ReportProblemRounded'
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded'
-import { useMemo } from 'react'
 import type { ElementType } from 'react'
+
+import { UserRole } from '@/app/api/auth/me/types'
+import { useAuthenticatedUser } from '@/hooks/useAuthenticatedUser'
 
 export type SidebarChildRoute = {
   label: string
@@ -73,5 +75,11 @@ const sidebarRoutesConfig: SidebarRoute[] = [
 ]
 
 export function useSidebarRoutes(): SidebarRoute[] {
-  return useMemo(() => sidebarRoutesConfig, [])
+  const { data: user } = useAuthenticatedUser()
+
+  if (user?.role === UserRole.SEGURANCA) {
+    return sidebarRoutesConfig.filter((route) => route.href !== '/relatorios')
+  }
+
+  return sidebarRoutesConfig
 }

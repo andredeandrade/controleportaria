@@ -2,6 +2,7 @@ import { decryptText, encryptText } from '../../lib/crypto.js'
 import { HttpError } from '../../lib/http-error.js'
 import { prisma } from '../../lib/prisma.js'
 import type {
+  CreateEventGuestInput,
   CreateEventInput,
   CreateEventVehicleInput,
   EventGuestInput,
@@ -714,6 +715,38 @@ export const eventsService = {
       data: {
         checkOutAt: new Date(),
         checkedOutByUserId: userId,
+      },
+    })
+
+    return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))
+  },
+
+  async addGuest(
+    eventId: string,
+    condominiumId: string,
+    input: CreateEventGuestInput,
+  ): Promise<EventResponse> {
+    const trimmedEventId = eventId.trim()
+
+    if (!trimmedEventId) {
+      throw new HttpError(400, 'ID do evento é obrigatório.')
+    }
+
+    await loadEventOrThrow(trimmedEventId, condominiumId)
+
+    const name = input.name.trim()
+
+    if (name.length < 3) {
+      throw new HttpError(400, 'Nome do convidado deve ter ao menos 3 caracteres.')
+    }
+
+    const document = normalizeOptionalText(input.document)
+
+    await prisma.eventGuest.create({
+      data: {
+        eventId: trimmedEventId,
+        name,
+        documentEncrypted: document ? encryptText(document) : null,
       },
     })
 

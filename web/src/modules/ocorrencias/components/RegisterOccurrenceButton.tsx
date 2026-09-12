@@ -5,6 +5,8 @@ import Button from '@mui/material/Button'
 import type { SxProps, Theme } from '@mui/material/styles'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
+
 type RegisterOccurrenceButtonProps = {
   fullWidth?: boolean
   size?: 'medium' | 'large'
@@ -17,6 +19,11 @@ export function RegisterOccurrenceButton({
   sx,
 }: RegisterOccurrenceButtonProps) {
   const router = useRouter()
+  const canCreate = useCan('incidents', 'create')
+
+  if (!canCreate) {
+    return null
+  }
 
   const handleNavigateToRegister = () => {
     router.push('/ocorrencias/registrar')

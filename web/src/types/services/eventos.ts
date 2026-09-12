@@ -14,6 +14,8 @@ export type CheckOutEventGuestApiResponseBody = ({ message?: string } & Partial<
 
 export type CreateEventVehicleApiResponseBody = ({ message?: string } & Partial<Event>) | null
 
+export type CreateEventGuestApiResponseBody = ({ message?: string } & Partial<Event>) | null
+
 export type CheckOutEventVehicleApiResponseBody = ({ message?: string } & Partial<Event>) | null
 
 export type DeleteEventVehicleApiResponseBody = ({ message?: string } & Partial<Event>) | null

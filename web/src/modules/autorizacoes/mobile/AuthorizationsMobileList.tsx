@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { RegisterAuthorizationButton } from '@/modules/autorizacoes/components/RegisterAuthorizationButton'
 import { useAuthorizationListContext } from '@/modules/autorizacoes/context/AuthorizationListContext'
 import { AuthorizationsMobileListLoader } from '@/modules/autorizacoes/mobile/AuthorizationsMobileListLoader'
@@ -30,6 +31,8 @@ export function AuthorizationsMobileList() {
     handleOpenDeleteConfirmation,
     handleOpenView,
   } = useAuthorizationListContext()
+  const canUpdate = useCan('authorizations', 'update')
+  const canRemove = useCan('authorizations', 'remove')
 
   return (
     <Stack spacing={3}>
@@ -103,23 +106,27 @@ export function AuthorizationsMobileList() {
                   <Button variant="contained" color="primary" onClick={() => handleOpenView(record)}>
                     Visualizar
                   </Button>
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    onClick={() => router.push(`/autorizacoes/${record.id}/editar`)}
-                    sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
-                  >
-                    Editar
-                  </Button>
+                  {canUpdate ? (
+                    <Button
+                      variant="outlined"
+                      color="inherit"
+                      onClick={() => router.push(`/autorizacoes/${record.id}/editar`)}
+                      sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+                    >
+                      Editar
+                    </Button>
+                  ) : null}
                 </Stack>
-                <IconButton
-                  size="small"
-                  color="error"
-                  aria-label="Excluir autorização"
-                  onClick={() => handleOpenDeleteConfirmation(record)}
-                >
-                  <DeleteOutlineRoundedIcon fontSize="small" />
-                </IconButton>
+                {canRemove ? (
+                  <IconButton
+                    size="small"
+                    color="error"
+                    aria-label="Excluir autorização"
+                    onClick={() => handleOpenDeleteConfirmation(record)}
+                  >
+                    <DeleteOutlineRoundedIcon fontSize="small" />
+                  </IconButton>
+                ) : null}
               </Stack>
             </Stack>
           </MobileListCard>

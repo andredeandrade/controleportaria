@@ -62,6 +62,11 @@ export interface CreateEventVehicleInput {
   color?: string
 }
 
+export interface CreateEventGuestInput {
+  name: string
+  document?: string
+}
+
 export interface EventResponse {
   id: string
   title: string

@@ -1,4 +1,5 @@
 import type {
+  CreateEventGuestRequest,
   CreateEventRequest,
   CreateEventVehicleRequest,
   Event,
@@ -10,6 +11,7 @@ import type {
   CheckInEventGuestApiResponseBody,
   CheckOutEventGuestApiResponseBody,
   CheckOutEventVehicleApiResponseBody,
+  CreateEventGuestApiResponseBody,
   CreateEventVehicleApiResponseBody,
   DeleteEventVehicleApiResponseBody,
   GetEventApiResponseBody,
@@ -233,6 +235,34 @@ export async function createEventVehicle({
 
   if (!responseBody?.id) {
     throw new EventsServiceError('Resposta inválida ao adicionar o veículo.')
+  }
+
+  return responseBody as Event
+}
+
+export async function createEventGuest({
+  eventId,
+  ...payload
+}: { eventId: string } & CreateEventGuestRequest): Promise<Event> {
+  const response = await fetch('/api/events/guests', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ eventId, ...payload }),
+  })
+
+  const responseBody = (await safeReadJson(response)) as CreateEventGuestApiResponseBody
+
+  if (!response.ok) {
+    throw new EventsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível adicionar o convidado.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new EventsServiceError('Resposta inválida ao adicionar o convidado.')
   }
 
   return responseBody as Event
