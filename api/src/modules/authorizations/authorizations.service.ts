@@ -12,7 +12,7 @@ const PAGE_MIN = 1
 const PAGE_SIZE_MIN = 1
 const PAGE_SIZE_MAX = 100
 
-const PERSON_TYPES = new Set<string>(['morador', 'visitante', 'prestador_servico', 'colaborador'])
+const PERSON_TYPES = new Set<string>(['morador', 'visitante', 'prestador_servico'])
 
 function normalizeOptionalText(value: string | null | undefined): string | null {
   if (value === undefined || value === null) {

@@ -28,5 +28,4 @@ export const PERSON_TYPE_LABEL: Record<PersonTypeValue, string> = {
   morador: 'Morador',
   visitante: 'Visitante',
   prestador_servico: 'Prestador de servico',
-  colaborador: 'Colaborador',
 }
