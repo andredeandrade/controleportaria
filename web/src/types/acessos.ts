@@ -37,7 +37,6 @@ export const ACCESS_PERSON_CATEGORY_LABEL: Record<string, string> = {
   morador: 'Morador',
   visitante: 'Visitante',
   prestador_servico: 'Prestador de servico',
-  colaborador: 'Colaborador',
 }
 
 export const ACCESS_LOCOMOTION_LABEL: Record<string, string> = {

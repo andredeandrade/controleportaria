@@ -14,12 +14,7 @@ const PAGE_MIN = 1
 const PAGE_SIZE_MIN = 1
 const PAGE_SIZE_MAX = 100
 
-const PERSON_CATEGORIES = new Set<string>([
-  'morador',
-  'visitante',
-  'prestador_servico',
-  'colaborador',
-])
+const PERSON_CATEGORIES = new Set<string>(['morador', 'visitante', 'prestador_servico'])
 const LOCOMOTION_OPTIONS = new Set<string>([
   'a_pe',
   'carro',

@@ -7,7 +7,6 @@ export const PERSON_TYPE_OPTIONS = [
   { label: 'Morador', value: 'morador' },
   { label: 'Visitante', value: 'visitante' },
   { label: 'Prestador de servico', value: 'prestador_servico' },
-  { label: 'Colaborador', value: 'colaborador' },
 ] as const
 
 export type PersonTypeValue = (typeof PERSON_TYPE_OPTIONS)[number]['value']
