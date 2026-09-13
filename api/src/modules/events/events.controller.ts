@@ -1,7 +1,12 @@
 import type { Request, Response } from 'express'
 import { HttpError } from '../../lib/http-error.js'
 import { eventsService } from './events.service.js'
-import type { CreateEventVehicleInput, EventGuestInput, UpdateEventInput } from './events.types.js'
+import type {
+  CreateEventGuestInput,
+  CreateEventVehicleInput,
+  EventGuestInput,
+  UpdateEventInput,
+} from './events.types.js'
 
 function getBodyAsRecord(body: unknown): Record<string, unknown> {
   if (!body || typeof body !== 'object') {
@@ -49,6 +54,13 @@ function parseCreateVehicleInput(body: Record<string, unknown>): CreateEventVehi
     brandModel: readOptionalString(body['brandModel']),
     driverName: readOptionalString(body['driverName']),
     color: readOptionalString(body['color']),
+  }
+}
+
+function parseAddGuestInput(body: Record<string, unknown>): CreateEventGuestInput {
+  return {
+    name: String(body['name'] ?? ''),
+    document: readOptionalString(body['document']),
   }
 }
 
@@ -233,6 +245,22 @@ export const eventsController = {
     )
 
     res.json(event)
+  },
+
+  async addGuest(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const body = getBodyAsRecord(req.body)
+
+    const event = await eventsService.addGuest(
+      String(req.params['id'] ?? ''),
+      req.authUser.condominiumId,
+      parseAddGuestInput(body),
+    )
+
+    res.status(201).json(event)
   },
 
   async deleteVehicle(req: Request, res: Response) {

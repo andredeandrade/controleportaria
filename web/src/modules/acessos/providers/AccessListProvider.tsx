@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from 'react'
 
+import { useCan } from '@/hooks/useCan'
 import {
   AccessListContext,
   type AccessListContextValue,
@@ -25,7 +26,8 @@ export function AccessListProvider({
   const selection = useListSelection<AccessRecord>()
   const checkOutMutation = useCheckOutAccessRecord()
 
-  const showExitActions = true
+  const canCheckOut = useCan('access-records', 'checkOut')
+  const showExitActions = canCheckOut
 
   const handleClearFilters = () => {
     query.handleSearchChange('')

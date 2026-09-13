@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { RegisterServiceProviderButton } from '@/modules/prestadores-servicos/components/RegisterServiceProviderButton'
 import { useServiceProviderListContext } from '@/modules/prestadores-servicos/context/ServiceProviderListContext'
 import { ServiceProvidersMobileListLoader } from '@/modules/prestadores-servicos/mobile/ServiceProvidersMobileListLoader'
@@ -30,6 +31,8 @@ export function ServiceProvidersMobileList() {
     handleOpenDeleteConfirmation,
     handleOpenView,
   } = useServiceProviderListContext()
+  const canUpdate = useCan('service-providers', 'update')
+  const canRemove = useCan('service-providers', 'remove')
 
   return (
     <Stack spacing={3}>
@@ -128,23 +131,27 @@ export function ServiceProvidersMobileList() {
                     <Button variant="contained" color="primary" onClick={() => handleOpenView(record)}>
                       Visualizar
                     </Button>
-                    <Button
-                      variant="outlined"
-                      color="inherit"
-                      onClick={() => router.push(`/prestadores-servicos/${record.id}/editar`)}
-                      sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
-                    >
-                      Editar
-                    </Button>
+                    {canUpdate ? (
+                      <Button
+                        variant="outlined"
+                        color="inherit"
+                        onClick={() => router.push(`/prestadores-servicos/${record.id}/editar`)}
+                        sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+                      >
+                        Editar
+                      </Button>
+                    ) : null}
                   </Stack>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    aria-label="Excluir prestador de serviço"
-                    onClick={() => handleOpenDeleteConfirmation(record)}
-                  >
-                    <DeleteOutlineRoundedIcon fontSize="small" />
-                  </IconButton>
+                  {canRemove ? (
+                    <IconButton
+                      size="small"
+                      color="error"
+                      aria-label="Excluir prestador de serviço"
+                      onClick={() => handleOpenDeleteConfirmation(record)}
+                    >
+                      <DeleteOutlineRoundedIcon fontSize="small" />
+                    </IconButton>
+                  ) : null}
                 </Stack>
               </Stack>
             </MobileListCard>

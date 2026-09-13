@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { useResidentListContext } from '@/modules/moradores/context/ResidentListContext'
 import {
   DEFAULT_RESIDENT_CATEGORY_CHIP_COLOR,
@@ -25,6 +26,8 @@ type ResidentsTableRowProps = {
 export function ResidentsTableRow({ record }: ResidentsTableRowProps) {
   const router = useRouter()
   const { handleOpenDeleteConfirmation, handleOpenView } = useResidentListContext()
+  const canUpdate = useCan('residents', 'update')
+  const canRemove = useCan('residents', 'remove')
   const chipColor =
     residentCategoryChipColor[record.relation.toLowerCase()] ??
     DEFAULT_RESIDENT_CATEGORY_CHIP_COLOR
@@ -86,20 +89,24 @@ export function ResidentsTableRow({ record }: ResidentsTableRowProps) {
           >
             <VisibilityRoundedIcon fontSize="small" />
           </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Editar morador"
-            onClick={() => router.push(`/moradores/${record.id}/editar`)}
-          >
-            <EditRoundedIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Excluir morador"
-            onClick={() => handleOpenDeleteConfirmation(record)}
-          >
-            <DeleteOutlineRoundedIcon fontSize="small" />
-          </IconButton>
+          {canUpdate ? (
+            <IconButton
+              size="small"
+              aria-label="Editar morador"
+              onClick={() => router.push(`/moradores/${record.id}/editar`)}
+            >
+              <EditRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
+          {canRemove ? (
+            <IconButton
+              size="small"
+              aria-label="Excluir morador"
+              onClick={() => handleOpenDeleteConfirmation(record)}
+            >
+              <DeleteOutlineRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
         </Stack>
       </TableCell>
     </TableRow>

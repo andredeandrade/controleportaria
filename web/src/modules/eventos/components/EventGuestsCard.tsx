@@ -13,6 +13,8 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import { useState } from 'react'
 
 import type { Event, EventGuest } from '@/app/api/events/types'
+import { useCan } from '@/hooks/useCan'
+import { EventAddGuestDialog } from '@/modules/eventos/components/EventAddGuestDialog'
 import { useCheckInEventGuest } from '@/modules/eventos/hooks/useCheckInEventGuest'
 import { useCheckOutEventGuest } from '@/modules/eventos/hooks/useCheckOutEventGuest'
 import { Table } from '@/modules/table/components/Table'
@@ -66,7 +68,10 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [searchTerm, setSearchTerm] = useState('')
+  const [addGuestOpen, setAddGuestOpen] = useState(false)
   const { showSuccess, showError } = useAppSnackbar()
+  const canUpdate = useCan('events', 'update')
+  const canAddGuest = useCan('events', 'addGuest')
   const checkInMutation = useCheckInEventGuest()
   const checkOutMutation = useCheckOutEventGuest()
 
@@ -127,7 +132,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
 
   const renderAction = (guest: EventGuest, status: GuestStatus, fullWidth: boolean) => {
     if (status === 'aguardando') {
-      return (
+      return canUpdate ? (
         <Button
           variant="contained"
           color="primary"
@@ -138,11 +143,11 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
         >
           Registrar entrada
         </Button>
-      )
+      ) : null
     }
 
     if (status === 'dentro') {
-      return (
+      return canUpdate ? (
         <Button
           variant="outlined"
           color="inherit"
@@ -153,7 +158,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
         >
           Registrar saída
         </Button>
-      )
+      ) : null
     }
 
     return (
@@ -180,12 +185,25 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
               <Chip size="small" color="success" label={`${guestsCount} na lista`} />
             </Stack>
 
-            <ListSearchField
-              value={searchTerm}
-              onChange={setSearchTerm}
-              placeholder="Buscar convidado..."
-              sx={{ width: { xs: '100%', sm: 260 } }}
-            />
+            <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" rowGap={2}>
+              <ListSearchField
+                value={searchTerm}
+                onChange={setSearchTerm}
+                placeholder="Buscar convidado..."
+                sx={{ width: { xs: '100%', sm: 260 } }}
+              />
+
+              {!isMobile && canAddGuest ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  onClick={() => setAddGuestOpen(true)}
+                >
+                  + Adicionar convidado
+                </Button>
+              ) : null}
+            </Stack>
           </Stack>
 
           <Typography variant="body2" color="text.secondary">
@@ -278,8 +296,20 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
               </TableBody>
             </Table>
           )}
+
+          {isMobile && canAddGuest ? (
+            <Button variant="contained" color="primary" fullWidth onClick={() => setAddGuestOpen(true)}>
+              + Adicionar convidado
+            </Button>
+          ) : null}
         </Stack>
       </CardContent>
+
+      <EventAddGuestDialog
+        open={addGuestOpen}
+        onClose={() => setAddGuestOpen(false)}
+        eventId={event.id}
+      />
     </MuiCard>
   )
 }

@@ -1,6 +1,8 @@
 import { ACCESS_TOKEN_COOKIE_NAME, getApiBaseUrls } from './lib/auth/session'
+import { hasPermission, type ResourceActionMap } from './lib/permissions/permissions'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import type { AuthenticatedUser, AuthMeResponse } from './app/api/auth/me/types'
 
 const PROTECTED_ROUTE_PREFIXES = [
   '/dashboard',
@@ -14,13 +16,107 @@ const PROTECTED_ROUTE_PREFIXES = [
   '/relatorios',
 ] as const
 
+type PermissionRule = {
+  [Resource in keyof ResourceActionMap]: {
+    pattern: RegExp
+    resource: Resource
+    action: ResourceActionMap[Resource]
+    redirectTo: string
+  }
+}[keyof ResourceActionMap]
+
+const PERMISSION_RULES: PermissionRule[] = [
+  {
+    pattern: /^\/moradores\/cadastrar$/,
+    resource: 'residents',
+    action: 'create',
+    redirectTo: '/moradores',
+  },
+  {
+    pattern: /^\/moradores\/[^/]+\/editar$/,
+    resource: 'residents',
+    action: 'update',
+    redirectTo: '/moradores',
+  },
+  {
+    pattern: /^\/visitantes\/cadastrar$/,
+    resource: 'visitors',
+    action: 'create',
+    redirectTo: '/visitantes',
+  },
+  {
+    pattern: /^\/visitantes\/[^/]+\/editar$/,
+    resource: 'visitors',
+    action: 'update',
+    redirectTo: '/visitantes',
+  },
+  {
+    pattern: /^\/prestadores-servicos\/cadastrar$/,
+    resource: 'service-providers',
+    action: 'create',
+    redirectTo: '/prestadores-servicos',
+  },
+  {
+    pattern: /^\/prestadores-servicos\/[^/]+\/editar$/,
+    resource: 'service-providers',
+    action: 'update',
+    redirectTo: '/prestadores-servicos',
+  },
+  {
+    pattern: /^\/autorizacoes\/cadastrar$/,
+    resource: 'authorizations',
+    action: 'create',
+    redirectTo: '/autorizacoes',
+  },
+  {
+    pattern: /^\/autorizacoes\/[^/]+\/editar$/,
+    resource: 'authorizations',
+    action: 'update',
+    redirectTo: '/autorizacoes',
+  },
+  {
+    pattern: /^\/eventos\/cadastrar$/,
+    resource: 'events',
+    action: 'create',
+    redirectTo: '/eventos',
+  },
+  {
+    pattern: /^\/eventos\/[^/]+\/editar$/,
+    resource: 'events',
+    action: 'update',
+    redirectTo: '/eventos',
+  },
+  {
+    pattern: /^\/ocorrencias\/registrar$/,
+    resource: 'incidents',
+    action: 'create',
+    redirectTo: '/ocorrencias',
+  },
+  {
+    pattern: /^\/ocorrencias\/[^/]+\/editar$/,
+    resource: 'incidents',
+    action: 'update',
+    redirectTo: '/ocorrencias',
+  },
+  {
+    pattern: /^\/acessos\/registrar$/,
+    resource: 'access-records',
+    action: 'checkIn',
+    redirectTo: '/acessos',
+  },
+]
+
 function isProtectedPath(pathname: string): boolean {
   return PROTECTED_ROUTE_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   )
 }
 
-async function isAccessTokenValid(accessToken: string): Promise<boolean> {
+function isReportsPath(pathname: string): boolean {
+  return pathname === '/relatorios' || pathname.startsWith('/relatorios/')
+}
+
+async function fetchAuthenticatedUser(accessToken: string): Promise<AuthenticatedUser | null> {
   const apiBaseUrls = getApiBaseUrls()
 
   for (const apiBaseUrl of apiBaseUrls) {
@@ -35,22 +131,23 @@ async function isAccessTokenValid(accessToken: string): Promise<boolean> {
       })
 
       if (response.ok) {
-        return true
+        const body: AuthMeResponse = await response.json()
+        return body.user
       }
 
       if (response.status === 401 || response.status === 403) {
-        return false
+        return null
       }
     } catch {
       const isLastAttempt = apiBaseUrl === apiBaseUrls[apiBaseUrls.length - 1]
 
       if (isLastAttempt) {
-        return false
+        return null
       }
     }
   }
 
-  return false
+  return null
 }
 
 function redirectToLoginAndClearCookie(request: NextRequest): NextResponse {
@@ -72,9 +169,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const tokenIsValid = await isAccessTokenValid(accessToken)
+  const user = await fetchAuthenticatedUser(accessToken)
 
-  if (!tokenIsValid) {
+  if (!user) {
     if (pathname === '/' || isProtectedPath(pathname)) {
       return redirectToLoginAndClearCookie(request)
     }
@@ -84,6 +181,16 @@ export async function proxy(request: NextRequest) {
 
   if (pathname === '/') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  if (isReportsPath(pathname) && !hasPermission(user.role, 'reports', 'view')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  const matchedRule = PERMISSION_RULES.find((rule) => rule.pattern.test(pathname))
+
+  if (matchedRule && !hasPermission(user.role, matchedRule.resource, matchedRule.action)) {
+    return NextResponse.redirect(new URL(matchedRule.redirectTo, request.url))
   }
 
   return NextResponse.next()

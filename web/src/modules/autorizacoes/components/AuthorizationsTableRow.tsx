@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { useAuthorizationListContext } from '@/modules/autorizacoes/context/AuthorizationListContext'
 import { TableCell } from '@/modules/table/components/TableCell'
 import { TableRow } from '@/modules/table/components/TableRow'
@@ -20,6 +21,8 @@ type AuthorizationsTableRowProps = {
 export function AuthorizationsTableRow({ record }: AuthorizationsTableRowProps) {
   const router = useRouter()
   const { handleOpenDeleteConfirmation, handleOpenView } = useAuthorizationListContext()
+  const canUpdate = useCan('authorizations', 'update')
+  const canRemove = useCan('authorizations', 'remove')
 
   return (
     <TableRow>
@@ -58,20 +61,24 @@ export function AuthorizationsTableRow({ record }: AuthorizationsTableRowProps) 
           >
             <VisibilityRoundedIcon fontSize="small" />
           </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Editar autorização"
-            onClick={() => router.push(`/autorizacoes/${record.id}/editar`)}
-          >
-            <EditRoundedIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            size="small"
-            aria-label="Excluir autorização"
-            onClick={() => handleOpenDeleteConfirmation(record)}
-          >
-            <DeleteOutlineRoundedIcon fontSize="small" />
-          </IconButton>
+          {canUpdate ? (
+            <IconButton
+              size="small"
+              aria-label="Editar autorização"
+              onClick={() => router.push(`/autorizacoes/${record.id}/editar`)}
+            >
+              <EditRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
+          {canRemove ? (
+            <IconButton
+              size="small"
+              aria-label="Excluir autorização"
+              onClick={() => handleOpenDeleteConfirmation(record)}
+            >
+              <DeleteOutlineRoundedIcon fontSize="small" />
+            </IconButton>
+          ) : null}
         </Stack>
       </TableCell>
     </TableRow>

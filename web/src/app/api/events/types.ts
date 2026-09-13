@@ -80,3 +80,8 @@ export type CreateEventVehicleRequest = {
   driverName?: string
   color?: string
 }
+
+export type CreateEventGuestRequest = {
+  name: string
+  document?: string
+}
