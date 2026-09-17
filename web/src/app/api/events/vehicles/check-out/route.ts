@@ -5,12 +5,23 @@ import {
   readAccessToken,
   requestEventsApi,
 } from '../../helpers'
+import type { CheckOutEventVehicleRequest } from '../../types'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-type CheckOutVehicleBody = {
+type CheckOutVehicleBody = CheckOutEventVehicleRequest & {
   eventId: string
   vehicleId: string
+}
+
+function parseGuestIds(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined
+  }
+
+  const guestIds = value.filter((item): item is string => typeof item === 'string')
+
+  return guestIds.length ? guestIds : undefined
 }
 
 function parseCheckOutBody(body: unknown): CheckOutVehicleBody {
@@ -23,6 +34,7 @@ function parseCheckOutBody(body: unknown): CheckOutVehicleBody {
   return {
     eventId: String(payload['eventId'] ?? ''),
     vehicleId: String(payload['vehicleId'] ?? ''),
+    guestIds: parseGuestIds(payload['guestIds']),
   }
 }
 
@@ -58,6 +70,12 @@ export async function POST(request: Request) {
       accessToken,
       {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          guestIds: body.guestIds,
+        }),
       },
     )
 

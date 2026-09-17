@@ -2,18 +2,55 @@ import { decryptText, encryptText } from '../../lib/crypto.js'
 import { HttpError } from '../../lib/http-error.js'
 import { prisma } from '../../lib/prisma.js'
 import type {
+  CheckInEventGuestInput,
+  CheckOutEventVehicleInput,
   CreateEventGuestInput,
   CreateEventInput,
   CreateEventVehicleInput,
   EventGuestInput,
   EventResponse,
+  EventVehicleMovementType,
+  EventVehicleOccupantResponse,
   ListEventsInput,
+  RegisterEventAccessInput,
   UpdateEventInput,
 } from './events.types.js'
 
 const PAGE_MIN = 1
 const PAGE_SIZE_MIN = 1
 const PAGE_SIZE_MAX = 100
+
+const EVENT_VEHICLE_MOVEMENT_TYPES = new Set<EventVehicleMovementType>([
+  'CONVIDADO',
+  'DESEMBARQUE',
+  'BUSCA',
+])
+
+type EventGuestSituation = 'aguardando' | 'presente' | 'saiu'
+
+function guestSituation(guest: { checkInAt: Date | null; checkOutAt: Date | null }): EventGuestSituation {
+  if (!guest.checkInAt) {
+    return 'aguardando'
+  }
+
+  return guest.checkOutAt ? 'saiu' : 'presente'
+}
+
+const EVENT_GUEST_INCLUDE = {
+  entryVehicle: {
+    select: { id: true, plateEncrypted: true, brandModel: true },
+  },
+  exitVehicle: {
+    select: { id: true, plateEncrypted: true, brandModel: true },
+  },
+} as const
+
+const EVENT_INCLUDE = {
+  guests: {
+    include: EVENT_GUEST_INCLUDE,
+  },
+  vehicles: true,
+} as const
 
 function normalizeOptionalText(value: string | null | undefined): string | null {
   if (value === undefined || value === null) {
@@ -268,6 +305,11 @@ function toResponse(event: {
     id: string
     name: string
     documentEncrypted: string | null
+    isAdHoc: boolean
+    entryVehicleId: string | null
+    exitVehicleId: string | null
+    entryVehicle: { id: string; plateEncrypted: string | null; brandModel: string | null } | null
+    exitVehicle: { id: string; plateEncrypted: string | null; brandModel: string | null } | null
     checkInAt: Date | null
     checkOutAt: Date | null
   }>
@@ -276,7 +318,9 @@ function toResponse(event: {
     plateEncrypted: string | null
     brandModel: string | null
     driverName: string | null
+    driverDocumentEncrypted: string | null
     color: string | null
+    movementType: EventVehicleMovementType
     checkInAt: Date
     checkOutAt: Date | null
   }>
@@ -294,18 +338,57 @@ function toResponse(event: {
       id: guest.id,
       name: guest.name,
       document: guest.documentEncrypted ? decryptText(guest.documentEncrypted) : null,
+      isAdHoc: guest.isAdHoc,
+      entryVehicle: guest.entryVehicle
+        ? {
+            id: guest.entryVehicle.id,
+            plate: guest.entryVehicle.plateEncrypted
+              ? decryptText(guest.entryVehicle.plateEncrypted)
+              : null,
+            brandModel: guest.entryVehicle.brandModel,
+          }
+        : null,
+      exitVehicle: guest.exitVehicle
+        ? {
+            id: guest.exitVehicle.id,
+            plate: guest.exitVehicle.plateEncrypted
+              ? decryptText(guest.exitVehicle.plateEncrypted)
+              : null,
+            brandModel: guest.exitVehicle.brandModel,
+          }
+        : null,
       checkInAt: guest.checkInAt,
       checkOutAt: guest.checkOutAt,
     })),
-    vehicles: event.vehicles.map((vehicle) => ({
-      id: vehicle.id,
-      plate: vehicle.plateEncrypted ? decryptText(vehicle.plateEncrypted) : null,
-      brandModel: vehicle.brandModel,
-      driverName: vehicle.driverName,
-      color: vehicle.color,
-      checkInAt: vehicle.checkInAt,
-      checkOutAt: vehicle.checkOutAt,
-    })),
+    vehicles: event.vehicles.map((vehicle) => {
+      const occupants: EventVehicleOccupantResponse[] = []
+
+      event.guests.forEach((guest) => {
+        if (guest.entryVehicleId === vehicle.id) {
+          occupants.push({ id: guest.id, name: guest.name, via: 'entry' })
+        }
+
+        if (guest.exitVehicleId === vehicle.id) {
+          occupants.push({ id: guest.id, name: guest.name, via: 'exit' })
+        }
+      })
+
+      return {
+        id: vehicle.id,
+        plate: vehicle.plateEncrypted ? decryptText(vehicle.plateEncrypted) : null,
+        brandModel: vehicle.brandModel,
+        driverName: vehicle.driverName,
+        driverDocument: vehicle.driverDocumentEncrypted
+          ? decryptText(vehicle.driverDocumentEncrypted)
+          : null,
+        color: vehicle.color,
+        movementType: vehicle.movementType,
+        isOpen: vehicle.checkOutAt === null,
+        occupants,
+        checkInAt: vehicle.checkInAt,
+        checkOutAt: vehicle.checkOutAt,
+      }
+    }),
     observations: event.observationsEncrypted ? decryptText(event.observationsEncrypted) : null,
     createdByUserId: event.createdByUserId,
     createdAt: event.createdAt,
@@ -319,10 +402,7 @@ async function loadEventOrThrow(eventId: string, condominiumId: string) {
       id: eventId,
       condominiumId,
     },
-    include: {
-      guests: true,
-      vehicles: true,
-    },
+    include: EVENT_INCLUDE,
   })
 
   if (!event) {
@@ -355,10 +435,7 @@ export const eventsService = {
           })),
         },
       },
-      include: {
-        guests: true,
-        vehicles: true,
-      },
+      include: EVENT_INCLUDE,
     })
 
     return toResponse(event)
@@ -384,10 +461,7 @@ export const eventsService = {
     const [items, total] = await prisma.$transaction([
       prisma.event.findMany({
         where,
-        include: {
-          guests: true,
-          vehicles: true,
-        },
+        include: EVENT_INCLUDE,
         skip,
         take: pageSize,
         orderBy: [{ date: 'desc' }, { startTime: 'desc' }, { createdAt: 'desc' }],
@@ -418,10 +492,7 @@ export const eventsService = {
         id: eventId,
         condominiumId,
       },
-      include: {
-        guests: true,
-        vehicles: true,
-      },
+      include: EVENT_INCLUDE,
     })
 
     if (!event) {
@@ -526,10 +597,7 @@ export const eventsService = {
             }
           : {}),
       },
-      include: {
-        guests: true,
-        vehicles: true,
-      },
+      include: EVENT_INCLUDE,
     })
 
     return toResponse(event)
@@ -566,6 +634,7 @@ export const eventsService = {
     guestId: string,
     condominiumId: string,
     userId: string,
+    input?: CheckInEventGuestInput,
   ): Promise<EventResponse> {
     const trimmedEventId = eventId.trim()
     const trimmedGuestId = guestId.trim()
@@ -589,12 +658,46 @@ export const eventsService = {
       throw new HttpError(400, 'Convidado já registrou entrada.')
     }
 
-    await prisma.eventGuest.update({
-      where: { id: trimmedGuestId },
-      data: {
-        checkInAt: new Date(),
-        checkedInByUserId: userId,
-      },
+    const document = normalizeOptionalText(input?.document)
+    const plate = normalizeOptionalText(input?.vehicle?.plate)
+    const brandModel = normalizeOptionalText(input?.vehicle?.brandModel)
+    const color = normalizeOptionalText(input?.vehicle?.color)
+    const hasVehicleData = Boolean(plate || brandModel || color)
+    const now = new Date()
+
+    // Desvio deliberado do padrão array-form de $transaction documentado no CLAUDE.md do
+    // backend: aqui a atualização do guest (passo 2) depende do id do veículo criado no
+    // passo 1, que só existe após o create resolver — não é possível expressar essa
+    // dependência entre passos na forma array, então usamos a forma de callback.
+    await prisma.$transaction(async (tx) => {
+      let entryVehicleId: string | undefined
+
+      if (hasVehicleData) {
+        const vehicle = await tx.eventVehicle.create({
+          data: {
+            eventId: trimmedEventId,
+            movementType: 'CONVIDADO',
+            plateEncrypted: plate ? encryptText(plate) : null,
+            brandModel,
+            color,
+            checkInAt: now,
+            checkedInByUserId: userId,
+          },
+        })
+
+        entryVehicleId = vehicle.id
+      }
+
+      await tx.eventGuest.update({
+        where: { id: trimmedGuestId },
+        data: {
+          checkInAt: now,
+          checkedInByUserId: userId,
+          documentEncrypted:
+            document && !guest.documentEncrypted ? encryptText(document) : undefined,
+          entryVehicleId,
+        },
+      })
     })
 
     return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))
@@ -665,6 +768,7 @@ export const eventsService = {
 
     const brandModel = normalizeOptionalText(input.brandModel)
     const driverName = normalizeOptionalText(input.driverName)
+    const driverDocument = normalizeOptionalText(input.driverDocument)
     const color = normalizeOptionalText(input.color)
 
     await prisma.eventVehicle.create({
@@ -673,6 +777,7 @@ export const eventsService = {
         plateEncrypted: encryptText(plate),
         brandModel,
         driverName,
+        driverDocumentEncrypted: driverDocument ? encryptText(driverDocument) : null,
         color,
         checkInAt: new Date(),
         checkedInByUserId: userId,
@@ -687,6 +792,7 @@ export const eventsService = {
     vehicleId: string,
     condominiumId: string,
     userId: string,
+    input?: CheckOutEventVehicleInput,
   ): Promise<EventResponse> {
     const trimmedEventId = eventId.trim()
     const trimmedVehicleId = vehicleId.trim()
@@ -710,13 +816,60 @@ export const eventsService = {
       throw new HttpError(400, 'Veículo já registrou saída.')
     }
 
-    await prisma.eventVehicle.update({
-      where: { id: trimmedVehicleId },
-      data: {
-        checkOutAt: new Date(),
-        checkedOutByUserId: userId,
-      },
-    })
+    const eligibleGuests =
+      vehicle.movementType === 'CONVIDADO'
+        ? event.guests.filter(
+            (guest) => guest.entryVehicleId === vehicle.id && guest.checkOutAt === null,
+          )
+        : vehicle.movementType === 'BUSCA'
+          ? event.guests.filter(
+              (guest) => guest.exitVehicleId === vehicle.id && guest.checkOutAt === null,
+            )
+          : []
+
+    const eligibleGuestIds = new Set(eligibleGuests.map((guest) => guest.id))
+
+    let selectedGuestIds: string[]
+
+    if (input?.guestIds) {
+      const requestedGuestIds = [
+        ...new Set(input.guestIds.map((guestId) => guestId.trim()).filter(Boolean)),
+      ]
+
+      const hasInvalidGuestId = requestedGuestIds.some(
+        (guestId) => !eligibleGuestIds.has(guestId),
+      )
+
+      if (hasInvalidGuestId) {
+        throw new HttpError(
+          400,
+          'Um ou mais convidados informados não pertencem a este veículo ou já possuem saída.',
+        )
+      }
+
+      selectedGuestIds = requestedGuestIds
+    } else {
+      selectedGuestIds = [...eligibleGuestIds]
+    }
+
+    const checkOutAt = new Date()
+
+    await prisma.$transaction([
+      prisma.eventVehicle.update({
+        where: { id: trimmedVehicleId },
+        data: {
+          checkOutAt,
+          checkedOutByUserId: userId,
+        },
+      }),
+      prisma.eventGuest.updateMany({
+        where: { id: { in: selectedGuestIds } },
+        data: {
+          checkOutAt,
+          checkedOutByUserId: userId,
+        },
+      }),
+    ])
 
     return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))
   },
@@ -776,8 +929,178 @@ export const eventsService = {
       throw new HttpError(404, 'Veículo não encontrado.')
     }
 
+    const hasLinkedGuests = event.guests.some(
+      (guest) => guest.entryVehicleId === vehicle.id || guest.exitVehicleId === vehicle.id,
+    )
+
+    if (hasLinkedGuests) {
+      throw new HttpError(400, 'Não é possível remover veículo com convidados vinculados.')
+    }
+
     await prisma.eventVehicle.delete({
       where: { id: trimmedVehicleId },
+    })
+
+    return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))
+  },
+
+  async registerAccess(
+    eventId: string,
+    condominiumId: string,
+    userId: string,
+    input: RegisterEventAccessInput,
+  ): Promise<EventResponse> {
+    const trimmedEventId = eventId.trim()
+
+    if (!trimmedEventId) {
+      throw new HttpError(400, 'ID do evento é obrigatório.')
+    }
+
+    const event = await loadEventOrThrow(trimmedEventId, condominiumId)
+
+    if (!EVENT_VEHICLE_MOVEMENT_TYPES.has(input.movementType)) {
+      throw new HttpError(400, 'Tipo de movimentação inválido.')
+    }
+
+    const movementType = input.movementType
+
+    const plate = normalizeOptionalText(input.vehicle?.plate)
+    const brandModel = normalizeOptionalText(input.vehicle?.brandModel)
+    const driverName = normalizeOptionalText(input.vehicle?.driverName)
+    const driverDocument = normalizeOptionalText(input.vehicle?.driverDocument)
+    const color = normalizeOptionalText(input.vehicle?.color)
+    const hasVehicleData = Boolean(plate || brandModel || driverName || driverDocument || color)
+
+    if (movementType === 'BUSCA' && !plate) {
+      throw new HttpError(400, 'Veículo é obrigatório para busca de convidado.')
+    }
+
+    const existingGuestItems = Array.isArray(input.guests) ? input.guests : []
+    const newGuestItems = Array.isArray(input.newGuests) ? input.newGuests : []
+
+    if (existingGuestItems.length === 0 && newGuestItems.length === 0) {
+      throw new HttpError(400, 'Informe ao menos um convidado.')
+    }
+
+    if (movementType === 'BUSCA' && newGuestItems.length > 0) {
+      throw new HttpError(400, 'Não é possível cadastrar novos convidados em uma busca.')
+    }
+
+    const existingGuestsById = new Map(event.guests.map((guest) => [guest.id, guest]))
+
+    const validatedExistingGuests = existingGuestItems.map((item) => {
+      const guestId = String(item.guestId ?? '').trim()
+
+      if (!guestId) {
+        throw new HttpError(400, 'ID do convidado é obrigatório.')
+      }
+
+      const guest = existingGuestsById.get(guestId)
+
+      if (!guest) {
+        throw new HttpError(404, 'Convidado não encontrado.')
+      }
+
+      const situation = guestSituation(guest)
+
+      if (movementType === 'BUSCA' && situation !== 'presente') {
+        throw new HttpError(400, 'Convidado não está presente no evento.')
+      }
+
+      if (movementType !== 'BUSCA' && situation === 'presente') {
+        throw new HttpError(400, 'Convidado já está presente no evento.')
+      }
+
+      const document = normalizeOptionalText(item.document)
+
+      if (movementType !== 'BUSCA' && !guest.documentEncrypted && !document) {
+        throw new HttpError(400, 'Informe o CPF do convidado para liberar o acesso.')
+      }
+
+      return { guest, document }
+    })
+
+    const validatedNewGuests = newGuestItems.map((item, index) => {
+      const name = String(item.name ?? '').trim()
+
+      if (name.length < 3) {
+        throw new HttpError(400, `Nome do convidado ${index + 1} deve ter ao menos 3 caracteres.`)
+      }
+
+      return { name, document: normalizeOptionalText(item.document) }
+    })
+
+    const now = new Date()
+
+    // Desvio deliberado do padrão array-form de $transaction documentado no CLAUDE.md do
+    // backend: os passos seguintes (criação dos novos convidados e atualização em lote)
+    // dependem dos ids gerados pelo passo de criação do veículo e dos novos convidados,
+    // que só existem depois que cada create resolve — não é possível expressar essas
+    // dependências entre passos na forma array, então usamos a forma de callback.
+    await prisma.$transaction(async (tx) => {
+      let vehicleId: string | undefined
+
+      if (hasVehicleData) {
+        const vehicle = await tx.eventVehicle.create({
+          data: {
+            eventId: trimmedEventId,
+            movementType,
+            plateEncrypted: plate ? encryptText(plate) : null,
+            brandModel,
+            driverName,
+            driverDocumentEncrypted: driverDocument ? encryptText(driverDocument) : null,
+            color,
+            checkInAt: now,
+            checkedInByUserId: userId,
+          },
+        })
+
+        vehicleId = vehicle.id
+      }
+
+      const newGuestIds: string[] = []
+
+      for (const newGuest of validatedNewGuests) {
+        const created = await tx.eventGuest.create({
+          data: {
+            eventId: trimmedEventId,
+            name: newGuest.name,
+            documentEncrypted: newGuest.document ? encryptText(newGuest.document) : null,
+            isAdHoc: true,
+          },
+        })
+
+        newGuestIds.push(created.id)
+      }
+
+      for (const { guest, document } of validatedExistingGuests) {
+        if (document && !guest.documentEncrypted) {
+          await tx.eventGuest.update({
+            where: { id: guest.id },
+            data: { documentEncrypted: encryptText(document) },
+          })
+        }
+      }
+
+      const allGuestIds = [...validatedExistingGuests.map(({ guest }) => guest.id), ...newGuestIds]
+
+      if (movementType === 'BUSCA') {
+        await tx.eventGuest.updateMany({
+          where: { id: { in: allGuestIds } },
+          data: {
+            exitVehicleId: vehicleId,
+          },
+        })
+      } else {
+        await tx.eventGuest.updateMany({
+          where: { id: { in: allGuestIds } },
+          data: {
+            checkInAt: now,
+            checkedInByUserId: userId,
+            entryVehicleId: vehicleId,
+          },
+        })
+      }
     })
 
     return toResponse(await loadEventOrThrow(trimmedEventId, condominiumId))

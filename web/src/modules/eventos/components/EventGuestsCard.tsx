@@ -1,13 +1,17 @@
 'use client'
 
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
+import LoginRoundedIcon from '@mui/icons-material/LoginRounded'
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
+import IconButton from '@mui/material/IconButton'
 import { useTheme } from '@mui/material/styles'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useState } from 'react'
@@ -15,8 +19,17 @@ import { useState } from 'react'
 import type { Event, EventGuest } from '@/app/api/events/types'
 import { useCan } from '@/hooks/useCan'
 import { EventAddGuestDialog } from '@/modules/eventos/components/EventAddGuestDialog'
-import { useCheckInEventGuest } from '@/modules/eventos/hooks/useCheckInEventGuest'
-import { useCheckOutEventGuest } from '@/modules/eventos/hooks/useCheckOutEventGuest'
+import {
+  EventCheckOutDialog,
+  type EventCheckOutTarget,
+} from '@/modules/eventos/components/EventCheckOutDialog'
+import { EventGuestCheckInDialog } from '@/modules/eventos/components/EventGuestCheckInDialog'
+import { EventGuestDetailsDialog } from '@/modules/eventos/components/EventGuestDetailsDialog'
+import {
+  EventGuestStatusChip,
+  getEventGuestStatus,
+  type EventGuestStatus,
+} from '@/modules/eventos/components/EventGuestStatusChip'
 import { Table } from '@/modules/table/components/Table'
 import { TableBody } from '@/modules/table/components/TableBody'
 import { TableCell } from '@/modules/table/components/TableCell'
@@ -24,27 +37,17 @@ import { TableHead } from '@/modules/table/components/TableHead'
 import { TableHeadCell } from '@/modules/table/components/TableHeadCell'
 import { TableRow } from '@/modules/table/components/TableRow'
 import { ListSearchField } from '@/modules/table/components/ListSearchField'
-import { useAppSnackbar } from '@/providers'
 import { MobileListCard } from '@/styles/MobileList.styles'
 
 const COLUMN_COUNT = 5
 
-type GuestStatus = 'aguardando' | 'dentro' | 'saiu'
+type GuestFilter = 'todos' | EventGuestStatus
 
-function getGuestStatus(guest: EventGuest): GuestStatus {
-  if (!guest.checkInAt) {
-    return 'aguardando'
-  }
-
-  if (!guest.checkOutAt) {
-    return 'dentro'
-  }
-
-  return 'saiu'
-}
-
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+const FILTER_LABEL: Record<GuestFilter, string> = {
+  todos: 'Todos',
+  aguardando: 'Aguardando',
+  presente: 'Presentes',
+  saiu: 'Saíram',
 }
 
 function matchesSearch(guest: EventGuest, searchTerm: string): boolean {
@@ -68,105 +71,78 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<GuestFilter>('todos')
   const [addGuestOpen, setAddGuestOpen] = useState(false)
-  const { showSuccess, showError } = useAppSnackbar()
-  const canUpdate = useCan('events', 'update')
+  const [viewedGuestId, setViewedGuestId] = useState<string | null>(null)
+  const [checkInGuestId, setCheckInGuestId] = useState<string | null>(null)
+  const [checkOutTarget, setCheckOutTarget] = useState<EventCheckOutTarget | null>(null)
   const canAddGuest = useCan('events', 'addGuest')
-  const checkInMutation = useCheckInEventGuest()
-  const checkOutMutation = useCheckOutEventGuest()
+  const canRegisterAccess = useCan('events', 'registerAccess')
 
   const guestsCount = event.guests.length
-  const filteredGuests = event.guests.filter((guest) => matchesSearch(guest, searchTerm))
+  const presentCount = event.guests.filter((guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'presente').length
+  const departedCount = event.guests.filter((guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'saiu').length
+  const waitingCount = event.guests.filter((guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'aguardando').length
 
-  const presentCount = event.guests.filter(
-    (guest) => guest.checkInAt && !guest.checkOutAt,
-  ).length
-  const departedCount = event.guests.filter((guest) => guest.checkOutAt).length
-  const waitingCount = event.guests.filter((guest) => !guest.checkInAt).length
+  const filteredGuests = event.guests.filter((guest) => {
+    if (!matchesSearch(guest, searchTerm)) {
+      return false
+    }
+
+    if (statusFilter === 'todos') {
+      return true
+    }
+
+    return getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === statusFilter
+  })
+
+  const viewedGuest = event.guests.find((guest) => guest.id === viewedGuestId) ?? null
+  const checkInGuest = event.guests.find((guest) => guest.id === checkInGuestId) ?? null
 
   const emptyMessage =
     guestsCount === 0
       ? 'Nenhum convidado cadastrado para este evento.'
-      : 'Nenhum convidado corresponde à busca.'
+      : 'Nenhum convidado corresponde ao filtro selecionado.'
 
-  const handleCheckIn = async (guestId: string) => {
-    try {
-      await checkInMutation.mutateAsync({ eventId: event.id, guestId })
-      showSuccess('Entrada registrada.')
-    } catch (error) {
-      showError(error instanceof Error ? error.message : 'Não foi possível registrar a entrada.')
-    }
-  }
-
-  const handleCheckOut = async (guestId: string) => {
-    try {
-      await checkOutMutation.mutateAsync({ eventId: event.id, guestId })
-      showSuccess('Saída registrada.')
-    } catch (error) {
-      showError(error instanceof Error ? error.message : 'Não foi possível registrar a saída.')
-    }
-  }
-
-  const renderStatus = (guest: EventGuest, status: GuestStatus) => {
-    if (status === 'aguardando') {
-      return <Chip size="small" color="warning" label="Aguardando" />
-    }
-
-    if (status === 'dentro') {
-      return (
-        <Stack direction="row" spacing={1} alignItems="center">
-          <CheckCircleRoundedIcon color="success" fontSize="small" />
-          <Typography variant="body2" color="text.primary">
-            {`Entrada ${formatTime(guest.checkInAt as string)}`}
-          </Typography>
-        </Stack>
-      )
-    }
-
-    return (
-      <Typography variant="body2" color="text.secondary">
-        {`Entrada ${formatTime(guest.checkInAt as string)} → Saída ${formatTime(guest.checkOutAt as string)}`}
-      </Typography>
-    )
-  }
-
-  const renderAction = (guest: EventGuest, status: GuestStatus, fullWidth: boolean) => {
-    if (status === 'aguardando') {
-      return canUpdate ? (
-        <Button
-          variant="contained"
-          color="primary"
+  const renderAction = (guest: EventGuest, status: EventGuestStatus) => (
+    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+      <Tooltip title="Visualizar">
+        <IconButton
+          aria-label={`Visualizar ${guest.name}`}
           size="small"
-          fullWidth={fullWidth}
-          disabled={checkInMutation.isPending}
-          onClick={() => void handleCheckIn(guest.id)}
+          onClick={() => setViewedGuestId(guest.id)}
         >
-          Registrar entrada
-        </Button>
-      ) : null
-    }
+          <VisibilityRoundedIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
 
-    if (status === 'dentro') {
-      return canUpdate ? (
-        <Button
-          variant="outlined"
-          color="inherit"
-          size="small"
-          fullWidth={fullWidth}
-          disabled={checkOutMutation.isPending}
-          onClick={() => void handleCheckOut(guest.id)}
-        >
-          Registrar saída
-        </Button>
-      ) : null
-    }
+      {canRegisterAccess && status === 'aguardando' ? (
+        <Tooltip title="Registrar entrada">
+          <IconButton
+            aria-label={`Registrar entrada de ${guest.name}`}
+            size="small"
+            color="success"
+            onClick={() => setCheckInGuestId(guest.id)}
+          >
+            <LoginRoundedIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ) : null}
 
-    return (
-      <Typography variant="body2" color="text.disabled">
-        Concluído
-      </Typography>
-    )
-  }
+      {canRegisterAccess && status === 'presente' ? (
+        <Tooltip title="Registrar saída">
+          <IconButton
+            aria-label={`Registrar saída de ${guest.name}`}
+            size="small"
+            color="warning"
+            onClick={() => setCheckOutTarget({ type: 'guest', guestId: guest.id })}
+          >
+            <LogoutRoundedIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ) : null}
+    </Stack>
+  )
 
   return (
     <MuiCard>
@@ -189,7 +165,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
               <ListSearchField
                 value={searchTerm}
                 onChange={setSearchTerm}
-                placeholder="Buscar convidado..."
+                placeholder="Buscar por nome ou documento..."
                 sx={{ width: { xs: '100%', sm: 260 } }}
               />
 
@@ -210,6 +186,30 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
             {`${presentCount} presentes · ${departedCount} saídas registradas · ${waitingCount} aguardando`}
           </Typography>
 
+          <Stack direction="row" spacing={1} flexWrap="wrap" rowGap={1}>
+            {(['todos', 'aguardando', 'presente', 'saiu'] as GuestFilter[]).map((filter) => {
+              const count =
+                filter === 'todos'
+                  ? guestsCount
+                  : filter === 'aguardando'
+                    ? waitingCount
+                    : filter === 'presente'
+                      ? presentCount
+                      : departedCount
+
+              return (
+                <Chip
+                  key={filter}
+                  label={`${FILTER_LABEL[filter]} (${count})`}
+                  size="small"
+                  color={statusFilter === filter ? 'primary' : 'default'}
+                  variant={statusFilter === filter ? 'filled' : 'outlined'}
+                  onClick={() => setStatusFilter(filter)}
+                />
+              )
+            })}
+          </Stack>
+
           {isMobile ? (
             filteredGuests.length === 0 ? (
               <Typography variant="body2" color="text.secondary">
@@ -218,7 +218,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
             ) : (
               <Stack spacing={1.5}>
                 {filteredGuests.map((guest, index) => {
-                  const status = getGuestStatus(guest)
+                  const status = getEventGuestStatus(guest.checkInAt, guest.checkOutAt)
 
                   return (
                     <MobileListCard key={guest.id} variant="outlined">
@@ -242,12 +242,13 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                             </Stack>
                           </Stack>
 
-                          {status === 'aguardando' ? renderStatus(guest, status) : null}
+                          <EventGuestStatusChip
+                            checkInAt={guest.checkInAt}
+                            checkOutAt={guest.checkOutAt}
+                          />
                         </Stack>
 
-                        {status !== 'aguardando' ? renderStatus(guest, status) : null}
-
-                        {renderAction(guest, status, true)}
+                        {renderAction(guest, status)}
                       </Stack>
                     </MobileListCard>
                   )
@@ -273,7 +274,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                 colSpan={COLUMN_COUNT}
               >
                 {filteredGuests.map((guest, index) => {
-                  const status = getGuestStatus(guest)
+                  const status = getEventGuestStatus(guest.checkInAt, guest.checkOutAt)
 
                   return (
                     <TableRow key={guest.id}>
@@ -288,8 +289,13 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                           {guest.document ?? '—'}
                         </Typography>
                       </TableCell>
-                      <TableCell>{renderStatus(guest, status)}</TableCell>
-                      <TableCell align="right">{renderAction(guest, status, false)}</TableCell>
+                      <TableCell>
+                        <EventGuestStatusChip
+                          checkInAt={guest.checkInAt}
+                          checkOutAt={guest.checkOutAt}
+                        />
+                      </TableCell>
+                      <TableCell align="right">{renderAction(guest, status)}</TableCell>
                     </TableRow>
                   )
                 })}
@@ -310,6 +316,19 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
         onClose={() => setAddGuestOpen(false)}
         eventId={event.id}
       />
+
+      <EventGuestDetailsDialog event={event} guest={viewedGuest} onClose={() => setViewedGuestId(null)} />
+
+      {checkInGuest ? (
+        <EventGuestCheckInDialog
+          open={Boolean(checkInGuest)}
+          onClose={() => setCheckInGuestId(null)}
+          eventId={event.id}
+          guest={checkInGuest}
+        />
+      ) : null}
+
+      <EventCheckOutDialog event={event} target={checkOutTarget} onClose={() => setCheckOutTarget(null)} />
     </MuiCard>
   )
 }

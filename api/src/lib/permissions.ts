@@ -3,7 +3,7 @@ import type { UserRole } from './jwt.js'
 export type DomainAction = 'create' | 'view' | 'update' | 'remove'
 export type AccessRecordAction = 'checkIn' | 'checkOut' | 'view'
 export type ReportAction = 'view'
-export type EventAction = DomainAction | 'addGuest'
+export type EventAction = DomainAction | 'addGuest' | 'registerAccess'
 
 export type ResourceActionMap = {
   residents: DomainAction
@@ -27,7 +27,7 @@ const permissionMatrix: Record<UserRole, PermissionsByResource> = {
     visitors: DOMAIN_ACTIONS_FULL,
     'service-providers': DOMAIN_ACTIONS_FULL,
     authorizations: DOMAIN_ACTIONS_FULL,
-    events: [...DOMAIN_ACTIONS_FULL, 'addGuest'],
+    events: [...DOMAIN_ACTIONS_FULL, 'addGuest', 'registerAccess'],
     incidents: DOMAIN_ACTIONS_FULL,
     'access-records': ['checkIn', 'checkOut', 'view'],
     reports: ['view'],
@@ -37,7 +37,7 @@ const permissionMatrix: Record<UserRole, PermissionsByResource> = {
     visitors: DOMAIN_ACTIONS_FULL,
     'service-providers': DOMAIN_ACTIONS_FULL,
     authorizations: DOMAIN_ACTIONS_FULL,
-    events: [...DOMAIN_ACTIONS_FULL, 'addGuest'],
+    events: [...DOMAIN_ACTIONS_FULL, 'addGuest', 'registerAccess'],
     incidents: DOMAIN_ACTIONS_FULL,
     'access-records': ['checkIn', 'checkOut', 'view'],
     reports: ['view'],
@@ -47,7 +47,7 @@ const permissionMatrix: Record<UserRole, PermissionsByResource> = {
     visitors: DOMAIN_ACTIONS_FULL,
     'service-providers': DOMAIN_ACTIONS_FULL,
     authorizations: DOMAIN_ACTIONS_FULL,
-    events: [...DOMAIN_ACTIONS_FULL, 'addGuest'],
+    events: [...DOMAIN_ACTIONS_FULL, 'addGuest', 'registerAccess'],
     incidents: DOMAIN_ACTIONS_FULL,
     'access-records': ['view'],
     reports: ['view'],
@@ -57,7 +57,7 @@ const permissionMatrix: Record<UserRole, PermissionsByResource> = {
     visitors: DOMAIN_ACTIONS_VIEW_ONLY,
     'service-providers': DOMAIN_ACTIONS_VIEW_ONLY,
     authorizations: DOMAIN_ACTIONS_VIEW_ONLY,
-    events: ['view', 'addGuest'],
+    events: ['view', 'addGuest', 'registerAccess'],
     incidents: ['view', 'create'],
     'access-records': ['checkIn', 'checkOut', 'view'],
     reports: [],

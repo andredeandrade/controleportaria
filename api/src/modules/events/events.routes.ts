@@ -14,12 +14,12 @@ eventsRouter.patch('/:id', authorizePermission('events', 'update'), eventsContro
 eventsRouter.delete('/:id', authorizePermission('events', 'remove'), eventsController.remove)
 eventsRouter.post(
   '/:id/guests/:guestId/check-in',
-  authorizePermission('events', 'update'),
+  authorizePermission('events', 'registerAccess'),
   eventsController.checkInGuest,
 )
 eventsRouter.post(
   '/:id/guests/:guestId/check-out',
-  authorizePermission('events', 'update'),
+  authorizePermission('events', 'registerAccess'),
   eventsController.checkOutGuest,
 )
 eventsRouter.post(
@@ -29,16 +29,21 @@ eventsRouter.post(
 )
 eventsRouter.post(
   '/:id/vehicles',
-  authorizePermission('events', 'update'),
+  authorizePermission('events', 'registerAccess'),
   eventsController.createVehicle,
 )
 eventsRouter.post(
   '/:id/vehicles/:vehicleId/check-out',
-  authorizePermission('events', 'update'),
+  authorizePermission('events', 'registerAccess'),
   eventsController.checkOutVehicle,
 )
 eventsRouter.delete(
   '/:id/vehicles/:vehicleId',
-  authorizePermission('events', 'update'),
+  authorizePermission('events', 'registerAccess'),
   eventsController.deleteVehicle,
+)
+eventsRouter.post(
+  '/:id/access',
+  authorizePermission('events', 'registerAccess'),
+  eventsController.registerAccess,
 )

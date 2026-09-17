@@ -2,9 +2,13 @@ import type { Request, Response } from 'express'
 import { HttpError } from '../../lib/http-error.js'
 import { eventsService } from './events.service.js'
 import type {
+  CheckInEventGuestInput,
+  CheckOutEventVehicleInput,
   CreateEventGuestInput,
   CreateEventVehicleInput,
   EventGuestInput,
+  EventVehicleMovementType,
+  RegisterEventAccessInput,
   UpdateEventInput,
 } from './events.types.js'
 
@@ -53,6 +57,7 @@ function parseCreateVehicleInput(body: Record<string, unknown>): CreateEventVehi
     plate: String(body['plate'] ?? ''),
     brandModel: readOptionalString(body['brandModel']),
     driverName: readOptionalString(body['driverName']),
+    driverDocument: readOptionalString(body['driverDocument']),
     color: readOptionalString(body['color']),
   }
 }
@@ -61,6 +66,112 @@ function parseAddGuestInput(body: Record<string, unknown>): CreateEventGuestInpu
   return {
     name: String(body['name'] ?? ''),
     document: readOptionalString(body['document']),
+  }
+}
+
+function parseCheckInGuestVehicle(
+  value: unknown,
+): { plate?: string; brandModel?: string; color?: string } | undefined {
+  if (!value || typeof value !== 'object') {
+    return undefined
+  }
+
+  const vehicleRecord = value as Record<string, unknown>
+
+  return {
+    plate: readOptionalString(vehicleRecord['plate']),
+    brandModel: readOptionalString(vehicleRecord['brandModel']),
+    color: readOptionalString(vehicleRecord['color']),
+  }
+}
+
+function parseCheckInGuestInput(body: Record<string, unknown>): CheckInEventGuestInput {
+  return {
+    document: readOptionalString(body['document']),
+    vehicle: parseCheckInGuestVehicle(body['vehicle']),
+  }
+}
+
+function parseGuestIds(value: unknown): string[] | undefined {
+  if (value === undefined) {
+    return undefined
+  }
+
+  if (!Array.isArray(value)) {
+    throw new HttpError(400, 'guestIds deve ser um array de identificadores.')
+  }
+
+  return value.map((guestId) => String(guestId ?? '').trim())
+}
+
+function parseCheckOutVehicleInput(body: Record<string, unknown>): CheckOutEventVehicleInput {
+  return {
+    guestIds: parseGuestIds(body['guestIds']),
+  }
+}
+
+function parseRegisterAccessVehicle(value: unknown): RegisterEventAccessInput['vehicle'] {
+  if (!value || typeof value !== 'object') {
+    return undefined
+  }
+
+  const vehicleRecord = value as Record<string, unknown>
+
+  return {
+    driverName: readOptionalString(vehicleRecord['driverName']),
+    driverDocument: readOptionalString(vehicleRecord['driverDocument']),
+    plate: readOptionalString(vehicleRecord['plate']),
+    brandModel: readOptionalString(vehicleRecord['brandModel']),
+    color: readOptionalString(vehicleRecord['color']),
+  }
+}
+
+function parseRegisterAccessGuests(value: unknown): RegisterEventAccessInput['guests'] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.map((guest) => {
+    if (!guest || typeof guest !== 'object') {
+      return { guestId: '', document: undefined }
+    }
+
+    const guestRecord = guest as Record<string, unknown>
+
+    return {
+      guestId: String(guestRecord['guestId'] ?? ''),
+      document: readOptionalString(guestRecord['document']),
+    }
+  })
+}
+
+function parseRegisterAccessNewGuests(
+  value: unknown,
+): RegisterEventAccessInput['newGuests'] {
+  if (!Array.isArray(value)) {
+    return undefined
+  }
+
+  return value.map((guest) => {
+    if (!guest || typeof guest !== 'object') {
+      return { name: '', document: undefined }
+    }
+
+    const guestRecord = guest as Record<string, unknown>
+
+    return {
+      name: String(guestRecord['name'] ?? ''),
+      document: readOptionalString(guestRecord['document']),
+    }
+  })
+}
+
+function parseRegisterAccessInput(body: Record<string, unknown>): RegisterEventAccessInput {
+  return {
+    movementType: String(body['movementType'] ?? '') as EventVehicleMovementType,
+    vehicle: parseRegisterAccessVehicle(body['vehicle']),
+    guests: parseRegisterAccessGuests(body['guests']),
+    newGuests: parseRegisterAccessNewGuests(body['newGuests']),
   }
 }
 
@@ -190,11 +301,14 @@ export const eventsController = {
       throw new HttpError(401, 'Não autenticado.')
     }
 
+    const body = getBodyAsRecord(req.body)
+
     const event = await eventsService.checkInGuest(
       String(req.params['id'] ?? ''),
       String(req.params['guestId'] ?? ''),
       req.authUser.condominiumId,
       req.authUser.id,
+      parseCheckInGuestInput(body),
     )
 
     res.json(event)
@@ -237,14 +351,34 @@ export const eventsController = {
       throw new HttpError(401, 'Não autenticado.')
     }
 
+    const body = getBodyAsRecord(req.body)
+
     const event = await eventsService.checkOutVehicle(
       String(req.params['id'] ?? ''),
       String(req.params['vehicleId'] ?? ''),
       req.authUser.condominiumId,
       req.authUser.id,
+      parseCheckOutVehicleInput(body),
     )
 
     res.json(event)
+  },
+
+  async registerAccess(req: Request, res: Response) {
+    if (!req.authUser) {
+      throw new HttpError(401, 'Não autenticado.')
+    }
+
+    const body = getBodyAsRecord(req.body)
+
+    const event = await eventsService.registerAccess(
+      String(req.params['id'] ?? ''),
+      req.authUser.condominiumId,
+      req.authUser.id,
+      parseRegisterAccessInput(body),
+    )
+
+    res.status(201).json(event)
   },
 
   async addGuest(req: Request, res: Response) {

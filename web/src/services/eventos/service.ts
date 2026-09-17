@@ -1,9 +1,12 @@
 import type {
+  CheckInEventGuestRequest,
+  CheckOutEventVehicleRequest,
   CreateEventGuestRequest,
   CreateEventRequest,
   CreateEventVehicleRequest,
   Event,
   EventsListResponse,
+  RegisterEventAccessRequest,
   UpdateEventRequest,
 } from '@/app/api/events/types'
 import { getApiErrorMessage, safeReadJson } from '@/services/shared/http'
@@ -16,6 +19,7 @@ import type {
   DeleteEventVehicleApiResponseBody,
   GetEventApiResponseBody,
   ListEventsApiResponseBody,
+  RegisterEventAccessApiResponseBody,
   RegisterEventApiResponseBody,
   UpdateEventApiResponseBody,
 } from '@/types/services/eventos'
@@ -153,17 +157,18 @@ export async function deleteEvent(id: string): Promise<void> {
 export async function checkInEventGuest({
   eventId,
   guestId,
+  ...payload
 }: {
   eventId: string
   guestId: string
-}): Promise<Event> {
+} & CheckInEventGuestRequest): Promise<Event> {
   const response = await fetch('/api/events/guests/check-in', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    body: JSON.stringify({ eventId, guestId }),
+    body: JSON.stringify({ eventId, guestId, ...payload }),
   })
 
   const responseBody = (await safeReadJson(response)) as CheckInEventGuestApiResponseBody
@@ -271,17 +276,18 @@ export async function createEventGuest({
 export async function checkOutEventVehicle({
   eventId,
   vehicleId,
+  ...payload
 }: {
   eventId: string
   vehicleId: string
-}): Promise<Event> {
+} & CheckOutEventVehicleRequest): Promise<Event> {
   const response = await fetch('/api/events/vehicles/check-out', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    body: JSON.stringify({ eventId, vehicleId }),
+    body: JSON.stringify({ eventId, vehicleId, ...payload }),
   })
 
   const responseBody = (await safeReadJson(response)) as CheckOutEventVehicleApiResponseBody
@@ -325,6 +331,34 @@ export async function deleteEventVehicle({
 
   if (!responseBody?.id) {
     throw new EventsServiceError('Resposta inválida ao remover o veículo.')
+  }
+
+  return responseBody as Event
+}
+
+export async function registerEventAccess(
+  eventId: string,
+  payload: RegisterEventAccessRequest,
+): Promise<Event> {
+  const response = await fetch('/api/events/access', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ eventId, ...payload }),
+  })
+
+  const responseBody = (await safeReadJson(response)) as RegisterEventAccessApiResponseBody
+
+  if (!response.ok) {
+    throw new EventsServiceError(
+      getApiErrorMessage(responseBody, 'Não foi possível registrar o acesso.'),
+    )
+  }
+
+  if (!responseBody?.id) {
+    throw new EventsServiceError('Resposta inválida ao registrar o acesso.')
   }
 
   return responseBody as Event
