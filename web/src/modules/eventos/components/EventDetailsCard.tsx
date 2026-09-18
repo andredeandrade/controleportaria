@@ -13,6 +13,16 @@ import Typography from '@mui/material/Typography'
 import type { Event } from '@/app/api/events/types'
 import { TextField, TextFieldLabel, TextFieldStack } from '@/modules/form'
 
+function formatDate(value: string): string {
+  const date = new Date(`${value}T00:00:00`)
+
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return new Intl.DateTimeFormat('pt-BR').format(date)
+}
+
 type EventDetailsCardProps = {
   event: Event
 }
@@ -42,11 +52,18 @@ export function EventDetailsCard({ event }: EventDetailsCardProps) {
               </TextFieldStack>
             </Grid>
 
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <TextFieldStack>
+                <TextFieldLabel>Responsável pelo evento</TextFieldLabel>
+                <TextField value={event.responsibleName} slotProps={{ input: { readOnly: true } }} />
+              </TextFieldStack>
+            </Grid>
+
             <Grid size={{ xs: 6, sm: 6, md: 4 }}>
               <TextFieldStack>
                 <TextFieldLabel>Data</TextFieldLabel>
                 <TextField
-                  value={event.date}
+                  value={formatDate(event.date)}
                   slotProps={{
                     input: {
                       readOnly: true,
@@ -58,13 +75,6 @@ export function EventDetailsCard({ event }: EventDetailsCardProps) {
                     },
                   }}
                 />
-              </TextFieldStack>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextFieldStack>
-                <TextFieldLabel>Responsável pelo evento</TextFieldLabel>
-                <TextField value={event.responsibleName} slotProps={{ input: { readOnly: true } }} />
               </TextFieldStack>
             </Grid>
 

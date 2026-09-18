@@ -4,12 +4,11 @@ import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import LoginRoundedIcon from '@mui/icons-material/LoginRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
-import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
-import { useTheme } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -18,7 +17,6 @@ import { useState } from 'react'
 
 import type { Event, EventGuest } from '@/app/api/events/types'
 import { useCan } from '@/hooks/useCan'
-import { EventAddGuestDialog } from '@/modules/eventos/components/EventAddGuestDialog'
 import {
   EventCheckOutDialog,
   type EventCheckOutTarget,
@@ -50,6 +48,21 @@ const FILTER_LABEL: Record<GuestFilter, string> = {
   saiu: 'Saíram',
 }
 
+const FILTER_PALETTE: Record<GuestFilter, 'primary' | 'warning' | 'success' | 'default'> = {
+  todos: 'primary',
+  aguardando: 'warning',
+  presente: 'success',
+  saiu: 'default',
+}
+
+function formatTime(iso: string | null): string {
+  if (!iso) {
+    return '—'
+  }
+
+  return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+}
+
 function matchesSearch(guest: EventGuest, searchTerm: string): boolean {
   const normalizedSearch = searchTerm.trim().toLowerCase()
 
@@ -72,11 +85,9 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<GuestFilter>('todos')
-  const [addGuestOpen, setAddGuestOpen] = useState(false)
   const [viewedGuestId, setViewedGuestId] = useState<string | null>(null)
   const [checkInGuestId, setCheckInGuestId] = useState<string | null>(null)
   const [checkOutTarget, setCheckOutTarget] = useState<EventCheckOutTarget | null>(null)
-  const canAddGuest = useCan('events', 'addGuest')
   const canRegisterAccess = useCan('events', 'registerAccess')
 
   const guestsCount = event.guests.length
@@ -148,43 +159,21 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
     <MuiCard>
       <CardContent>
         <Stack spacing={2.5}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            flexWrap="wrap"
-            rowGap={2}
-          >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <GroupsRoundedIcon color="primary" fontSize="small" />
-              <Typography variant="h4">Controle de Acesso de Convidados</Typography>
-              <Chip size="small" color="success" label={`${guestsCount} na lista`} />
-            </Stack>
-
-            <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" rowGap={2}>
-              <ListSearchField
-                value={searchTerm}
-                onChange={setSearchTerm}
-                placeholder="Buscar por nome ou documento..."
-                sx={{ width: { xs: '100%', sm: 260 } }}
-              />
-
-              {!isMobile && canAddGuest ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={() => setAddGuestOpen(true)}
-                >
-                  + Adicionar convidado
-                </Button>
-              ) : null}
-            </Stack>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <GroupsRoundedIcon color="primary" fontSize="small" />
+            <Typography variant="h4">Convidados</Typography>
           </Stack>
 
           <Typography variant="body2" color="text.secondary">
             {`${presentCount} presentes · ${departedCount} saídas registradas · ${waitingCount} aguardando`}
           </Typography>
+
+          <ListSearchField
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Buscar convidado..."
+            sx={{ width: '100%', maxWidth: 420 }}
+          />
 
           <Stack direction="row" spacing={1} flexWrap="wrap" rowGap={1}>
             {(['todos', 'aguardando', 'presente', 'saiu'] as GuestFilter[]).map((filter) => {
@@ -197,15 +186,45 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                       ? presentCount
                       : departedCount
 
+              const isActive = statusFilter === filter
+              const paletteKey = FILTER_PALETTE[filter]
+              const dotColor =
+                paletteKey === 'default' ? theme.palette.text.disabled : theme.palette[paletteKey].main
+              const activeTextColor =
+                paletteKey === 'default' ? theme.palette.text.primary : theme.palette[paletteKey].main
+
               return (
-                <Chip
+                <Box
                   key={filter}
-                  label={`${FILTER_LABEL[filter]} (${count})`}
-                  size="small"
-                  color={statusFilter === filter ? 'primary' : 'default'}
-                  variant={statusFilter === filter ? 'filled' : 'outlined'}
                   onClick={() => setStatusFilter(filter)}
-                />
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    padding: '6px 14px',
+                    borderRadius: 999,
+                    border: '1px solid',
+                    borderColor: isActive ? dotColor : 'divider',
+                    backgroundColor: isActive ? alpha(dotColor, 0.16) : 'transparent',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: dotColor,
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    sx={{ color: isActive ? activeTextColor : 'text.secondary' }}
+                  >
+                    {`${FILTER_LABEL[filter]} (${count})`}
+                  </Typography>
+                </Box>
               )
             })}
           </Stack>
@@ -217,7 +236,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
               </Typography>
             ) : (
               <Stack spacing={1.5}>
-                {filteredGuests.map((guest, index) => {
+                {filteredGuests.map((guest) => {
                   const status = getEventGuestStatus(guest.checkInAt, guest.checkOutAt)
 
                   return (
@@ -228,24 +247,28 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                           justifyContent="space-between"
                           alignItems="flex-start"
                         >
-                          <Stack direction="row" spacing={1.5} alignItems="flex-start">
-                            <Typography variant="caption" color="text.disabled">
-                              {index + 1}
+                          <Stack spacing={0.25}>
+                            <Typography variant="body2" fontWeight={700} color="text.primary">
+                              {guest.name}
                             </Typography>
-                            <Stack spacing={0.25}>
-                              <Typography variant="body2" fontWeight={700} color="text.primary">
-                                {guest.name}
-                              </Typography>
-                              <Typography variant="caption" color="text.disabled">
-                                {guest.document ?? '—'}
-                              </Typography>
-                            </Stack>
+                            <Typography variant="caption" color="text.disabled">
+                              {guest.document ?? '—'}
+                            </Typography>
                           </Stack>
 
                           <EventGuestStatusChip
                             checkInAt={guest.checkInAt}
                             checkOutAt={guest.checkOutAt}
                           />
+                        </Stack>
+
+                        <Stack direction="row" spacing={2}>
+                          <Typography variant="caption" color="text.secondary">
+                            {`Entrada ${formatTime(guest.checkInAt)}`}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {`Saída ${formatTime(guest.checkOutAt)}`}
+                          </Typography>
                         </Stack>
 
                         {renderAction(guest, status)}
@@ -258,10 +281,10 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
           ) : (
             <Table>
               <TableHead>
-                <TableHeadCell>#</TableHeadCell>
-                <TableHeadCell>Nome</TableHeadCell>
-                <TableHeadCell>Documento</TableHeadCell>
-                <TableHeadCell>Status</TableHeadCell>
+                <TableHeadCell>Convidado</TableHeadCell>
+                <TableHeadCell>Entrada</TableHeadCell>
+                <TableHeadCell>Saída</TableHeadCell>
+                <TableHeadCell>Situação</TableHeadCell>
                 <TableHeadCell align="right">Ação</TableHeadCell>
               </TableHead>
               <TableBody
@@ -273,20 +296,29 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                 }
                 colSpan={COLUMN_COUNT}
               >
-                {filteredGuests.map((guest, index) => {
+                {filteredGuests.map((guest) => {
                   const status = getEventGuestStatus(guest.checkInAt, guest.checkOutAt)
 
                   return (
                     <TableRow key={guest.id}>
-                      <TableCell>{index + 1}</TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.primary">
-                          {guest.name}
-                        </Typography>
+                        <Stack spacing={0.25}>
+                          <Typography variant="body2" fontWeight={600} color="text.primary">
+                            {guest.name}
+                          </Typography>
+                          <Typography variant="caption" color="text.disabled">
+                            {guest.document ?? '—'}
+                          </Typography>
+                        </Stack>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.primary">
-                          {guest.document ?? '—'}
+                          {formatTime(guest.checkInAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatTime(guest.checkOutAt)}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -302,20 +334,8 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
               </TableBody>
             </Table>
           )}
-
-          {isMobile && canAddGuest ? (
-            <Button variant="contained" color="primary" fullWidth onClick={() => setAddGuestOpen(true)}>
-              + Adicionar convidado
-            </Button>
-          ) : null}
         </Stack>
       </CardContent>
-
-      <EventAddGuestDialog
-        open={addGuestOpen}
-        onClose={() => setAddGuestOpen(false)}
-        eventId={event.id}
-      />
 
       <EventGuestDetailsDialog event={event} guest={viewedGuest} onClose={() => setViewedGuestId(null)} />
 

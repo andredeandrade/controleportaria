@@ -2,12 +2,13 @@
 
 import DirectionsCarRoundedIcon from '@mui/icons-material/DirectionsCarRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
+import Box from '@mui/material/Box'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
-import { useTheme } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -42,7 +43,18 @@ const MOVEMENT_FILTER_LABEL: Record<MovementFilter, string> = {
   BUSCA: 'Busca de convidado',
 }
 
-function formatTime(iso: string): string {
+const MOVEMENT_FILTER_PALETTE: Record<MovementFilter, 'primary' | 'info' | 'warning'> = {
+  todos: 'primary',
+  CONVIDADO: 'primary',
+  DESEMBARQUE: 'info',
+  BUSCA: 'warning',
+}
+
+function formatTime(iso: string | null): string {
+  if (!iso) {
+    return '—'
+  }
+
   return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 }
 
@@ -104,18 +116,6 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
       ? 'Nenhum veículo registrado. Veículos entram no evento pela tela "Registrar acesso".'
       : 'Nenhum veículo corresponde ao filtro selecionado.'
 
-  const renderStatus = (vehicle: EventVehicle) => {
-    if (vehicle.isOpen) {
-      return <Chip size="small" color="success" label="No local" />
-    }
-
-    return (
-      <Typography variant="body2" color="text.secondary">
-        {`Saída ${formatTime(vehicle.checkOutAt as string)}`}
-      </Typography>
-    )
-  }
-
   const renderAction = (vehicle: EventVehicle) => (
     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
       <Tooltip title="Visualizar">
@@ -147,50 +147,89 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
     <MuiCard>
       <CardContent>
         <Stack spacing={2.5}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            flexWrap="wrap"
-            rowGap={2}
-          >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <DirectionsCarRoundedIcon color="primary" fontSize="small" />
-              <Typography variant="h4">Veículos no Evento</Typography>
-              <Chip size="small" color="success" label={`${vehiclesCount} registrados`} />
-            </Stack>
-
-            <ListSearchField
-              value={searchTerm}
-              onChange={setSearchTerm}
-              placeholder="Buscar por placa, modelo ou motorista..."
-              sx={{ width: { xs: '100%', sm: 260 } }}
-            />
+          <Stack direction="row" spacing={2} alignItems="center">
+            <DirectionsCarRoundedIcon color="primary" fontSize="small" />
+            <Typography variant="h4">Veículos</Typography>
           </Stack>
 
           <Typography variant="body2" color="text.secondary">
             {`${openCount} no local · ${vehiclesCount - openCount} com saída registrada`}
           </Typography>
 
-          <Stack direction="row" spacing={1} flexWrap="wrap" rowGap={1}>
-            {(['todos', 'CONVIDADO', 'DESEMBARQUE', 'BUSCA'] as MovementFilter[]).map((filter) => (
-              <Chip
-                key={filter}
-                label={MOVEMENT_FILTER_LABEL[filter]}
-                size="small"
-                color={movementFilter === filter ? 'primary' : 'default'}
-                variant={movementFilter === filter ? 'filled' : 'outlined'}
-                onClick={() => setMovementFilter(filter)}
-              />
-            ))}
+          <ListSearchField
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Buscar por placa, modelo ou motorista..."
+            sx={{ width: '100%', maxWidth: 420 }}
+          />
 
-            <Chip
-              label="Somente no local"
-              size="small"
-              color={onlyOpen ? 'primary' : 'default'}
-              variant={onlyOpen ? 'filled' : 'outlined'}
+          <Stack direction="row" spacing={1} flexWrap="wrap" rowGap={1}>
+            {(['todos', 'CONVIDADO', 'DESEMBARQUE', 'BUSCA'] as MovementFilter[]).map((filter) => {
+              const isActive = movementFilter === filter
+              const paletteKey = MOVEMENT_FILTER_PALETTE[filter]
+              const dotColor = theme.palette[paletteKey].main
+
+              return (
+                <Box
+                  key={filter}
+                  onClick={() => setMovementFilter(filter)}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    padding: '6px 14px',
+                    borderRadius: 999,
+                    border: '1px solid',
+                    borderColor: isActive ? dotColor : 'divider',
+                    backgroundColor: isActive ? alpha(dotColor, 0.16) : 'transparent',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: dotColor,
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    sx={{ color: isActive ? dotColor : 'text.secondary' }}
+                  >
+                    {MOVEMENT_FILTER_LABEL[filter]}
+                  </Typography>
+                </Box>
+              )
+            })}
+
+            <Box
               onClick={() => setOnlyOpen((current) => !current)}
-            />
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 1,
+                padding: '6px 14px',
+                borderRadius: 999,
+                border: '1px solid',
+                borderColor: onlyOpen ? 'success.main' : 'divider',
+                backgroundColor: onlyOpen ? alpha(theme.palette.success.main, 0.16) : 'transparent',
+                cursor: 'pointer',
+              }}
+            >
+              <PlaceRoundedIcon
+                fontSize="small"
+                sx={{ color: onlyOpen ? 'success.main' : 'text.secondary' }}
+              />
+              <Typography
+                variant="body2"
+                fontWeight={600}
+                sx={{ color: onlyOpen ? 'success.main' : 'text.secondary' }}
+              >
+                Somente no local
+              </Typography>
+            </Box>
           </Stack>
 
           {isMobile ? (
@@ -200,34 +239,31 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
               </Typography>
             ) : (
               <Stack spacing={1.5}>
-                {filteredVehicles.map((vehicle, index) => (
+                {filteredVehicles.map((vehicle) => (
                   <MobileListCard key={vehicle.id} variant="outlined">
                     <Stack spacing={2}>
                       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                        <Stack direction="row" spacing={1.5} alignItems="flex-start">
-                          <Typography variant="caption" color="text.disabled">
-                            {index + 1}
+                        <Stack spacing={0.25}>
+                          <Typography variant="body2" fontWeight={700} color="text.primary">
+                            {vehicle.plate ?? '—'}
                           </Typography>
-                          <Stack spacing={0.25}>
-                            <Typography variant="body2" fontWeight={700} color="text.primary">
-                              {vehicle.plate ?? '—'}
-                            </Typography>
-                            <Typography variant="caption" color="text.disabled">
-                              {vehicle.brandModel ?? '—'}
-                            </Typography>
-                            <Typography variant="caption" color="text.disabled">
-                              {vehicle.driverName ?? '—'}
-                            </Typography>
-                          </Stack>
+                          <Typography variant="caption" color="text.disabled">
+                            {vehicle.brandModel ?? '—'}
+                          </Typography>
+                          <Typography variant="caption" color="text.disabled">
+                            {vehicle.driverName ?? '—'}
+                          </Typography>
                         </Stack>
 
-                        {renderStatus(vehicle)}
+                        <EventVehicleMovementBadge movementType={vehicle.movementType} />
                       </Stack>
 
-                      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" rowGap={1}>
-                        <EventVehicleMovementBadge movementType={vehicle.movementType} />
+                      <Stack direction="row" spacing={2}>
                         <Typography variant="caption" color="text.secondary">
                           {`Entrada ${formatTime(vehicle.checkInAt)}`}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {`Saída ${formatTime(vehicle.checkOutAt)}`}
                         </Typography>
                       </Stack>
 
@@ -240,12 +276,12 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
           ) : (
             <Table>
               <TableHead>
-                <TableHeadCell>#</TableHeadCell>
                 <TableHeadCell>Placa</TableHeadCell>
                 <TableHeadCell>Modelo</TableHeadCell>
                 <TableHeadCell>Movimentação</TableHeadCell>
-                <TableHeadCell>Situação</TableHeadCell>
-                <TableHeadCell align="right">Ação</TableHeadCell>
+                <TableHeadCell>Entrada</TableHeadCell>
+                <TableHeadCell>Saída</TableHeadCell>
+                <TableHeadCell align="right">Ações</TableHeadCell>
               </TableHead>
               <TableBody
                 isEmpty={filteredVehicles.length === 0}
@@ -256,23 +292,31 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
                 }
                 colSpan={COLUMN_COUNT}
               >
-                {filteredVehicles.map((vehicle, index) => (
+                {filteredVehicles.map((vehicle) => (
                   <TableRow key={vehicle.id}>
-                    <TableCell>{index + 1}</TableCell>
                     <TableCell>
-                      <Typography variant="body2" color="text.primary">
+                      <Typography variant="body2" fontWeight={600} color="text.primary">
                         {vehicle.plate ?? '—'}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" color="text.primary">
+                      <Typography variant="body2" color="text.secondary">
                         {vehicle.brandModel ?? '—'}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <EventVehicleMovementBadge movementType={vehicle.movementType} />
                     </TableCell>
-                    <TableCell>{renderStatus(vehicle)}</TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.primary">
+                        {formatTime(vehicle.checkInAt)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatTime(vehicle.checkOutAt)}
+                      </Typography>
+                    </TableCell>
                     <TableCell align="right">{renderAction(vehicle)}</TableCell>
                   </TableRow>
                 ))}
