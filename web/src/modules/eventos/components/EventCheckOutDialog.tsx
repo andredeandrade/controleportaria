@@ -1,6 +1,8 @@
 'use client'
 
+import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
 import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
 import Dialog from '@mui/material/Dialog'
@@ -17,6 +19,11 @@ import type { Event, EventGuest, EventVehicleMovementType } from '@/app/api/even
 import { useCheckOutEventGuest } from '@/modules/eventos/hooks/useCheckOutEventGuest'
 import { useCheckOutEventVehicle } from '@/modules/eventos/hooks/useCheckOutEventVehicle'
 import { useAppSnackbar } from '@/providers'
+import { MobileFieldLabel } from '@/styles/MobileList.styles'
+
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+}
 
 export type EventCheckOutTarget =
   | { type: 'guest'; guestId: string }
@@ -51,7 +58,9 @@ export function EventCheckOutDialog({ event, target, onClose }: EventCheckOutDia
   const [selectedGuestIds, setSelectedGuestIds] = useState<string[]>([])
 
   const vehicle =
-    target?.type === 'vehicle' ? event.vehicles.find((item) => item.id === target.vehicleId) : undefined
+    target?.type === 'vehicle'
+      ? event.vehicles.find((item) => item.id === target.vehicleId)
+      : undefined
 
   const cascadeGuests =
     target?.type === 'vehicle' && vehicle
@@ -124,32 +133,72 @@ export function EventCheckOutDialog({ event, target, onClose }: EventCheckOutDia
         {target.type === 'guest' ? (
           <DialogContentText>Confirma o registro de saída deste convidado?</DialogContentText>
         ) : (
-          <Stack spacing={2}>
-            <DialogContentText>
-              {`Confirma o registro de saída do veículo ${vehicle?.plate ?? ''}?`}
-            </DialogContentText>
+          <Stack spacing={3.5}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 3,
+                p: 3.5,
+                borderRadius: 1,
+                bgcolor: 'background.default',
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <GroupsRoundedIcon color="success" />
+              <Stack spacing={0.25}>
+                <Typography variant="body2" fontWeight={700} color="text.primary">
+                  {`Saída do veículo · ${vehicle?.plate ?? ''}`}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Confirme quais convidados vinculados saem junto com o veículo.
+                </Typography>
+              </Stack>
+            </Box>
 
             {cascadeGuests.length > 0 ? (
-              <Stack spacing={1}>
-                <Typography variant="body2" fontWeight={700} color="text.primary">
-                  Convidados neste veículo
-                </Typography>
-                {cascadeGuests.map((guest) => (
-                  <FormControlLabel
-                    key={guest.id}
-                    control={
-                      <Checkbox
-                        checked={selectedGuestIds.includes(guest.id)}
-                        onChange={() => toggleGuestSelection(guest.id)}
-                        disabled={isPending}
+              <Stack spacing={2}>
+                <MobileFieldLabel variant="caption">Convidados vinculados</MobileFieldLabel>
+                <Stack spacing={1}>
+                  {cascadeGuests.map((guest) => {
+                    const isChecked = selectedGuestIds.includes(guest.id)
+
+                    return (
+                      <FormControlLabel
+                        key={guest.id}
+                        control={
+                          <Checkbox
+                            checked={isChecked}
+                            onChange={() => toggleGuestSelection(guest.id)}
+                            disabled={isPending}
+                          />
+                        }
+                        label={
+                          <Stack spacing={0.25}>
+                            <Typography variant="body2" fontWeight={700} color="text.primary">
+                              {guest.name}
+                            </Typography>
+                            {guest.checkInAt ? (
+                              <Typography variant="caption" color="text.secondary">
+                                {`Entrada ${formatTime(guest.checkInAt)}`}
+                              </Typography>
+                            ) : null}
+                          </Stack>
+                        }
+                        sx={{
+                          m: 0,
+                          width: '100%',
+                          alignItems: 'center',
+                          px: 1.5,
+                          py: 3,
+                          borderRadius: 1,
+                          bgcolor: isChecked ? 'rgba(52, 211, 153, 0.08)' : 'transparent',
+                        }}
                       />
-                    }
-                    label={guest.name}
-                  />
-                ))}
-                <Typography variant="caption" color="text.secondary">
-                  Desmarque os convidados que não saíram junto com o veículo.
-                </Typography>
+                    )
+                  })}
+                </Stack>
               </Stack>
             ) : null}
           </Stack>
@@ -173,7 +222,11 @@ export function EventCheckOutDialog({ event, target, onClose }: EventCheckOutDia
           onClick={() => void handleConfirm()}
           disabled={isPending}
         >
-          {isPending ? 'Registrando...' : 'Registrar saída'}
+          {isPending
+            ? 'Registrando...'
+            : target.type === 'vehicle'
+              ? 'Confirmar saída'
+              : 'Registrar saída'}
         </Button>
       </DialogActions>
     </Dialog>

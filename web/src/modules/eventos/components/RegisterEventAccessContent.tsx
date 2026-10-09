@@ -40,6 +40,9 @@ export function RegisterEventAccessContent({ eventId }: RegisterEventAccessConte
   const [vehicleValues, setVehicleValues] = useState<EventAccessVehicleValues>(
     EMPTY_EVENT_ACCESS_VEHICLE_VALUES,
   )
+  const [isWalkIn, setIsWalkIn] = useState(false)
+  const [driverNameError, setDriverNameError] = useState('')
+  const [driverDocumentError, setDriverDocumentError] = useState('')
   const [plateError, setPlateError] = useState('')
   const [selectedGuestIds, setSelectedGuestIds] = useState<string[]>([])
   const [guestDocuments, setGuestDocuments] = useState<Record<string, string>>({})
@@ -71,6 +74,17 @@ export function RegisterEventAccessContent({ eventId }: RegisterEventAccessConte
     setMovementType(value)
     setSelectedGuestIds([])
     setGuestDocuments({})
+    setIsWalkIn(false)
+    setDriverNameError('')
+    setDriverDocumentError('')
+    setPlateError('')
+  }
+
+  const handleWalkInChange = (value: boolean) => {
+    setIsWalkIn(value)
+    setVehicleValues(EMPTY_EVENT_ACCESS_VEHICLE_VALUES)
+    setDriverNameError('')
+    setDriverDocumentError('')
     setPlateError('')
   }
 
@@ -87,12 +101,19 @@ export function RegisterEventAccessContent({ eventId }: RegisterEventAccessConte
   const handleCancel = () => router.back()
 
   const handleSubmit = async () => {
-    if (movementType === 'BUSCA' && !vehicleValues.plate.trim()) {
-      setPlateError('Placa é obrigatória para busca de convidado.')
+    const nextDriverNameError =
+      isWalkIn || vehicleValues.driverName.trim() ? '' : 'Nome do motorista é obrigatório.'
+    const nextDriverDocumentError =
+      isWalkIn || vehicleValues.driverDocument.trim() ? '' : 'CPF do motorista é obrigatório.'
+    const nextPlateError = isWalkIn || vehicleValues.plate.trim() ? '' : 'Placa é obrigatória.'
+
+    setDriverNameError(nextDriverNameError)
+    setDriverDocumentError(nextDriverDocumentError)
+    setPlateError(nextPlateError)
+
+    if (nextDriverNameError || nextDriverDocumentError || nextPlateError) {
       return
     }
-
-    setPlateError('')
 
     const newGuestValues = getValues('newGuests')
 
@@ -113,13 +134,15 @@ export function RegisterEventAccessContent({ eventId }: RegisterEventAccessConte
       return
     }
 
-    const hasVehicleData = Boolean(
-      vehicleValues.driverName.trim() ||
-        vehicleValues.driverDocument.trim() ||
-        vehicleValues.plate.trim() ||
-        vehicleValues.brandModel.trim() ||
-        vehicleValues.color.trim(),
-    )
+    const hasVehicleData =
+      !isWalkIn &&
+      Boolean(
+        vehicleValues.driverName.trim() ||
+          vehicleValues.driverDocument.trim() ||
+          vehicleValues.plate.trim() ||
+          vehicleValues.brandModel.trim() ||
+          vehicleValues.color.trim(),
+      )
 
     const payload: RegisterEventAccessRequest = {
       movementType,
@@ -180,6 +203,10 @@ export function RegisterEventAccessContent({ eventId }: RegisterEventAccessConte
           movementType={movementType}
           value={vehicleValues}
           onChange={setVehicleValues}
+          isWalkIn={isWalkIn}
+          onWalkInChange={handleWalkInChange}
+          driverNameError={driverNameError}
+          driverDocumentError={driverDocumentError}
           plateError={plateError}
         />
 

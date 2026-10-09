@@ -1,13 +1,13 @@
 'use client'
 
-import RouteRoundedIcon from '@mui/icons-material/RouteRounded'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import type { EventVehicleMovementType } from '@/app/api/events/types'
-import { EventVehicleMovementBadge } from '@/modules/eventos/components/EventVehicleMovementBadge'
+import { MOVEMENT_ICON } from '@/modules/eventos/components/EventVehicleMovementBadge'
+import { MobileFieldLabel } from '@/styles/MobileList.styles'
 
 type MovementOption = {
   value: EventVehicleMovementType
@@ -42,46 +42,51 @@ type EventAccessTypeCardProps = {
 }
 
 export function EventAccessTypeCard({ value, onChange }: EventAccessTypeCardProps) {
+  const selectedOption =
+    MOVEMENT_OPTIONS.find((option) => option.value === value) ?? MOVEMENT_OPTIONS[0]
+  const SelectedIcon = MOVEMENT_ICON[selectedOption.value]
+
   return (
     <MuiCard>
       <CardContent>
-        <Stack spacing={2.5}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <RouteRoundedIcon color="primary" fontSize="small" />
-            <Typography variant="h4">Tipo de Movimentação</Typography>
-          </Stack>
+        <Stack spacing={3}>
+          <MobileFieldLabel variant="caption">Tipo de acesso</MobileFieldLabel>
 
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+          <Stack direction="row" spacing={2.5} flexWrap="wrap" rowGap={1.5}>
             {MOVEMENT_OPTIONS.map((option) => {
               const isSelected = value === option.value
 
               return (
-                <MuiCard
+                <Typography
                   key={option.value}
-                  variant="outlined"
+                  component="button"
+                  type="button"
                   onClick={() => onChange(option.value)}
+                  variant="body2"
                   sx={{
-                    flex: 1,
-                    cursor: 'pointer',
+                    px: 2.5,
+                    py: 1,
+                    borderRadius: 999,
+                    border: '1px solid',
                     borderColor: isSelected ? 'primary.main' : 'divider',
-                    borderWidth: isSelected ? 2 : 1,
-                    bgcolor: isSelected ? 'rgba(52, 211, 153, 0.08)' : 'transparent',
+                    bgcolor: isSelected ? 'primary.main' : 'transparent',
+                    color: isSelected ? 'primary.contrastText' : 'text.primary',
+                    fontWeight: 700,
+                    fontFamily: 'inherit',
+                    cursor: 'pointer',
                   }}
                 >
-                  <CardContent>
-                    <Stack spacing={1.25}>
-                      <EventVehicleMovementBadge movementType={option.value} />
-                      <Typography variant="body2" fontWeight={700} color="text.primary">
-                        {option.title}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {option.description}
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </MuiCard>
+                  {option.title}
+                </Typography>
               )
             })}
+          </Stack>
+
+          <Stack direction="row" spacing={2} alignItems="center">
+            <SelectedIcon color="primary" fontSize="small" />
+            <Typography variant="caption" color="text.secondary">
+              {selectedOption.description}
+            </Typography>
           </Stack>
         </Stack>
       </CardContent>

@@ -6,7 +6,7 @@ import { RegisterEventForm } from '@/modules/eventos/components/RegisterEventFor
 import { BackToPreviousPageButton } from '@/modules/navigation/components/BackToPreviousPageButton'
 
 export const metadata: Metadata = {
-  title: 'Agendar Evento',
+  title: 'Registrar Evento',
 }
 
 export default function CadastrarEventoPage() {
@@ -20,7 +20,7 @@ export default function CadastrarEventoPage() {
           />
 
           <Typography variant="h2" fontWeight={700} color="text.primary">
-            Agendar Evento
+            Registrar Evento
           </Typography>
         </Stack>
 

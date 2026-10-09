@@ -1,14 +1,15 @@
 'use client'
 
-import DirectionsCarRoundedIcon from '@mui/icons-material/DirectionsCarRounded'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
-import Typography from '@mui/material/Typography'
+import Switch from '@mui/material/Switch'
 
 import type { EventVehicleMovementType } from '@/app/api/events/types'
 import { TextField, TextFieldLabel, TextFieldStack } from '@/modules/form'
+import { MobileFieldLabel } from '@/styles/MobileList.styles'
 
 export type EventAccessVehicleValues = {
   driverName: string
@@ -30,6 +31,10 @@ type EventAccessVehicleCardProps = {
   movementType: EventVehicleMovementType
   value: EventAccessVehicleValues
   onChange: (value: EventAccessVehicleValues) => void
+  isWalkIn: boolean
+  onWalkInChange: (value: boolean) => void
+  driverNameError?: string
+  driverDocumentError?: string
   plateError?: string
 }
 
@@ -37,9 +42,13 @@ export function EventAccessVehicleCard({
   movementType,
   value,
   onChange,
+  isWalkIn,
+  onWalkInChange,
+  driverNameError,
+  driverDocumentError,
   plateError,
 }: EventAccessVehicleCardProps) {
-  const isPlateRequired = movementType === 'BUSCA'
+  const canBeWalkIn = movementType === 'CONVIDADO'
 
   const patch = (field: keyof EventAccessVehicleValues, fieldValue: string) => {
     onChange({ ...value, [field]: fieldValue })
@@ -49,34 +58,44 @@ export function EventAccessVehicleCard({
     <MuiCard>
       <CardContent>
         <Stack spacing={2.5}>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <DirectionsCarRoundedIcon color="primary" fontSize="small" />
-            <Typography variant="h4">Dados do Veículo</Typography>
-          </Stack>
+          <MobileFieldLabel variant="caption">Veículo</MobileFieldLabel>
 
-          <Typography variant="body2" color="text.secondary">
-            {isPlateRequired
-              ? 'Busca de convidado exige um veículo — não é possível registrar uma busca a pé.'
-              : 'Preencha apenas se um veículo estiver envolvido nesta movimentação.'}
-          </Typography>
+          {canBeWalkIn ? (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isWalkIn}
+                  onChange={(event) => onWalkInChange(event.target.checked)}
+                />
+              }
+              label="Entrada a pé (sem veículo)"
+              sx={{ m: 0, alignSelf: 'flex-start' }}
+            />
+          ) : null}
 
-          <Grid container spacing={2}>
+          {canBeWalkIn && isWalkIn ? null : (
+            <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextFieldStack>
-                <TextFieldLabel>Motorista</TextFieldLabel>
+                <TextFieldLabel required>Motorista</TextFieldLabel>
                 <TextField
                   value={value.driverName}
                   onChange={(event) => patch('driverName', event.target.value)}
+                  error={Boolean(driverNameError)}
+                  helperText={driverNameError}
+                  placeholder="Nome completo"
                 />
               </TextFieldStack>
             </Grid>
 
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextFieldStack>
-                <TextFieldLabel>CPF do motorista</TextFieldLabel>
+                <TextFieldLabel required>CPF</TextFieldLabel>
                 <TextField
                   value={value.driverDocument}
                   onChange={(event) => patch('driverDocument', event.target.value)}
+                  error={Boolean(driverDocumentError)}
+                  helperText={driverDocumentError}
                   placeholder="000.000.000-00"
                 />
               </TextFieldStack>
@@ -84,12 +103,13 @@ export function EventAccessVehicleCard({
 
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextFieldStack>
-                <TextFieldLabel required={isPlateRequired}>Placa</TextFieldLabel>
+                <TextFieldLabel required>Placa</TextFieldLabel>
                 <TextField
                   value={value.plate}
                   onChange={(event) => patch('plate', event.target.value)}
                   error={Boolean(plateError)}
                   helperText={plateError}
+                  placeholder="AAA-0000"
                 />
               </TextFieldStack>
             </Grid>
@@ -100,6 +120,7 @@ export function EventAccessVehicleCard({
                 <TextField
                   value={value.brandModel}
                   onChange={(event) => patch('brandModel', event.target.value)}
+                  placeholder="Ex: Honda Civic"
                 />
               </TextFieldStack>
             </Grid>
@@ -110,10 +131,12 @@ export function EventAccessVehicleCard({
                 <TextField
                   value={value.color}
                   onChange={(event) => patch('color', event.target.value)}
+                  placeholder="Ex: Prata"
                 />
               </TextFieldStack>
             </Grid>
-          </Grid>
+            </Grid>
+          )}
         </Stack>
       </CardContent>
     </MuiCard>

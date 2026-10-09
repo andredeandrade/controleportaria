@@ -17,7 +17,7 @@ const MOVEMENT_COLOR: Record<EventVehicleMovementType, 'primary' | 'info' | 'war
   BUSCA: 'warning',
 }
 
-const MOVEMENT_ICON: Record<EventVehicleMovementType, typeof GroupsRoundedIcon> = {
+export const MOVEMENT_ICON: Record<EventVehicleMovementType, typeof GroupsRoundedIcon> = {
   CONVIDADO: GroupsRoundedIcon,
   DESEMBARQUE: ExitToAppRoundedIcon,
   BUSCA: PersonSearchRoundedIcon,

@@ -1,15 +1,13 @@
 'use client'
 
-import AddRoundedIcon from '@mui/icons-material/AddRounded'
-import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
-import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
+import PersonAddRoundedIcon from '@mui/icons-material/PersonAddRounded'
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
@@ -17,6 +15,7 @@ import { useState } from 'react'
 import type { Event, EventGuest, EventVehicleMovementType } from '@/app/api/events/types'
 import { TextField, TextFieldLabel, TextFieldStack } from '@/modules/form'
 import { ListSearchField } from '@/modules/table/components/ListSearchField'
+import { MobileFieldLabel } from '@/styles/MobileList.styles'
 
 export type NewGuestField = {
   id: string
@@ -85,40 +84,30 @@ export function EventAccessGuestsCard({
       : 'Nenhum convidado aguardando ou fora do evento para liberar entrada.'
 
   const handleAddNewGuest = () => {
-    if (!newGuestName.trim()) {
+    if (!newGuestName.trim() || !newGuestDocument.trim()) {
       return
     }
 
     onAppendNewGuest({ name: newGuestName.trim(), document: newGuestDocument.trim() })
     setNewGuestName('')
     setNewGuestDocument('')
+    setShowNewGuestForm(false)
   }
 
   return (
     <MuiCard>
       <CardContent>
-        <Stack spacing={2.5}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            flexWrap="wrap"
-            rowGap={2}
-          >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <GroupsRoundedIcon color="primary" fontSize="small" />
-              <Typography variant="h4">Convidados</Typography>
-            </Stack>
+        <Stack spacing={2}>
+          <MobileFieldLabel variant="caption">Quem está entrando</MobileFieldLabel>
 
-            <ListSearchField
-              value={searchTerm}
-              onChange={setSearchTerm}
-              placeholder="Buscar por nome ou documento..."
-              sx={{ width: { xs: '100%', sm: 260 } }}
-            />
-          </Stack>
+          <ListSearchField
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Buscar por nome ou CPF..."
+            sx={{ width: '100%' }}
+          />
 
-          {eligibleGuests.length === 0 ? (
+          {eligibleGuests.length === 0 && newGuestFields.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
               {emptyMessage}
             </Typography>
@@ -129,7 +118,15 @@ export function EventAccessGuestsCard({
                 const needsDocument = isSelected && !guest.document && movementType !== 'BUSCA'
 
                 return (
-                  <Stack key={guest.id} spacing={1}>
+                  <Stack
+                    key={guest.id}
+                    spacing={1}
+                    sx={{
+                      borderRadius: 1,
+                      p: needsDocument ? 2 : 0,
+                      bgcolor: needsDocument ? 'rgba(52, 211, 153, 0.08)' : 'transparent',
+                    }}
+                  >
                     <Stack direction="row" spacing={1.5} alignItems="center">
                       <Checkbox
                         checked={isSelected}
@@ -140,112 +137,121 @@ export function EventAccessGuestsCard({
                         <Typography variant="body2" fontWeight={700} color="text.primary">
                           {guest.name}
                         </Typography>
-                        <Typography variant="caption" color="text.disabled">
-                          {guest.document ?? 'Sem documento cadastrado'}
+                        <Typography
+                          variant="caption"
+                          color={guest.document ? 'text.disabled' : 'warning.main'}
+                        >
+                          {guest.document ?? 'Sem CPF cadastrado'}
                         </Typography>
                       </Stack>
                     </Stack>
 
                     {needsDocument ? (
-                      <TextFieldStack sx={{ pl: 5 }}>
-                        <TextFieldLabel required>CPF</TextFieldLabel>
-                        <TextField
-                          required
-                          value={guestDocuments[guest.id] ?? ''}
-                          onChange={(event) => onGuestDocumentChange(guest.id, event.target.value)}
-                          placeholder="000.000.000-00"
-                          sx={{ maxWidth: 260 }}
-                        />
-                      </TextFieldStack>
+                      <TextField
+                        required
+                        value={guestDocuments[guest.id] ?? ''}
+                        onChange={(event) => onGuestDocumentChange(guest.id, event.target.value)}
+                        placeholder="Informe o CPF para liberar a entrada"
+                        aria-label={`CPF de ${guest.name}`}
+                        sx={{ ml: 5 }}
+                      />
                     ) : null}
                   </Stack>
                 )
               })}
+
+              {newGuestFields.map((field, index) => (
+                <Stack
+                  key={field.id}
+                  direction="row"
+                  spacing={1.5}
+                  alignItems="center"
+                  sx={{
+                    borderRadius: 1,
+                    p: 2,
+                    bgcolor: 'rgba(52, 211, 153, 0.08)',
+                  }}
+                >
+                  <Checkbox
+                    checked
+                    onChange={() => onRemoveNewGuest(index)}
+                    aria-label={`Remover ${field.name} da lista`}
+                  />
+                  <Stack spacing={0.25} sx={{ flex: 1 }}>
+                    <Typography variant="body2" fontWeight={700} color="text.primary">
+                      {field.name}
+                    </Typography>
+                    <Typography variant="caption" color="text.disabled">
+                      {field.document}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              ))}
             </Stack>
           )}
 
           {canAddNewGuest ? (
             <Stack spacing={1.5}>
-              <Divider sx={{ borderColor: 'divider' }} />
-
-              {newGuestFields.length > 0 ? (
-                <Stack spacing={1}>
-                  <Typography variant="body2" fontWeight={700} color="text.primary">
-                    Novos convidados adicionados
-                  </Typography>
-                  {newGuestFields.map((field, index) => (
-                    <Stack
-                      key={field.id}
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Stack spacing={0.25}>
-                        <Typography variant="body2" color="text.primary">
-                          {field.name}
-                        </Typography>
-                        <Typography variant="caption" color="text.disabled">
-                          {field.document || 'Sem documento informado'}
-                        </Typography>
-                      </Stack>
-                      <IconButton
-                        aria-label={`Remover ${field.name} da lista`}
-                        size="small"
-                        color="error"
-                        onClick={() => onRemoveNewGuest(index)}
-                      >
-                        <DeleteOutlineRoundedIcon fontSize="small" />
-                      </IconButton>
-                    </Stack>
-                  ))}
-                </Stack>
-              ) : null}
+              <Button
+                variant="text"
+                color="primary"
+                startIcon={<PersonAddRoundedIcon fontSize="small" />}
+                onClick={() => setShowNewGuestForm((current) => !current)}
+                sx={{ alignSelf: 'flex-start' }}
+              >
+                {showNewGuestForm ? 'Fechar cadastro' : 'A pessoa não está na lista'}
+              </Button>
 
               {showNewGuestForm ? (
-                <Stack spacing={1.5}>
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                      <TextFieldStack>
-                        <TextFieldLabel required>Nome</TextFieldLabel>
-                        <TextField
-                          value={newGuestName}
-                          onChange={(event) => setNewGuestName(event.target.value)}
-                        />
-                      </TextFieldStack>
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                      <TextFieldStack>
-                        <TextFieldLabel>CPF</TextFieldLabel>
-                        <TextField
-                          value={newGuestDocument}
-                          onChange={(event) => setNewGuestDocument(event.target.value)}
-                          placeholder="000.000.000-00"
-                        />
-                      </TextFieldStack>
-                    </Grid>
-                  </Grid>
-
-                  <Button
-                    variant="outlined"
-                    color="inherit"
-                    disabled={!newGuestName.trim()}
-                    onClick={handleAddNewGuest}
-                    sx={{ alignSelf: 'flex-start' }}
-                  >
-                    Adicionar à lista
-                  </Button>
-                </Stack>
-              ) : (
-                <Button
-                  variant="text"
-                  color="primary"
-                  startIcon={<AddRoundedIcon fontSize="small" />}
-                  onClick={() => setShowNewGuestForm(true)}
-                  sx={{ alignSelf: 'flex-start' }}
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                  }}
                 >
-                  Adicionar novo convidado
-                </Button>
-              )}
+                  <Stack spacing={2}>
+                    <Typography variant="body2" color="text.secondary">
+                      A pessoa não está na lista do evento. O cadastro fica marcado como autorizado
+                      na portaria.
+                    </Typography>
+
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextFieldStack>
+                          <TextFieldLabel required>Nome</TextFieldLabel>
+                          <TextField
+                            value={newGuestName}
+                            onChange={(event) => setNewGuestName(event.target.value)}
+                            placeholder="Nome completo"
+                          />
+                        </TextFieldStack>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <TextFieldStack>
+                          <TextFieldLabel required>CPF</TextFieldLabel>
+                          <TextField
+                            value={newGuestDocument}
+                            onChange={(event) => setNewGuestDocument(event.target.value)}
+                            placeholder="000.000.000-00"
+                          />
+                        </TextFieldStack>
+                      </Grid>
+                    </Grid>
+
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      disabled={!newGuestName.trim() || !newGuestDocument.trim()}
+                      onClick={handleAddNewGuest}
+                      sx={{ alignSelf: 'flex-end' }}
+                    >
+                      Adicionar à lista
+                    </Button>
+                  </Stack>
+                </Box>
+              ) : null}
             </Stack>
           ) : (
             <Typography variant="caption" color="text.secondary">

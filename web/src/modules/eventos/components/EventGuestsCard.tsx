@@ -91,9 +91,15 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
   const canRegisterAccess = useCan('events', 'registerAccess')
 
   const guestsCount = event.guests.length
-  const presentCount = event.guests.filter((guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'presente').length
-  const departedCount = event.guests.filter((guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'saiu').length
-  const waitingCount = event.guests.filter((guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'aguardando').length
+  const presentCount = event.guests.filter(
+    (guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'presente',
+  ).length
+  const departedCount = event.guests.filter(
+    (guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'saiu',
+  ).length
+  const waitingCount = event.guests.filter(
+    (guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'aguardando',
+  ).length
 
   const filteredGuests = event.guests.filter((guest) => {
     if (!matchesSearch(guest, searchTerm)) {
@@ -158,7 +164,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
   return (
     <MuiCard>
       <CardContent>
-        <Stack spacing={2.5}>
+        <Stack spacing={3.5}>
           <Stack direction="row" spacing={2} alignItems="center">
             <GroupsRoundedIcon color="primary" fontSize="small" />
             <Typography variant="h4">Convidados</Typography>
@@ -189,9 +195,13 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
               const isActive = statusFilter === filter
               const paletteKey = FILTER_PALETTE[filter]
               const dotColor =
-                paletteKey === 'default' ? theme.palette.text.disabled : theme.palette[paletteKey].main
+                paletteKey === 'default'
+                  ? theme.palette.text.disabled
+                  : theme.palette[paletteKey].main
               const activeTextColor =
-                paletteKey === 'default' ? theme.palette.text.primary : theme.palette[paletteKey].main
+                paletteKey === 'default'
+                  ? theme.palette.text.primary
+                  : theme.palette[paletteKey].main
 
               return (
                 <Box
@@ -337,7 +347,11 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
         </Stack>
       </CardContent>
 
-      <EventGuestDetailsDialog event={event} guest={viewedGuest} onClose={() => setViewedGuestId(null)} />
+      <EventGuestDetailsDialog
+        event={event}
+        guest={viewedGuest}
+        onClose={() => setViewedGuestId(null)}
+      />
 
       {checkInGuest ? (
         <EventGuestCheckInDialog
@@ -348,7 +362,11 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
         />
       ) : null}
 
-      <EventCheckOutDialog event={event} target={checkOutTarget} onClose={() => setCheckOutTarget(null)} />
+      <EventCheckOutDialog
+        event={event}
+        target={checkOutTarget}
+        onClose={() => setCheckOutTarget(null)}
+      />
     </MuiCard>
   )
 }

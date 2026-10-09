@@ -39,7 +39,7 @@ export function RegisterEventButton({
       onClick={handleNavigateToRegister}
       sx={sx}
     >
-      Agendar evento
+      Registrar evento
     </Button>
   )
 }

@@ -43,7 +43,7 @@ export function EventsTable() {
         emptyState={
           <ListEmptyState
             title="Nenhum evento encontrado."
-            description="Nenhum registro corresponde à busca realizada. Ajuste os critérios ou agende um novo evento."
+            description="Nenhum registro corresponde à busca realizada. Ajuste os critérios ou registre um novo evento."
             actions={
               <>
                 <Button variant="outlined" onClick={handleClearFilters}>

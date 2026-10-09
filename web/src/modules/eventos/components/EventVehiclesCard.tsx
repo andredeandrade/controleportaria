@@ -146,7 +146,7 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
   return (
     <MuiCard>
       <CardContent>
-        <Stack spacing={2.5}>
+        <Stack spacing={3.5}>
           <Stack direction="row" spacing={2} alignItems="center">
             <DirectionsCarRoundedIcon color="primary" fontSize="small" />
             <Typography variant="h4">Veículos</Typography>
@@ -332,7 +332,11 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
         onClose={() => setViewedVehicleId(null)}
       />
 
-      <EventCheckOutDialog event={event} target={checkOutTarget} onClose={() => setCheckOutTarget(null)} />
+      <EventCheckOutDialog
+        event={event}
+        target={checkOutTarget}
+        onClose={() => setCheckOutTarget(null)}
+      />
     </MuiCard>
   )
 }

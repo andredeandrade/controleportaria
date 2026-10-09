@@ -1,6 +1,8 @@
 'use client'
 
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -55,15 +57,17 @@ export function EventVehicleDetailsDialog({
         <DialogContent>
           <Stack spacing={2.5}>
             <Stack spacing={0.5}>
-              <Typography variant="h4" fontWeight={700} color="text.primary">
-                {vehicle.plate ?? '—'}
-              </Typography>
+              <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between">
+                <Typography variant="h4" fontWeight={700} color="text.primary">
+                  {vehicle.plate ?? '—'}
+                </Typography>
+                <EventVehicleMovementBadge movementType={vehicle.movementType} />
+              </Stack>
               {vehicle.brandModel ? (
                 <Typography variant="caption" color="text.disabled">
                   {vehicle.brandModel}
                 </Typography>
               ) : null}
-              <EventVehicleMovementBadge movementType={vehicle.movementType} />
             </Stack>
 
             <Divider sx={{ borderColor: 'divider' }} />
@@ -72,23 +76,20 @@ export function EventVehicleDetailsDialog({
               <Grid size={6}>
                 <Stack spacing={0.25}>
                   <MobileFieldLabel variant="caption">Motorista</MobileFieldLabel>
-                  <Typography variant="body2" color="text.primary">
+                  <Typography variant="body2" fontWeight={700} color="text.primary">
                     {vehicle.driverName ?? '—'}
                   </Typography>
-                </Stack>
-              </Grid>
-              <Grid size={6}>
-                <Stack spacing={0.25}>
-                  <MobileFieldLabel variant="caption">Documento</MobileFieldLabel>
-                  <Typography variant="body2" color="text.primary">
-                    {vehicle.driverDocument ?? '—'}
-                  </Typography>
+                  {vehicle.driverDocument ? (
+                    <Typography variant="caption" color="text.disabled">
+                      {vehicle.driverDocument}
+                    </Typography>
+                  ) : null}
                 </Stack>
               </Grid>
               <Grid size={6}>
                 <Stack spacing={0.25}>
                   <MobileFieldLabel variant="caption">Entrada</MobileFieldLabel>
-                  <Typography variant="body2" color="text.primary">
+                  <Typography variant="body2" fontWeight={700} color="text.primary">
                     {formatTime(vehicle.checkInAt)}
                   </Typography>
                 </Stack>
@@ -96,7 +97,7 @@ export function EventVehicleDetailsDialog({
               <Grid size={6}>
                 <Stack spacing={0.25}>
                   <MobileFieldLabel variant="caption">Saída</MobileFieldLabel>
-                  <Typography variant="body2" color="text.primary">
+                  <Typography variant="body2" fontWeight={700} color="text.primary">
                     {vehicle.checkOutAt ? formatTime(vehicle.checkOutAt) : '—'}
                   </Typography>
                 </Stack>
@@ -106,19 +107,26 @@ export function EventVehicleDetailsDialog({
             {vehicle.occupants.length > 0 ? (
               <>
                 <Divider sx={{ borderColor: 'divider' }} />
-                <Stack spacing={0.75}>
-                  <MobileFieldLabel variant="caption">Ocupantes</MobileFieldLabel>
-                  {vehicle.occupants.map((occupant) => (
-                    <Typography key={occupant.id} variant="body2" color="text.primary">
-                      {occupant.name}
-                      <Typography component="span" variant="caption" color="text.disabled">
-                        {occupant.via === 'entry' ? ' · entrada' : ' · saída reservada'}
-                      </Typography>
+                <Stack spacing={1}>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <GroupsRoundedIcon color="primary" fontSize="small" />
+                    <Typography variant="body2" fontWeight={700} color="text.primary">
+                      Passageiros
                     </Typography>
+                  </Stack>
+                  {vehicle.occupants.map((occupant) => (
+                    <Stack key={occupant.id} direction="row" spacing={1} alignItems="center">
+                      <PersonRoundedIcon fontSize="small" color="disabled" />
+                      <Typography variant="body2" color="text.primary">
+                        {occupant.name}
+                      </Typography>
+                    </Stack>
                   ))}
                 </Stack>
               </>
             ) : null}
+
+            <Divider sx={{ borderColor: 'divider' }} />
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
@@ -132,7 +140,7 @@ export function EventVehicleDetailsDialog({
               color="primary"
               onClick={() => setCheckOutTarget({ type: 'vehicle', vehicleId: vehicle.id })}
             >
-              Registrar saída
+              Registrar saída do veículo
             </Button>
           ) : null}
         </DialogActions>

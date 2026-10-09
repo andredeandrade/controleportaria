@@ -1,6 +1,7 @@
 'use client'
 
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+import DirectionsCarRoundedIcon from '@mui/icons-material/DirectionsCarRounded'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -15,9 +16,15 @@ import { useState } from 'react'
 
 import type { Event, EventGuest } from '@/app/api/events/types'
 import { useCan } from '@/hooks/useCan'
-import { EventCheckOutDialog, type EventCheckOutTarget } from '@/modules/eventos/components/EventCheckOutDialog'
+import {
+  EventCheckOutDialog,
+  type EventCheckOutTarget,
+} from '@/modules/eventos/components/EventCheckOutDialog'
 import { EventGuestCheckInDialog } from '@/modules/eventos/components/EventGuestCheckInDialog'
-import { EventGuestStatusChip, getEventGuestStatus } from '@/modules/eventos/components/EventGuestStatusChip'
+import {
+  EventGuestStatusChip,
+  getEventGuestStatus,
+} from '@/modules/eventos/components/EventGuestStatusChip'
 import { MobileFieldLabel } from '@/styles/MobileList.styles'
 
 function formatTime(iso: string): string {
@@ -55,20 +62,22 @@ export function EventGuestDetailsDialog({ event, guest, onClose }: EventGuestDet
         <DialogContent>
           <Stack spacing={2.5}>
             <Stack spacing={0.5}>
-              <Typography variant="h4" fontWeight={700} color="text.primary">
-                {guest.name}
-              </Typography>
+              <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between">
+                <Typography variant="h4" fontWeight={700} color="text.primary">
+                  {guest.name}
+                </Typography>
+                <EventGuestStatusChip
+                  checkInAt={guest.checkInAt}
+                  checkOutAt={guest.checkOutAt}
+                  isAdHoc={guest.isAdHoc}
+                  showAdHocBadge
+                />
+              </Stack>
               {guest.document ? (
                 <Typography variant="caption" color="text.disabled">
                   {guest.document}
                 </Typography>
               ) : null}
-              <EventGuestStatusChip
-                checkInAt={guest.checkInAt}
-                checkOutAt={guest.checkOutAt}
-                isAdHoc={guest.isAdHoc}
-                showAdHocBadge
-              />
             </Stack>
 
             <Divider sx={{ borderColor: 'divider' }} />
@@ -95,12 +104,31 @@ export function EventGuestDetailsDialog({ event, guest, onClose }: EventGuestDet
             {guest.entryVehicle ? (
               <>
                 <Divider sx={{ borderColor: 'divider' }} />
-                <Stack spacing={0.25}>
-                  <MobileFieldLabel variant="caption">Veículo de entrada</MobileFieldLabel>
-                  <Typography variant="body2" color="text.primary">
-                    {guest.entryVehicle.plate ?? '—'}
-                    {guest.entryVehicle.brandModel ? ` · ${guest.entryVehicle.brandModel}` : ''}
-                  </Typography>
+                <Stack spacing={1}>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <DirectionsCarRoundedIcon color="primary" fontSize="small" />
+                    <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+                      Veículo de entrada
+                    </Typography>
+                  </Stack>
+                  <Grid container spacing={2}>
+                    <Grid size={6}>
+                      <Stack spacing={0.25}>
+                        <MobileFieldLabel variant="caption">Placa</MobileFieldLabel>
+                        <Typography variant="body2" color="text.primary">
+                          {guest.entryVehicle.plate ?? '—'}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid size={6}>
+                      <Stack spacing={0.25}>
+                        <MobileFieldLabel variant="caption">Modelo</MobileFieldLabel>
+                        <Typography variant="body2" color="text.primary">
+                          {guest.entryVehicle.brandModel ?? '—'}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </Grid>
                 </Stack>
               </>
             ) : null}
@@ -108,12 +136,31 @@ export function EventGuestDetailsDialog({ event, guest, onClose }: EventGuestDet
             {guest.exitVehicle ? (
               <>
                 <Divider sx={{ borderColor: 'divider' }} />
-                <Stack spacing={0.25}>
-                  <MobileFieldLabel variant="caption">Veículo de saída</MobileFieldLabel>
-                  <Typography variant="body2" color="text.primary">
-                    {guest.exitVehicle.plate ?? '—'}
-                    {guest.exitVehicle.brandModel ? ` · ${guest.exitVehicle.brandModel}` : ''}
-                  </Typography>
+                <Stack spacing={1}>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <DirectionsCarRoundedIcon color="primary" fontSize="small" />
+                    <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+                      Veículo de saída
+                    </Typography>
+                  </Stack>
+                  <Grid container spacing={2}>
+                    <Grid size={6}>
+                      <Stack spacing={0.25}>
+                        <MobileFieldLabel variant="caption">Placa</MobileFieldLabel>
+                        <Typography variant="body2" color="text.primary">
+                          {guest.exitVehicle.plate ?? '—'}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid size={6}>
+                      <Stack spacing={0.25}>
+                        <MobileFieldLabel variant="caption">Modelo</MobileFieldLabel>
+                        <Typography variant="body2" color="text.primary">
+                          {guest.exitVehicle.brandModel ?? '—'}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </Grid>
                 </Stack>
               </>
             ) : null}
@@ -149,7 +196,11 @@ export function EventGuestDetailsDialog({ event, guest, onClose }: EventGuestDet
         guest={guest}
       />
 
-      <EventCheckOutDialog event={event} target={checkOutTarget} onClose={() => setCheckOutTarget(null)} />
+      <EventCheckOutDialog
+        event={event}
+        target={checkOutTarget}
+        onClose={() => setCheckOutTarget(null)}
+      />
     </>
   )
 }
