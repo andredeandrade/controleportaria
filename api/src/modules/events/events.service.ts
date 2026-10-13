@@ -1088,7 +1088,7 @@ export const eventsService = {
         await tx.eventGuest.updateMany({
           where: { id: { in: allGuestIds } },
           data: {
-            exitVehicleId: vehicleId,
+            exitVehicleId: vehicleId ?? null,
           },
         })
       } else {
@@ -1097,7 +1097,9 @@ export const eventsService = {
           data: {
             checkInAt: now,
             checkedInByUserId: userId,
-            entryVehicleId: vehicleId,
+            entryVehicleId: vehicleId ?? null,
+            checkOutAt: null,
+            checkedOutByUserId: null,
           },
         })
       }

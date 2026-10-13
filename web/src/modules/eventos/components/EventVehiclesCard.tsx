@@ -93,16 +93,26 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
   const vehiclesCount = event.vehicles.length
   const openCount = event.vehicles.filter((vehicle) => vehicle.isOpen).length
 
+  const handleMovementFilterChange = (filter: MovementFilter) => {
+    setMovementFilter(filter)
+    setOnlyOpen(false)
+  }
+
+  const handleOnlyOpenToggle = () => {
+    setOnlyOpen((current) => !current)
+    setMovementFilter('todos')
+  }
+
   const filteredVehicles = event.vehicles.filter((vehicle) => {
     if (!matchesSearch(vehicle, searchTerm)) {
       return false
     }
 
-    if (movementFilter !== 'todos' && vehicle.movementType !== movementFilter) {
-      return false
+    if (onlyOpen) {
+      return vehicle.isOpen
     }
 
-    if (onlyOpen && !vehicle.isOpen) {
+    if (movementFilter !== 'todos' && vehicle.movementType !== movementFilter) {
       return false
     }
 
@@ -165,14 +175,14 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
 
           <Stack direction="row" spacing={1} flexWrap="wrap" rowGap={1}>
             {(['todos', 'CONVIDADO', 'DESEMBARQUE', 'BUSCA'] as MovementFilter[]).map((filter) => {
-              const isActive = movementFilter === filter
+              const isActive = !onlyOpen && movementFilter === filter
               const paletteKey = MOVEMENT_FILTER_PALETTE[filter]
               const dotColor = theme.palette[paletteKey].main
 
               return (
                 <Box
                   key={filter}
-                  onClick={() => setMovementFilter(filter)}
+                  onClick={() => handleMovementFilterChange(filter)}
                   sx={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -205,7 +215,7 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
             })}
 
             <Box
-              onClick={() => setOnlyOpen((current) => !current)}
+              onClick={handleOnlyOpenToggle}
               sx={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -327,9 +337,12 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
       </CardContent>
 
       <EventVehicleDetailsDialog
-        event={event}
         vehicle={viewedVehicle}
         onClose={() => setViewedVehicleId(null)}
+        onRegisterCheckOut={(vehicleId) => {
+          setViewedVehicleId(null)
+          setCheckOutTarget({ type: 'vehicle', vehicleId })
+        }}
       />
 
       <EventCheckOutDialog

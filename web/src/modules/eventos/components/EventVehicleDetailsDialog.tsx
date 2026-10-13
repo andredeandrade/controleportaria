@@ -13,11 +13,9 @@ import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { useState } from 'react'
 
-import type { Event, EventVehicle } from '@/app/api/events/types'
+import type { EventVehicle } from '@/app/api/events/types'
 import { useCan } from '@/hooks/useCan'
-import { EventCheckOutDialog, type EventCheckOutTarget } from '@/modules/eventos/components/EventCheckOutDialog'
 import { EventVehicleMovementBadge } from '@/modules/eventos/components/EventVehicleMovementBadge'
 import { MobileFieldLabel } from '@/styles/MobileList.styles'
 
@@ -26,17 +24,16 @@ function formatTime(iso: string): string {
 }
 
 type EventVehicleDetailsDialogProps = {
-  event: Event
   vehicle: EventVehicle | null
   onClose: () => void
+  onRegisterCheckOut: (vehicleId: string) => void
 }
 
 export function EventVehicleDetailsDialog({
-  event,
   vehicle,
   onClose,
+  onRegisterCheckOut,
 }: EventVehicleDetailsDialogProps) {
-  const [checkOutTarget, setCheckOutTarget] = useState<EventCheckOutTarget | null>(null)
   const canRegisterAccess = useCan('events', 'registerAccess')
 
   if (!vehicle) {
@@ -44,8 +41,7 @@ export function EventVehicleDetailsDialog({
   }
 
   return (
-    <>
-      <Dialog open={Boolean(vehicle)} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog open={Boolean(vehicle)} onClose={onClose} fullWidth maxWidth="sm">
         <DialogTitle
           sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 2 }}
         >
@@ -138,15 +134,12 @@ export function EventVehicleDetailsDialog({
             <Button
               variant="contained"
               color="primary"
-              onClick={() => setCheckOutTarget({ type: 'vehicle', vehicleId: vehicle.id })}
+              onClick={() => onRegisterCheckOut(vehicle.id)}
             >
               Registrar saída do veículo
             </Button>
           ) : null}
         </DialogActions>
       </Dialog>
-
-      <EventCheckOutDialog event={event} target={checkOutTarget} onClose={() => setCheckOutTarget(null)} />
-    </>
   )
 }

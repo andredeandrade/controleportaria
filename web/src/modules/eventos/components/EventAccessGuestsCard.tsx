@@ -98,7 +98,9 @@ export function EventAccessGuestsCard({
     <MuiCard>
       <CardContent>
         <Stack spacing={2}>
-          <MobileFieldLabel variant="caption">Quem está entrando</MobileFieldLabel>
+          <MobileFieldLabel variant="caption">
+            {movementType === 'BUSCA' ? 'Quem está buscando' : 'Quem está entrando'}
+          </MobileFieldLabel>
 
           <ListSearchField
             value={searchTerm}

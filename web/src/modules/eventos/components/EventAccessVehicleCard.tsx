@@ -49,6 +49,7 @@ export function EventAccessVehicleCard({
   plateError,
 }: EventAccessVehicleCardProps) {
   const canBeWalkIn = movementType === 'CONVIDADO'
+  const requiresDriverFields = movementType !== 'CONVIDADO'
 
   const patch = (field: keyof EventAccessVehicleValues, fieldValue: string) => {
     onChange({ ...value, [field]: fieldValue })
@@ -75,31 +76,35 @@ export function EventAccessVehicleCard({
 
           {canBeWalkIn && isWalkIn ? null : (
             <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextFieldStack>
-                <TextFieldLabel required>Motorista</TextFieldLabel>
-                <TextField
-                  value={value.driverName}
-                  onChange={(event) => patch('driverName', event.target.value)}
-                  error={Boolean(driverNameError)}
-                  helperText={driverNameError}
-                  placeholder="Nome completo"
-                />
-              </TextFieldStack>
-            </Grid>
+            {requiresDriverFields ? (
+              <>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextFieldStack>
+                    <TextFieldLabel required>Motorista</TextFieldLabel>
+                    <TextField
+                      value={value.driverName}
+                      onChange={(event) => patch('driverName', event.target.value)}
+                      error={Boolean(driverNameError)}
+                      helperText={driverNameError}
+                      placeholder="Nome completo"
+                    />
+                  </TextFieldStack>
+                </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextFieldStack>
-                <TextFieldLabel required>CPF</TextFieldLabel>
-                <TextField
-                  value={value.driverDocument}
-                  onChange={(event) => patch('driverDocument', event.target.value)}
-                  error={Boolean(driverDocumentError)}
-                  helperText={driverDocumentError}
-                  placeholder="000.000.000-00"
-                />
-              </TextFieldStack>
-            </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextFieldStack>
+                    <TextFieldLabel required>CPF</TextFieldLabel>
+                    <TextField
+                      value={value.driverDocument}
+                      onChange={(event) => patch('driverDocument', event.target.value)}
+                      error={Boolean(driverDocumentError)}
+                      helperText={driverDocumentError}
+                      placeholder="000.000.000-00"
+                    />
+                  </TextFieldStack>
+                </Grid>
+              </>
+            ) : null}
 
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextFieldStack>

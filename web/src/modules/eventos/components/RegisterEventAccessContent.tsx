@@ -101,10 +101,15 @@ export function RegisterEventAccessContent({ eventId }: RegisterEventAccessConte
   const handleCancel = () => router.back()
 
   const handleSubmit = async () => {
+    const requiresDriverFields = movementType !== 'CONVIDADO'
     const nextDriverNameError =
-      isWalkIn || vehicleValues.driverName.trim() ? '' : 'Nome do motorista é obrigatório.'
+      !requiresDriverFields || isWalkIn || vehicleValues.driverName.trim()
+        ? ''
+        : 'Nome do motorista é obrigatório.'
     const nextDriverDocumentError =
-      isWalkIn || vehicleValues.driverDocument.trim() ? '' : 'CPF do motorista é obrigatório.'
+      !requiresDriverFields || isWalkIn || vehicleValues.driverDocument.trim()
+        ? ''
+        : 'CPF do motorista é obrigatório.'
     const nextPlateError = isWalkIn || vehicleValues.plate.trim() ? '' : 'Placa é obrigatória.'
 
     setDriverNameError(nextDriverNameError)

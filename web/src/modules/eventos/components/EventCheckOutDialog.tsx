@@ -151,9 +151,11 @@ export function EventCheckOutDialog({ event, target, onClose }: EventCheckOutDia
                 <Typography variant="body2" fontWeight={700} color="text.primary">
                   {`Saída do veículo · ${vehicle?.plate ?? ''}`}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Confirme quais convidados vinculados saem junto com o veículo.
-                </Typography>
+                {vehicle?.movementType !== 'DESEMBARQUE' ? (
+                  <Typography variant="caption" color="text.secondary">
+                    Confirme quais convidados vinculados saem junto com o veículo.
+                  </Typography>
+                ) : null}
               </Stack>
             </Box>
 
