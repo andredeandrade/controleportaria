@@ -1,6 +1,6 @@
 'use client'
 
-import type { Event } from '@/app/api/events/types'
+import type { CheckInEventGuestRequest, Event } from '@/app/api/events/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { EventsServiceError, checkInEventGuest } from '@/services/eventos/service'
@@ -8,7 +8,11 @@ import { EventsServiceError, checkInEventGuest } from '@/services/eventos/servic
 export function useCheckInEventGuest() {
   const queryClient = useQueryClient()
 
-  return useMutation<Event, EventsServiceError, { eventId: string; guestId: string }>({
+  return useMutation<
+    Event,
+    EventsServiceError,
+    { eventId: string; guestId: string } & CheckInEventGuestRequest
+  >({
     mutationFn: (payload) => checkInEventGuest(payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['events'] })

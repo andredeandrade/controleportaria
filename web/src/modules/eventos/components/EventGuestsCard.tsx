@@ -1,22 +1,33 @@
 'use client'
 
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
-import Button from '@mui/material/Button'
+import LoginRoundedIcon from '@mui/icons-material/LoginRounded'
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
+import Box from '@mui/material/Box'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import Chip from '@mui/material/Chip'
-import { useTheme } from '@mui/material/styles'
+import IconButton from '@mui/material/IconButton'
+import { alpha, useTheme } from '@mui/material/styles'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useState } from 'react'
 
 import type { Event, EventGuest } from '@/app/api/events/types'
 import { useCan } from '@/hooks/useCan'
-import { EventAddGuestDialog } from '@/modules/eventos/components/EventAddGuestDialog'
-import { useCheckInEventGuest } from '@/modules/eventos/hooks/useCheckInEventGuest'
-import { useCheckOutEventGuest } from '@/modules/eventos/hooks/useCheckOutEventGuest'
+import {
+  EventCheckOutDialog,
+  type EventCheckOutTarget,
+} from '@/modules/eventos/components/EventCheckOutDialog'
+import { EventGuestCheckInDialog } from '@/modules/eventos/components/EventGuestCheckInDialog'
+import { EventGuestDetailsDialog } from '@/modules/eventos/components/EventGuestDetailsDialog'
+import {
+  EventGuestStatusChip,
+  getEventGuestStatus,
+  type EventGuestStatus,
+} from '@/modules/eventos/components/EventGuestStatusChip'
 import { Table } from '@/modules/table/components/Table'
 import { TableBody } from '@/modules/table/components/TableBody'
 import { TableCell } from '@/modules/table/components/TableCell'
@@ -24,26 +35,31 @@ import { TableHead } from '@/modules/table/components/TableHead'
 import { TableHeadCell } from '@/modules/table/components/TableHeadCell'
 import { TableRow } from '@/modules/table/components/TableRow'
 import { ListSearchField } from '@/modules/table/components/ListSearchField'
-import { useAppSnackbar } from '@/providers'
 import { MobileListCard } from '@/styles/MobileList.styles'
 
 const COLUMN_COUNT = 5
 
-type GuestStatus = 'aguardando' | 'dentro' | 'saiu'
+type GuestFilter = 'todos' | EventGuestStatus
 
-function getGuestStatus(guest: EventGuest): GuestStatus {
-  if (!guest.checkInAt) {
-    return 'aguardando'
-  }
-
-  if (!guest.checkOutAt) {
-    return 'dentro'
-  }
-
-  return 'saiu'
+const FILTER_LABEL: Record<GuestFilter, string> = {
+  todos: 'Todos',
+  aguardando: 'Aguardando',
+  presente: 'Presentes',
+  saiu: 'Saíram',
 }
 
-function formatTime(iso: string): string {
+const FILTER_PALETTE: Record<GuestFilter, 'primary' | 'warning' | 'success' | 'default'> = {
+  todos: 'primary',
+  aguardando: 'warning',
+  presente: 'success',
+  saiu: 'default',
+}
+
+function formatTime(iso: string | null): string {
+  if (!iso) {
+    return '—'
+  }
+
   return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 }
 
@@ -68,147 +84,160 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [searchTerm, setSearchTerm] = useState('')
-  const [addGuestOpen, setAddGuestOpen] = useState(false)
-  const { showSuccess, showError } = useAppSnackbar()
-  const canUpdate = useCan('events', 'update')
-  const canAddGuest = useCan('events', 'addGuest')
-  const checkInMutation = useCheckInEventGuest()
-  const checkOutMutation = useCheckOutEventGuest()
+  const [statusFilter, setStatusFilter] = useState<GuestFilter>('todos')
+  const [viewedGuestId, setViewedGuestId] = useState<string | null>(null)
+  const [checkInGuestId, setCheckInGuestId] = useState<string | null>(null)
+  const [checkOutTarget, setCheckOutTarget] = useState<EventCheckOutTarget | null>(null)
+  const canRegisterAccess = useCan('events', 'registerAccess')
 
   const guestsCount = event.guests.length
-  const filteredGuests = event.guests.filter((guest) => matchesSearch(guest, searchTerm))
-
   const presentCount = event.guests.filter(
-    (guest) => guest.checkInAt && !guest.checkOutAt,
+    (guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'presente',
   ).length
-  const departedCount = event.guests.filter((guest) => guest.checkOutAt).length
-  const waitingCount = event.guests.filter((guest) => !guest.checkInAt).length
+  const departedCount = event.guests.filter(
+    (guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'saiu',
+  ).length
+  const waitingCount = event.guests.filter(
+    (guest) => getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === 'aguardando',
+  ).length
+
+  const filteredGuests = event.guests.filter((guest) => {
+    if (!matchesSearch(guest, searchTerm)) {
+      return false
+    }
+
+    if (statusFilter === 'todos') {
+      return true
+    }
+
+    return getEventGuestStatus(guest.checkInAt, guest.checkOutAt) === statusFilter
+  })
+
+  const viewedGuest = event.guests.find((guest) => guest.id === viewedGuestId) ?? null
+  const checkInGuest = event.guests.find((guest) => guest.id === checkInGuestId) ?? null
 
   const emptyMessage =
     guestsCount === 0
       ? 'Nenhum convidado cadastrado para este evento.'
-      : 'Nenhum convidado corresponde à busca.'
+      : 'Nenhum convidado corresponde ao filtro selecionado.'
 
-  const handleCheckIn = async (guestId: string) => {
-    try {
-      await checkInMutation.mutateAsync({ eventId: event.id, guestId })
-      showSuccess('Entrada registrada.')
-    } catch (error) {
-      showError(error instanceof Error ? error.message : 'Não foi possível registrar a entrada.')
-    }
-  }
-
-  const handleCheckOut = async (guestId: string) => {
-    try {
-      await checkOutMutation.mutateAsync({ eventId: event.id, guestId })
-      showSuccess('Saída registrada.')
-    } catch (error) {
-      showError(error instanceof Error ? error.message : 'Não foi possível registrar a saída.')
-    }
-  }
-
-  const renderStatus = (guest: EventGuest, status: GuestStatus) => {
-    if (status === 'aguardando') {
-      return <Chip size="small" color="warning" label="Aguardando" />
-    }
-
-    if (status === 'dentro') {
-      return (
-        <Stack direction="row" spacing={1} alignItems="center">
-          <CheckCircleRoundedIcon color="success" fontSize="small" />
-          <Typography variant="body2" color="text.primary">
-            {`Entrada ${formatTime(guest.checkInAt as string)}`}
-          </Typography>
-        </Stack>
-      )
-    }
-
-    return (
-      <Typography variant="body2" color="text.secondary">
-        {`Entrada ${formatTime(guest.checkInAt as string)} → Saída ${formatTime(guest.checkOutAt as string)}`}
-      </Typography>
-    )
-  }
-
-  const renderAction = (guest: EventGuest, status: GuestStatus, fullWidth: boolean) => {
-    if (status === 'aguardando') {
-      return canUpdate ? (
-        <Button
-          variant="contained"
-          color="primary"
+  const renderAction = (guest: EventGuest, status: EventGuestStatus) => (
+    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+      <Tooltip title="Visualizar">
+        <IconButton
+          aria-label={`Visualizar ${guest.name}`}
           size="small"
-          fullWidth={fullWidth}
-          disabled={checkInMutation.isPending}
-          onClick={() => void handleCheckIn(guest.id)}
+          onClick={() => setViewedGuestId(guest.id)}
         >
-          Registrar entrada
-        </Button>
-      ) : null
-    }
+          <VisibilityRoundedIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
 
-    if (status === 'dentro') {
-      return canUpdate ? (
-        <Button
-          variant="outlined"
-          color="inherit"
-          size="small"
-          fullWidth={fullWidth}
-          disabled={checkOutMutation.isPending}
-          onClick={() => void handleCheckOut(guest.id)}
-        >
-          Registrar saída
-        </Button>
-      ) : null
-    }
+      {canRegisterAccess && status === 'aguardando' ? (
+        <Tooltip title="Registrar entrada">
+          <IconButton
+            aria-label={`Registrar entrada de ${guest.name}`}
+            size="small"
+            color="success"
+            onClick={() => setCheckInGuestId(guest.id)}
+          >
+            <LoginRoundedIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ) : null}
 
-    return (
-      <Typography variant="body2" color="text.disabled">
-        Concluído
-      </Typography>
-    )
-  }
+      {canRegisterAccess && status === 'presente' ? (
+        <Tooltip title="Registrar saída">
+          <IconButton
+            aria-label={`Registrar saída de ${guest.name}`}
+            size="small"
+            color="warning"
+            onClick={() => setCheckOutTarget({ type: 'guest', guestId: guest.id })}
+          >
+            <LogoutRoundedIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ) : null}
+    </Stack>
+  )
 
   return (
     <MuiCard>
       <CardContent>
-        <Stack spacing={2.5}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            flexWrap="wrap"
-            rowGap={2}
-          >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <GroupsRoundedIcon color="primary" fontSize="small" />
-              <Typography variant="h4">Controle de Acesso de Convidados</Typography>
-              <Chip size="small" color="success" label={`${guestsCount} na lista`} />
-            </Stack>
-
-            <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" rowGap={2}>
-              <ListSearchField
-                value={searchTerm}
-                onChange={setSearchTerm}
-                placeholder="Buscar convidado..."
-                sx={{ width: { xs: '100%', sm: 260 } }}
-              />
-
-              {!isMobile && canAddGuest ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={() => setAddGuestOpen(true)}
-                >
-                  + Adicionar convidado
-                </Button>
-              ) : null}
-            </Stack>
+        <Stack spacing={3.5}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <GroupsRoundedIcon color="primary" fontSize="small" />
+            <Typography variant="h4">Convidados</Typography>
           </Stack>
 
           <Typography variant="body2" color="text.secondary">
             {`${presentCount} presentes · ${departedCount} saídas registradas · ${waitingCount} aguardando`}
           </Typography>
+
+          <ListSearchField
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Buscar convidado..."
+            sx={{ width: '100%', maxWidth: 420 }}
+          />
+
+          <Stack direction="row" spacing={1} flexWrap="wrap" rowGap={1}>
+            {(['todos', 'aguardando', 'presente', 'saiu'] as GuestFilter[]).map((filter) => {
+              const count =
+                filter === 'todos'
+                  ? guestsCount
+                  : filter === 'aguardando'
+                    ? waitingCount
+                    : filter === 'presente'
+                      ? presentCount
+                      : departedCount
+
+              const isActive = statusFilter === filter
+              const paletteKey = FILTER_PALETTE[filter]
+              const dotColor =
+                paletteKey === 'default'
+                  ? theme.palette.text.disabled
+                  : theme.palette[paletteKey].main
+              const activeTextColor =
+                paletteKey === 'default'
+                  ? theme.palette.text.primary
+                  : theme.palette[paletteKey].main
+
+              return (
+                <Box
+                  key={filter}
+                  onClick={() => setStatusFilter(filter)}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    padding: '6px 14px',
+                    borderRadius: 999,
+                    border: '1px solid',
+                    borderColor: isActive ? dotColor : 'divider',
+                    backgroundColor: isActive ? alpha(dotColor, 0.16) : 'transparent',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: dotColor,
+                    }}
+                  />
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    sx={{ color: isActive ? activeTextColor : 'text.secondary' }}
+                  >
+                    {`${FILTER_LABEL[filter]} (${count})`}
+                  </Typography>
+                </Box>
+              )
+            })}
+          </Stack>
 
           {isMobile ? (
             filteredGuests.length === 0 ? (
@@ -217,8 +246,8 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
               </Typography>
             ) : (
               <Stack spacing={1.5}>
-                {filteredGuests.map((guest, index) => {
-                  const status = getGuestStatus(guest)
+                {filteredGuests.map((guest) => {
+                  const status = getEventGuestStatus(guest.checkInAt, guest.checkOutAt)
 
                   return (
                     <MobileListCard key={guest.id} variant="outlined">
@@ -228,26 +257,31 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                           justifyContent="space-between"
                           alignItems="flex-start"
                         >
-                          <Stack direction="row" spacing={1.5} alignItems="flex-start">
-                            <Typography variant="caption" color="text.disabled">
-                              {index + 1}
+                          <Stack spacing={0.25}>
+                            <Typography variant="body2" fontWeight={700} color="text.primary">
+                              {guest.name}
                             </Typography>
-                            <Stack spacing={0.25}>
-                              <Typography variant="body2" fontWeight={700} color="text.primary">
-                                {guest.name}
-                              </Typography>
-                              <Typography variant="caption" color="text.disabled">
-                                {guest.document ?? '—'}
-                              </Typography>
-                            </Stack>
+                            <Typography variant="caption" color="text.disabled">
+                              {guest.document ?? '—'}
+                            </Typography>
                           </Stack>
 
-                          {status === 'aguardando' ? renderStatus(guest, status) : null}
+                          <EventGuestStatusChip
+                            checkInAt={guest.checkInAt}
+                            checkOutAt={guest.checkOutAt}
+                          />
                         </Stack>
 
-                        {status !== 'aguardando' ? renderStatus(guest, status) : null}
+                        <Stack direction="row" spacing={2}>
+                          <Typography variant="caption" color="text.secondary">
+                            {`Entrada ${formatTime(guest.checkInAt)}`}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {`Saída ${formatTime(guest.checkOutAt)}`}
+                          </Typography>
+                        </Stack>
 
-                        {renderAction(guest, status, true)}
+                        {renderAction(guest, status)}
                       </Stack>
                     </MobileListCard>
                   )
@@ -257,10 +291,10 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
           ) : (
             <Table>
               <TableHead>
-                <TableHeadCell>#</TableHeadCell>
-                <TableHeadCell>Nome</TableHeadCell>
-                <TableHeadCell>Documento</TableHeadCell>
-                <TableHeadCell>Status</TableHeadCell>
+                <TableHeadCell>Convidado</TableHeadCell>
+                <TableHeadCell>Entrada</TableHeadCell>
+                <TableHeadCell>Saída</TableHeadCell>
+                <TableHeadCell>Situação</TableHeadCell>
                 <TableHeadCell align="right">Ação</TableHeadCell>
               </TableHead>
               <TableBody
@@ -272,43 +306,66 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                 }
                 colSpan={COLUMN_COUNT}
               >
-                {filteredGuests.map((guest, index) => {
-                  const status = getGuestStatus(guest)
+                {filteredGuests.map((guest) => {
+                  const status = getEventGuestStatus(guest.checkInAt, guest.checkOutAt)
 
                   return (
                     <TableRow key={guest.id}>
-                      <TableCell>{index + 1}</TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.primary">
-                          {guest.name}
-                        </Typography>
+                        <Stack spacing={0.25}>
+                          <Typography variant="body2" fontWeight={600} color="text.primary">
+                            {guest.name}
+                          </Typography>
+                          <Typography variant="caption" color="text.disabled">
+                            {guest.document ?? '—'}
+                          </Typography>
+                        </Stack>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.primary">
-                          {guest.document ?? '—'}
+                          {formatTime(guest.checkInAt)}
                         </Typography>
                       </TableCell>
-                      <TableCell>{renderStatus(guest, status)}</TableCell>
-                      <TableCell align="right">{renderAction(guest, status, false)}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatTime(guest.checkOutAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <EventGuestStatusChip
+                          checkInAt={guest.checkInAt}
+                          checkOutAt={guest.checkOutAt}
+                        />
+                      </TableCell>
+                      <TableCell align="right">{renderAction(guest, status)}</TableCell>
                     </TableRow>
                   )
                 })}
               </TableBody>
             </Table>
           )}
-
-          {isMobile && canAddGuest ? (
-            <Button variant="contained" color="primary" fullWidth onClick={() => setAddGuestOpen(true)}>
-              + Adicionar convidado
-            </Button>
-          ) : null}
         </Stack>
       </CardContent>
 
-      <EventAddGuestDialog
-        open={addGuestOpen}
-        onClose={() => setAddGuestOpen(false)}
-        eventId={event.id}
+      <EventGuestDetailsDialog
+        event={event}
+        guest={viewedGuest}
+        onClose={() => setViewedGuestId(null)}
+      />
+
+      {checkInGuest ? (
+        <EventGuestCheckInDialog
+          open={Boolean(checkInGuest)}
+          onClose={() => setCheckInGuestId(null)}
+          eventId={event.id}
+          guest={checkInGuest}
+        />
+      ) : null}
+
+      <EventCheckOutDialog
+        event={event}
+        target={checkOutTarget}
+        onClose={() => setCheckOutTarget(null)}
       />
     </MuiCard>
   )

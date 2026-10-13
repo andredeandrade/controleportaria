@@ -30,6 +30,8 @@ function parseCreateBody(body: unknown): CreateVehicleBody {
     plate: String(payload['plate'] ?? ''),
     brandModel: typeof payload['brandModel'] === 'string' ? payload['brandModel'] : undefined,
     driverName: typeof payload['driverName'] === 'string' ? payload['driverName'] : undefined,
+    driverDocument:
+      typeof payload['driverDocument'] === 'string' ? payload['driverDocument'] : undefined,
     color: typeof payload['color'] === 'string' ? payload['color'] : undefined,
   }
 }
@@ -83,6 +85,7 @@ export async function POST(request: Request) {
         plate,
         brandModel: body.brandModel,
         driverName: body.driverName,
+        driverDocument: body.driverDocument,
         color: body.color,
       }),
     })

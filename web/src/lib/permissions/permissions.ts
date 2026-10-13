@@ -1,7 +1,7 @@
 import { UserRole } from '@/app/api/auth/me/types'
 
 export type DomainAction = 'create' | 'view' | 'update' | 'remove'
-export type EventAction = DomainAction | 'addGuest'
+export type EventAction = DomainAction | 'addGuest' | 'registerAccess'
 export type AccessRecordAction = 'checkIn' | 'checkOut' | 'view'
 export type ReportAction = 'view'
 
@@ -17,7 +17,14 @@ export type ResourceActionMap = {
 }
 
 const ALL_DOMAIN_ACTIONS: DomainAction[] = ['create', 'view', 'update', 'remove']
-const ALL_EVENT_ACTIONS: EventAction[] = ['create', 'view', 'update', 'remove', 'addGuest']
+const ALL_EVENT_ACTIONS: EventAction[] = [
+  'create',
+  'view',
+  'update',
+  'remove',
+  'addGuest',
+  'registerAccess',
+]
 const ALL_ACCESS_RECORD_ACTIONS: AccessRecordAction[] = ['checkIn', 'checkOut', 'view']
 const ALL_REPORT_ACTIONS: ReportAction[] = ['view']
 
@@ -50,7 +57,7 @@ const PERMISSION_MATRIX: PermissionMatrix = {
     visitors: ['view'],
     'service-providers': ['view'],
     authorizations: ['view'],
-    events: ['view', 'addGuest'],
+    events: ['view', 'addGuest', 'registerAccess'],
     incidents: ['view', 'create'],
     'access-records': ['checkIn', 'checkOut', 'view'],
     reports: [],

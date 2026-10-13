@@ -5,12 +5,27 @@ import {
   readAccessToken,
   requestEventsApi,
 } from '../../helpers'
+import type { CheckInEventGuestRequest } from '../../types'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-type CheckInGuestBody = {
+type CheckInGuestBody = CheckInEventGuestRequest & {
   eventId: string
   guestId: string
+}
+
+function parseVehicle(value: unknown): CheckInEventGuestRequest['vehicle'] {
+  if (!value || typeof value !== 'object') {
+    return undefined
+  }
+
+  const payload = value as Record<string, unknown>
+
+  return {
+    plate: typeof payload['plate'] === 'string' ? payload['plate'] : undefined,
+    brandModel: typeof payload['brandModel'] === 'string' ? payload['brandModel'] : undefined,
+    color: typeof payload['color'] === 'string' ? payload['color'] : undefined,
+  }
 }
 
 function parseCheckInBody(body: unknown): CheckInGuestBody {
@@ -23,6 +38,8 @@ function parseCheckInBody(body: unknown): CheckInGuestBody {
   return {
     eventId: String(payload['eventId'] ?? ''),
     guestId: String(payload['guestId'] ?? ''),
+    document: typeof payload['document'] === 'string' ? payload['document'] : undefined,
+    vehicle: parseVehicle(payload['vehicle']),
   }
 }
 
@@ -55,6 +72,13 @@ export async function POST(request: Request) {
   try {
     const payload = await requestEventsApi(`/${eventId}/guests/${guestId}/check-in`, accessToken, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        document: body.document,
+        vehicle: body.vehicle,
+      }),
     })
 
     return NextResponse.json(payload, { status: 200 })

@@ -1,9 +1,13 @@
 'use client'
 
 import CircularProgress from '@mui/material/CircularProgress'
+import Button from '@mui/material/Button'
+import LoginRoundedIcon from '@mui/icons-material/LoginRounded'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 
+import { useCan } from '@/hooks/useCan'
 import { EventDetailsCard } from '@/modules/eventos/components/EventDetailsCard'
 import { EventGuestsCard } from '@/modules/eventos/components/EventGuestsCard'
 import { EventObservationsCard } from '@/modules/eventos/components/EventObservationsCard'
@@ -17,6 +21,8 @@ type ViewEventContentProps = {
 }
 
 export function ViewEventContent({ eventId }: ViewEventContentProps) {
+  const router = useRouter()
+  const canRegisterAccess = useCan('events', 'registerAccess')
   const { event, isLoading, isError, errorMessage, refetch } = useEvent(eventId)
 
   if (isLoading) {
@@ -40,15 +46,34 @@ export function ViewEventContent({ eventId }: ViewEventContentProps) {
   return (
     <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack spacing={{ xs: 2.5, sm: 2 }}>
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          <BackToPreviousPageButton
-            ariaLabel="Voltar para a pagina anterior"
-            fallbackHref="/eventos"
-          />
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          flexWrap="wrap"
+          rowGap={1.5}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <BackToPreviousPageButton
+              ariaLabel="Voltar para a pagina anterior"
+              fallbackHref="/eventos"
+            />
 
-          <Typography variant="h2" fontWeight={700} color="text.primary">
-            Visualização do Evento
-          </Typography>
+            <Typography variant="h2" fontWeight={700} color="text.primary">
+              Visualização do Evento
+            </Typography>
+          </Stack>
+
+          {canRegisterAccess ? (
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<LoginRoundedIcon fontSize="small" />}
+              onClick={() => router.push(`/eventos/${eventId}/registrar-acesso`)}
+            >
+              Registrar acesso
+            </Button>
+          ) : null}
         </Stack>
 
         <Typography variant="body2" color="primary.main">

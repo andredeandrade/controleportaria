@@ -31,6 +31,12 @@ enum VehicleType {
   OUTRO
 }
 
+enum EventVehicleMovementType {
+  CONVIDADO
+  DESEMBARQUE
+  BUSCA
+}
+
 model User {
   id               String      @id @default(uuid())
   condominiumId    String
@@ -263,6 +269,11 @@ model EventGuest {
   event              Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
   name               String
   documentEncrypted  String?
+  isAdHoc            Boolean       @default(false)
+  entryVehicleId     String?
+  entryVehicle       EventVehicle? @relation("EventVehicleEntryGuests", fields: [entryVehicleId], references: [id], onDelete: SetNull)
+  exitVehicleId      String?
+  exitVehicle        EventVehicle? @relation("EventVehicleExitGuests", fields: [exitVehicleId], references: [id], onDelete: SetNull)
   checkInAt          DateTime?
   checkOutAt         DateTime?
   checkedInByUserId  String?
@@ -277,24 +288,30 @@ model EventGuest {
   @@index([checkOutAt])
   @@index([checkedInByUserId])
   @@index([checkedOutByUserId])
+  @@index([entryVehicleId])
+  @@index([exitVehicleId])
 }
 
 model EventVehicle {
-  id                 String    @id @default(uuid())
-  eventId            String
-  event              Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  plateEncrypted     String?
-  brandModel         String?
-  driverName         String?
-  color              String?
-  checkInAt          DateTime  @default(now())
-  checkOutAt         DateTime?
-  checkedInByUserId  String?
-  checkedInByUser    User?     @relation("EventVehicleCheckInUser", fields: [checkedInByUserId], references: [id], onDelete: SetNull)
-  checkedOutByUserId String?
-  checkedOutByUser   User?     @relation("EventVehicleCheckOutUser", fields: [checkedOutByUserId], references: [id], onDelete: SetNull)
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  id                      String    @id @default(uuid())
+  eventId                 String
+  event                   Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  plateEncrypted          String?
+  brandModel              String?
+  driverName              String?
+  driverDocumentEncrypted String?
+  color                   String?
+  movementType            EventVehicleMovementType @default(CONVIDADO)
+  entryGuests             EventGuest[] @relation("EventVehicleEntryGuests")
+  exitGuests              EventGuest[] @relation("EventVehicleExitGuests")
+  checkInAt               DateTime  @default(now())
+  checkOutAt              DateTime?
+  checkedInByUserId       String?
+  checkedInByUser         User?     @relation("EventVehicleCheckInUser", fields: [checkedInByUserId], references: [id], onDelete: SetNull)
+  checkedOutByUserId      String?
+  checkedOutByUser        User?     @relation("EventVehicleCheckOutUser", fields: [checkedOutByUserId], references: [id], onDelete: SetNull)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
   @@index([eventId])
   @@index([checkInAt])
