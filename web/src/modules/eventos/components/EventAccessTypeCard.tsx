@@ -52,7 +52,11 @@ export function EventAccessTypeCard({ value, onChange }: EventAccessTypeCardProp
         <Stack spacing={3}>
           <MobileFieldLabel variant="caption">Tipo de acesso</MobileFieldLabel>
 
-          <Stack direction="row" spacing={2.5} flexWrap="wrap" rowGap={1.5}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={{ xs: 1.5, sm: 2.5 }}
+            sx={{ rowGap: { xs: 0, sm: 1.5 }, flexWrap: { xs: 'nowrap', sm: 'wrap' } }}
+          >
             {MOVEMENT_OPTIONS.map((option) => {
               const isSelected = value === option.value
 
@@ -64,8 +68,8 @@ export function EventAccessTypeCard({ value, onChange }: EventAccessTypeCardProp
                   onClick={() => onChange(option.value)}
                   variant="body2"
                   sx={{
-                    px: 2.5,
-                    py: 1,
+                    px: 3.5,
+                    py: 2,
                     borderRadius: 999,
                     border: '1px solid',
                     borderColor: isSelected ? 'primary.main' : 'divider',
@@ -74,6 +78,8 @@ export function EventAccessTypeCard({ value, onChange }: EventAccessTypeCardProp
                     fontWeight: 700,
                     fontFamily: 'inherit',
                     cursor: 'pointer',
+                    width: { xs: '100%', sm: 'auto' },
+                    textAlign: 'center',
                   }}
                 >
                   {option.title}

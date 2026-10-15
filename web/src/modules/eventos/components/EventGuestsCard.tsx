@@ -5,8 +5,10 @@ import LoginRoundedIcon from '@mui/icons-material/LoginRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import { alpha, useTheme } from '@mui/material/styles'
 import Stack from '@mui/material/Stack'
@@ -35,7 +37,7 @@ import { TableHead } from '@/modules/table/components/TableHead'
 import { TableHeadCell } from '@/modules/table/components/TableHeadCell'
 import { TableRow } from '@/modules/table/components/TableRow'
 import { ListSearchField } from '@/modules/table/components/ListSearchField'
-import { MobileListCard } from '@/styles/MobileList.styles'
+import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
 
 const COLUMN_COUNT = 5
 
@@ -171,7 +173,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
           </Stack>
 
           <Typography variant="body2" color="text.secondary">
-            {`${presentCount} presentes · ${departedCount} saídas registradas · ${waitingCount} aguardando`}
+            {`${presentCount} presentes · ${departedCount} saídas · ${waitingCount} aguardando`}
           </Typography>
 
           <ListSearchField
@@ -181,7 +183,16 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
             sx={{ width: '100%', maxWidth: 420 }}
           />
 
-          <Stack direction="row" spacing={1} flexWrap="wrap" rowGap={1}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              flexWrap: { xs: 'nowrap', sm: 'wrap' },
+              rowGap: 1,
+              overflowX: { xs: 'auto', sm: 'visible' },
+              pb: { xs: 3, sm: 0 },
+            }}
+          >
             {(['todos', 'aguardando', 'presente', 'saiu'] as GuestFilter[]).map((filter) => {
               const count =
                 filter === 'todos'
@@ -217,6 +228,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                     borderColor: isActive ? dotColor : 'divider',
                     backgroundColor: isActive ? alpha(dotColor, 0.16) : 'transparent',
                     cursor: 'pointer',
+                    flexShrink: 0,
                   }}
                 >
                   <Box
@@ -251,7 +263,7 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
 
                   return (
                     <MobileListCard key={guest.id} variant="outlined">
-                      <Stack spacing={2}>
+                      <Stack spacing={3}>
                         <Stack
                           direction="row"
                           justifyContent="space-between"
@@ -272,16 +284,60 @@ export function EventGuestsCard({ event }: EventGuestsCardProps) {
                           />
                         </Stack>
 
-                        <Stack direction="row" spacing={2}>
-                          <Typography variant="caption" color="text.secondary">
-                            {`Entrada ${formatTime(guest.checkInAt)}`}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {`Saída ${formatTime(guest.checkOutAt)}`}
-                          </Typography>
+                        <Divider sx={{ borderColor: 'divider' }} />
+
+                        <Stack direction="row">
+                          <Stack spacing={0.25} sx={{ flex: 1 }}>
+                            <MobileFieldLabel variant="caption">Entrada</MobileFieldLabel>
+                            <Typography variant="body2" color="text.primary">
+                              {formatTime(guest.checkInAt)}
+                            </Typography>
+                          </Stack>
+                          <Stack spacing={0.25} sx={{ flex: 1 }}>
+                            <MobileFieldLabel variant="caption">Saída</MobileFieldLabel>
+                            <Typography variant="body2" color="text.primary">
+                              {formatTime(guest.checkOutAt)}
+                            </Typography>
+                          </Stack>
                         </Stack>
 
-                        {renderAction(guest, status)}
+                        <Stack spacing={1.5}>
+                          {canRegisterAccess && status === 'aguardando' ? (
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              fullWidth
+                              onClick={() => setCheckInGuestId(guest.id)}
+                            >
+                              Registrar entrada
+                            </Button>
+                          ) : null}
+
+                          {canRegisterAccess && status === 'presente' ? (
+                            <Button
+                              variant="outlined"
+                              color="inherit"
+                              fullWidth
+                              onClick={() =>
+                                setCheckOutTarget({ type: 'guest', guestId: guest.id })
+                              }
+                              sx={{
+                                color: 'text.primary',
+                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                              }}
+                            >
+                              Registrar saída
+                            </Button>
+                          ) : null}
+
+                          <Button
+                            variant="text"
+                            color="primary"
+                            onClick={() => setViewedGuestId(guest.id)}
+                          >
+                            Ver mais
+                          </Button>
+                        </Stack>
                       </Stack>
                     </MobileListCard>
                   )
