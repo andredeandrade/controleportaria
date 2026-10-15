@@ -29,9 +29,14 @@ export function AccessListProvider({
   const canCheckOut = useCan('access-records', 'checkOut')
   const showExitActions = canCheckOut
 
+  const handleViewModeChange = (nextViewMode: AccessListViewMode) => {
+    query.handlePageChange(1)
+    setViewMode(nextViewMode)
+  }
+
   const handleClearFilters = () => {
     query.handleSearchChange('')
-    setViewMode('all')
+    handleViewModeChange('all')
   }
 
   const handleConfirmExit = async (personIds?: string[], observations?: string) => {
@@ -52,7 +57,7 @@ export function AccessListProvider({
   const value: AccessListContextValue = {
     ...query,
     viewMode,
-    setViewMode,
+    setViewMode: handleViewModeChange,
     showExitActions,
     selectedRecord: selection.selectedItem,
     handleOpenExitConfirmation: selection.selectItem,

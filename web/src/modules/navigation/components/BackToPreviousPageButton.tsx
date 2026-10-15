@@ -3,9 +3,10 @@
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
-import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import type { IconButtonProps } from '@mui/material/IconButton'
+
+import { useNavigateBack } from '@/modules/navigation/hooks/useNavigateBack'
 
 type BackToPreviousPageButtonProps = {
   ariaLabel: string
@@ -30,17 +31,8 @@ export function BackToPreviousPageButton({
   alwaysUseFallback = false,
   iconButtonProps,
 }: BackToPreviousPageButtonProps) {
-  const router = useRouter()
+  const handleBack = useNavigateBack(fallbackHref, alwaysUseFallback)
   const { sx: iconButtonSx, disableRipple, ...restIconButtonProps } = iconButtonProps ?? {}
-
-  const handleBack = () => {
-    if (!alwaysUseFallback && window.history.length > 1) {
-      router.back()
-      return
-    }
-
-    router.push(fallbackHref)
-  }
 
   return (
     <StyledBackButton

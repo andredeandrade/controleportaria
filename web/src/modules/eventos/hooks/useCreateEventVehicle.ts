@@ -3,6 +3,7 @@
 import type { CreateEventVehicleRequest, Event } from '@/app/api/events/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { EventsServiceError, createEventVehicle } from '@/services/eventos/service'
 
 export function useCreateEventVehicle() {
@@ -15,7 +16,7 @@ export function useCreateEventVehicle() {
   >({
     mutationFn: (payload) => createEventVehicle(payload),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await invalidateDomainQueries(queryClient, 'events')
     },
   })
 }

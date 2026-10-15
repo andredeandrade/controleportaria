@@ -6,6 +6,7 @@ export const ACCESS_PERSON_TYPE_OPTIONS = [
   { label: 'Morador', value: 'morador' },
   { label: 'Visitante', value: 'visitante' },
   { label: 'Prestador de servico', value: 'prestador_servico' },
+  { label: 'Autorizado', value: 'autorizado' },
 ] as const
 
 export type AccessPersonTypeValue = (typeof ACCESS_PERSON_TYPE_OPTIONS)[number]['value']

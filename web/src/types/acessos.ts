@@ -1,6 +1,6 @@
 import type { AccessRecord } from '@/app/api/access-records/types'
 
-export type AccessListViewMode = 'active' | 'all'
+export type AccessListViewMode = 'all' | 'active' | 'exited'
 
 export type AccessRecordCategoryUnit = {
   id: string
@@ -37,6 +37,7 @@ export const ACCESS_PERSON_CATEGORY_LABEL: Record<string, string> = {
   morador: 'Morador',
   visitante: 'Visitante',
   prestador_servico: 'Prestador de servico',
+  autorizado: 'Autorizado',
 }
 
 export const ACCESS_LOCOMOTION_LABEL: Record<string, string> = {

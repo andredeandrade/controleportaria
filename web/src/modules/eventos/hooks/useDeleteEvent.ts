@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { deleteEvent, EventsServiceError } from '@/services/eventos/service'
 
 export function useDeleteEvent() {
@@ -10,7 +11,7 @@ export function useDeleteEvent() {
   return useMutation<void, EventsServiceError, string>({
     mutationFn: deleteEvent,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await invalidateDomainQueries(queryClient, 'events')
     },
   })
 }

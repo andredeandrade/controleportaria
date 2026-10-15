@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { deleteIncident, IncidentsServiceError } from '@/services/ocorrencias/service'
 
 export function useDeleteOccurrence() {
@@ -10,7 +11,7 @@ export function useDeleteOccurrence() {
   return useMutation<void, IncidentsServiceError, string>({
     mutationFn: deleteIncident,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['incidents'] })
+      await invalidateDomainQueries(queryClient, 'incidents')
     },
   })
 }

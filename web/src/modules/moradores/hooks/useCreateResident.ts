@@ -2,6 +2,8 @@
 
 import type { CreateResidentRequest, Resident } from '@/app/api/residents/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { registerResident, ResidentsServiceError } from '@/services/moradores/service'
 
 export function useCreateResident() {
@@ -10,7 +12,7 @@ export function useCreateResident() {
   return useMutation<Resident, ResidentsServiceError, CreateResidentRequest>({
     mutationFn: registerResident,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['residents'] })
+      await invalidateDomainQueries(queryClient, 'residents')
     },
   })
 }

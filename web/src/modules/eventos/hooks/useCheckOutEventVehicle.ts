@@ -3,6 +3,7 @@
 import type { CheckOutEventVehicleRequest, Event } from '@/app/api/events/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { EventsServiceError, checkOutEventVehicle } from '@/services/eventos/service'
 
 export function useCheckOutEventVehicle() {
@@ -15,7 +16,7 @@ export function useCheckOutEventVehicle() {
   >({
     mutationFn: (payload) => checkOutEventVehicle(payload),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await invalidateDomainQueries(queryClient, 'events')
     },
   })
 }

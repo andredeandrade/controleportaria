@@ -1,6 +1,8 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { deleteResident, ResidentsServiceError } from '@/services/moradores/service'
 
 export function useDeleteResident() {
@@ -9,7 +11,7 @@ export function useDeleteResident() {
   return useMutation<void, ResidentsServiceError, string>({
     mutationFn: deleteResident,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['residents'] })
+      await invalidateDomainQueries(queryClient, 'residents')
     },
   })
 }

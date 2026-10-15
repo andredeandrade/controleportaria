@@ -9,12 +9,12 @@ import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { useRouter } from 'next/navigation'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 
 import { useCreateAccessRecord } from '@/modules/acessos/hooks/useCreateAccessRecord'
 import { type PersonSearchOption } from '@/modules/acessos/hooks/usePersonSearch'
 import { PersonSearchAutocomplete } from '@/modules/acessos/components/PersonSearchAutocomplete'
+import { useNavigateBack } from '@/modules/navigation/hooks/useNavigateBack'
 import {
   type AccessPersonTypeValue,
   type ColorValue,
@@ -46,7 +46,7 @@ type AccessRegisterFormValues = {
 }
 
 export function AccessRegisterForm() {
-  const router = useRouter()
+  const navigateBack = useNavigateBack('/acessos')
   const createAccessRecordMutation = useCreateAccessRecord()
   const { showError, showSuccess } = useAppSnackbar()
 
@@ -74,8 +74,8 @@ export function AccessRegisterForm() {
   })
 
   const watchedPeople = useWatch({ control, name: 'people' })
-  const hasServiceProvider = watchedPeople?.some(
-    (person) => person.category === 'prestador_servico',
+  const hasCompany = watchedPeople?.some(
+    (person) => person.category === 'prestador_servico' || person.category === 'autorizado',
   )
 
   const handleAddPerson = () => {
@@ -91,10 +91,13 @@ export function AccessRegisterForm() {
     setValue(`people.${index}.document`, option.document, { shouldDirty: true })
     setValue(`people.${index}.unit`, option.unit, { shouldDirty: true })
 
+    // A locomocao e compartilhada: so a Pessoa 1 define o veiculo do acesso.
     if (index === 0) {
-      if (option.locomotion) {
-        setValue('locomotion', option.locomotion, { shouldDirty: true, shouldValidate: true })
-      }
+      setValue('locomotion', option.locomotion, { shouldDirty: true, shouldValidate: true })
+      setValue('color', option.color, { shouldDirty: true })
+      setValue('plate', option.plate, { shouldDirty: true })
+      setValue('brandModel', option.brandModel, { shouldDirty: true })
+
       if (option.companyName) {
         setValue('company', option.companyName, { shouldDirty: true })
       }
@@ -119,23 +122,25 @@ export function AccessRegisterForm() {
       })
 
       showSuccess('Acesso registrado com sucesso.')
-      router.push('/acessos')
-      router.refresh()
+      navigateBack()
     } catch (error) {
       showError(error instanceof Error ? error.message : 'Nao foi possivel registrar o acesso.')
     }
   }
 
   return (
-    <Stack component="form" spacing={{ xs: 4, sm: 5 }} onSubmit={handleSubmit(onSubmit)}>
+    <Stack
+      component="form"
+      spacing={{ xs: 4, sm: 5 }}
+      onSubmit={handleSubmit(onSubmit)}
+      sx={{ width: '100%', maxWidth: 880 }}
+    >
       {fields.map((personField, index) => {
         const canRemovePerson = fields.length > 1 && index > 0
         const isFirstPerson = index === 0
         const personCategory = watchedPeople?.[index]?.category
         const unitLabel =
-          personCategory === 'visitante' || personCategory === 'prestador_servico'
-            ? 'Unidade responsável'
-            : 'Unidade'
+          personCategory && personCategory !== 'morador' ? 'Unidade responsável' : 'Unidade'
 
         return (
           <Card key={personField.id} sx={{ p: { xs: 3, sm: 5 }, overflow: 'hidden' }}>
@@ -185,7 +190,7 @@ export function AccessRegisterForm() {
               </TextFieldStack>
 
               <Grid container spacing={{ xs: 2.5, sm: 3.5 }}>
-                <Grid size={{ xs: 12, sm: 4 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 5 }}>
                   <TextFieldStack>
                     <TextFieldLabel required>Nome</TextFieldLabel>
                     <TextField
@@ -199,14 +204,14 @@ export function AccessRegisterForm() {
                   </TextFieldStack>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 4 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                   <TextFieldStack>
                     <TextFieldLabel>Documento (CPF/RG)</TextFieldLabel>
                     <TextField {...register(`people.${index}.document`)} />
                   </TextFieldStack>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 4 }}>
+                <Grid size={{ xs: 12, md: 3 }}>
                   <TextFieldStack>
                     <TextFieldLabel>{unitLabel}</TextFieldLabel>
                     <TextField {...register(`people.${index}.unit`)} />
@@ -214,7 +219,7 @@ export function AccessRegisterForm() {
                 </Grid>
               </Grid>
 
-              {isFirstPerson && hasServiceProvider ? (
+              {isFirstPerson && hasCompany ? (
                 <TextFieldStack>
                   <TextFieldLabel>Empresa</TextFieldLabel>
                   <TextField {...register('company')} />
@@ -321,7 +326,7 @@ export function AccessRegisterForm() {
         <Button
           variant="outlined"
           color="inherit"
-          onClick={() => router.back()}
+          onClick={navigateBack}
           sx={{
             color: 'text.primary',
             borderColor: 'rgba(255, 255, 255, 0.1)',

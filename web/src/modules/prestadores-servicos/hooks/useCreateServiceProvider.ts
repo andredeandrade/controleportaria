@@ -6,6 +6,7 @@ import type {
 } from '@/app/api/service-providers/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import {
   registerServiceProvider,
   ServiceProvidersServiceError,
@@ -17,7 +18,7 @@ export function useCreateServiceProvider() {
   return useMutation<ServiceProvider, ServiceProvidersServiceError, CreateServiceProviderRequest>({
     mutationFn: registerServiceProvider,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['service-providers'] })
+      await invalidateDomainQueries(queryClient, 'service-providers')
     },
   })
 }

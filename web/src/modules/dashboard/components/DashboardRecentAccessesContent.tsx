@@ -1,8 +1,6 @@
 'use client'
 
-import PersonRoundedIcon from '@mui/icons-material/PersonRounded'
 import Alert from '@mui/material/Alert'
-import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -95,19 +93,6 @@ export function DashboardRecentAccessesContent() {
                       borderColor: 'divider',
                     }}
                   >
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        bgcolor: 'background.default',
-                        color: 'text.secondary',
-                        border: '1px solid',
-                        borderColor: 'divider',
-                      }}
-                    >
-                      <PersonRoundedIcon sx={{ fontSize: 18 }} />
-                    </Avatar>
-
                     <Stack sx={{ minWidth: 0, flexGrow: 1 }}>
                       <Typography variant="body2" fontWeight={700} noWrap>
                         {record.name}
