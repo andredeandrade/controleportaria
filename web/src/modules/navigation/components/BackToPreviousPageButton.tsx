@@ -11,6 +11,7 @@ type BackToPreviousPageButtonProps = {
   ariaLabel: string
   children?: ReactNode
   fallbackHref?: string
+  alwaysUseFallback?: boolean
   iconButtonProps?: Omit<IconButtonProps, 'onClick' | 'aria-label' | 'children'>
 }
 
@@ -26,13 +27,14 @@ export function BackToPreviousPageButton({
   children,
   ariaLabel,
   fallbackHref = '/dashboard',
+  alwaysUseFallback = false,
   iconButtonProps,
 }: BackToPreviousPageButtonProps) {
   const router = useRouter()
   const { sx: iconButtonSx, disableRipple, ...restIconButtonProps } = iconButtonProps ?? {}
 
   const handleBack = () => {
-    if (window.history.length > 1) {
+    if (!alwaysUseFallback && window.history.length > 1) {
       router.back()
       return
     }

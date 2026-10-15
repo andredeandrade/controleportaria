@@ -54,8 +54,9 @@ export function ViewEventContent({ eventId }: ViewEventContentProps) {
         >
           <Stack direction="row" spacing={1.5} alignItems="center">
             <BackToPreviousPageButton
-              ariaLabel="Voltar para a pagina anterior"
+              ariaLabel="Voltar para a listagem de eventos"
               fallbackHref="/eventos"
+              alwaysUseFallback
             />
 
             <Typography variant="h2" fontWeight={700} color="text.primary">
