@@ -52,13 +52,6 @@ export function EventDetailsCard({ event }: EventDetailsCardProps) {
               </TextFieldStack>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-              <TextFieldStack>
-                <TextFieldLabel>Responsável pelo evento</TextFieldLabel>
-                <TextField value={event.responsibleName} slotProps={{ input: { readOnly: true } }} />
-              </TextFieldStack>
-            </Grid>
-
             <Grid size={{ xs: 6, sm: 6, md: 4 }}>
               <TextFieldStack>
                 <TextFieldLabel>Data</TextFieldLabel>
@@ -75,6 +68,13 @@ export function EventDetailsCard({ event }: EventDetailsCardProps) {
                     },
                   }}
                 />
+              </TextFieldStack>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <TextFieldStack>
+                <TextFieldLabel>Responsável pelo evento</TextFieldLabel>
+                <TextField value={event.responsibleName} slotProps={{ input: { readOnly: true } }} />
               </TextFieldStack>
             </Grid>
 

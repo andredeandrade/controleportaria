@@ -5,8 +5,10 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded'
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import { alpha, useTheme } from '@mui/material/styles'
 import Stack from '@mui/material/Stack'
@@ -30,7 +32,7 @@ import { TableHead } from '@/modules/table/components/TableHead'
 import { TableHeadCell } from '@/modules/table/components/TableHeadCell'
 import { TableRow } from '@/modules/table/components/TableRow'
 import { ListSearchField } from '@/modules/table/components/ListSearchField'
-import { MobileListCard } from '@/styles/MobileList.styles'
+import { MobileFieldLabel, MobileListCard } from '@/styles/MobileList.styles'
 
 const COLUMN_COUNT = 6
 
@@ -173,7 +175,16 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
             sx={{ width: '100%', maxWidth: 420 }}
           />
 
-          <Stack direction="row" spacing={1} flexWrap="wrap" rowGap={1}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              flexWrap: { xs: 'nowrap', sm: 'wrap' },
+              rowGap: 1,
+              overflowX: { xs: 'auto', sm: 'visible' },
+              pb: { xs: 0.5, sm: 0 },
+            }}
+          >
             {(['todos', 'CONVIDADO', 'DESEMBARQUE', 'BUSCA'] as MovementFilter[]).map((filter) => {
               const isActive = !onlyOpen && movementFilter === filter
               const paletteKey = MOVEMENT_FILTER_PALETTE[filter]
@@ -193,6 +204,7 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
                     borderColor: isActive ? dotColor : 'divider',
                     backgroundColor: isActive ? alpha(dotColor, 0.16) : 'transparent',
                     cursor: 'pointer',
+                    flexShrink: 0,
                   }}
                 >
                   <Box
@@ -226,6 +238,7 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
                 borderColor: onlyOpen ? 'success.main' : 'divider',
                 backgroundColor: onlyOpen ? alpha(theme.palette.success.main, 0.16) : 'transparent',
                 cursor: 'pointer',
+                flexShrink: 0,
               }}
             >
               <PlaceRoundedIcon
@@ -251,7 +264,7 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
               <Stack spacing={1.5}>
                 {filteredVehicles.map((vehicle) => (
                   <MobileListCard key={vehicle.id} variant="outlined">
-                    <Stack spacing={2}>
+                    <Stack spacing={3}>
                       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                         <Stack spacing={0.25}>
                           <Typography variant="body2" fontWeight={700} color="text.primary">
@@ -260,24 +273,51 @@ export function EventVehiclesCard({ event }: EventVehiclesCardProps) {
                           <Typography variant="caption" color="text.disabled">
                             {vehicle.brandModel ?? '—'}
                           </Typography>
-                          <Typography variant="caption" color="text.disabled">
-                            {vehicle.driverName ?? '—'}
-                          </Typography>
                         </Stack>
 
                         <EventVehicleMovementBadge movementType={vehicle.movementType} />
                       </Stack>
 
-                      <Stack direction="row" spacing={2}>
-                        <Typography variant="caption" color="text.secondary">
-                          {`Entrada ${formatTime(vehicle.checkInAt)}`}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {`Saída ${formatTime(vehicle.checkOutAt)}`}
-                        </Typography>
+                      <Divider sx={{ borderColor: 'divider' }} />
+
+                      <Stack direction="row">
+                        <Stack spacing={0.25} sx={{ flex: 1 }}>
+                          <MobileFieldLabel variant="caption">Entrada</MobileFieldLabel>
+                          <Typography variant="body2" color="text.primary">
+                            {formatTime(vehicle.checkInAt)}
+                          </Typography>
+                        </Stack>
+                        <Stack spacing={0.25} sx={{ flex: 1 }}>
+                          <MobileFieldLabel variant="caption">Saída</MobileFieldLabel>
+                          <Typography variant="body2" color="text.primary">
+                            {formatTime(vehicle.checkOutAt)}
+                          </Typography>
+                        </Stack>
                       </Stack>
 
-                      {renderAction(vehicle)}
+                      <Stack spacing={1.5}>
+                        {canRegisterAccess && vehicle.isOpen ? (
+                          <Button
+                            variant="outlined"
+                            color="inherit"
+                            fullWidth
+                            onClick={() =>
+                              setCheckOutTarget({ type: 'vehicle', vehicleId: vehicle.id })
+                            }
+                            sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+                          >
+                            Registrar saída
+                          </Button>
+                        ) : null}
+
+                        <Button
+                          variant="text"
+                          color="primary"
+                          onClick={() => setViewedVehicleId(vehicle.id)}
+                        >
+                          Ver mais
+                        </Button>
+                      </Stack>
                     </Stack>
                   </MobileListCard>
                 ))}

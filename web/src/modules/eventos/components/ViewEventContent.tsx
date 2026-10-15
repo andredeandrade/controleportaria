@@ -47,11 +47,10 @@ export function ViewEventContent({ eventId }: ViewEventContentProps) {
     <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
       <Stack spacing={{ xs: 2.5, sm: 2 }}>
         <Stack
-          direction="row"
+          direction={{ xs: 'column', sm: 'row' }}
           justifyContent="space-between"
-          alignItems="center"
-          flexWrap="wrap"
-          rowGap={1.5}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          spacing={3.5}
         >
           <Stack direction="row" spacing={1.5} alignItems="center">
             <BackToPreviousPageButton
@@ -68,8 +67,10 @@ export function ViewEventContent({ eventId }: ViewEventContentProps) {
             <Button
               variant="contained"
               color="primary"
+              size="large"
               startIcon={<LoginRoundedIcon fontSize="small" />}
               onClick={() => router.push(`/eventos/${eventId}/registrar-acesso`)}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
               Registrar acesso
             </Button>
