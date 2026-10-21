@@ -27,5 +27,5 @@ export type AuthorizationsPaginationState = {
 export const PERSON_TYPE_LABEL: Record<PersonTypeValue, string> = {
   morador: 'Morador',
   visitante: 'Visitante',
-  prestador_servico: 'Prestador de servico',
+  prestador_servico: 'Prestador de serviço',
 }

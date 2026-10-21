@@ -6,7 +6,7 @@ import { TextField } from './TextField'
 export const PERSON_TYPE_OPTIONS = [
   { label: 'Morador', value: 'morador' },
   { label: 'Visitante', value: 'visitante' },
-  { label: 'Prestador de servico', value: 'prestador_servico' },
+  { label: 'Prestador de serviço', value: 'prestador_servico' },
 ] as const
 
 export type PersonTypeValue = (typeof PERSON_TYPE_OPTIONS)[number]['value']

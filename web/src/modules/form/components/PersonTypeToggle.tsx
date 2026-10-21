@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 export const ACCESS_PERSON_TYPE_OPTIONS = [
   { label: 'Morador', value: 'morador' },
   { label: 'Visitante', value: 'visitante' },
-  { label: 'Prestador de servico', value: 'prestador_servico' },
+  { label: 'Prestador de serviço', value: 'prestador_servico' },
   { label: 'Autorizado', value: 'autorizado' },
 ] as const
 
