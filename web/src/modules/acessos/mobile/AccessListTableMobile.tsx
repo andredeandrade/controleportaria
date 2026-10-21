@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { AccessRegisterButton } from '@/modules/acessos/components/AccessRegisterButton'
+import { AccessStatusChip } from '@/modules/acessos/components/AccessStatusChip'
 import { useAccessListContext } from '@/modules/acessos/context/AccessListContext'
 import { AccessListTableMobileLoader } from '@/modules/acessos/mobile/AccessListTableMobileLoader'
 import { MobileRegisterExitButton } from '@/modules/acessos/styles/AccessStyles'
@@ -19,6 +20,7 @@ const categoryChipColor: Record<string, { bg: string; color: string }> = {
   morador: { bg: 'rgba(52, 211, 153, 0.16)', color: '#34d399' },
   visitante: { bg: 'rgba(96, 165, 250, 0.16)', color: '#60a5fa' },
   prestador_servico: { bg: 'rgba(251, 191, 36, 0.16)', color: '#fbbf24' },
+  autorizado: { bg: 'rgba(167, 139, 250, 0.16)', color: '#a78bfa' },
 }
 
 const DEFAULT_CATEGORY_CHIP_COLOR = { bg: 'rgba(255, 255, 255, 0.08)', color: '#9aa1ab' }
@@ -111,11 +113,21 @@ export function AccessListTableMobile() {
                     })}
                   </Stack>
 
-                  {units.length > 0 ? (
-                    <Typography variant="body2" color="text.secondary">
-                      Unidade: {units.join(', ')}
-                    </Typography>
-                  ) : null}
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    spacing={1}
+                  >
+                    {units.length > 0 ? (
+                      <Typography variant="body2" color="text.secondary">
+                        Unidade: {units.join(', ')}
+                      </Typography>
+                    ) : (
+                      <span />
+                    )}
+                    <AccessStatusChip hasExited={record.hasExited} />
+                  </Stack>
                 </Stack>
 
                 <Divider sx={{ borderColor: 'divider' }} />

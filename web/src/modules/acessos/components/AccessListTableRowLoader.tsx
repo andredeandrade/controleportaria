@@ -37,6 +37,9 @@ export function AccessListTableRowLoader({ showActions }: AccessListTableRowLoad
           <Skeleton variant="text" sx={{ fontSize: '0.75rem' }} width={56} />
         </Stack>
       </TableCell>
+      <TableCell>
+        <Skeleton variant="rounded" width={64} height={22} />
+      </TableCell>
       {showActions ? (
         <TableCell>
           <Skeleton variant="rounded" width={112} height={32} />

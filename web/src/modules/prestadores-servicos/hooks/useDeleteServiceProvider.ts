@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import {
   deleteServiceProvider,
   ServiceProvidersServiceError,
@@ -13,7 +14,7 @@ export function useDeleteServiceProvider() {
   return useMutation<void, ServiceProvidersServiceError, string>({
     mutationFn: deleteServiceProvider,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['service-providers'] })
+      await invalidateDomainQueries(queryClient, 'service-providers')
     },
   })
 }

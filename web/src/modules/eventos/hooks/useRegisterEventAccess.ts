@@ -3,6 +3,7 @@
 import type { Event, RegisterEventAccessRequest } from '@/app/api/events/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { EventsServiceError, registerEventAccess } from '@/services/eventos/service'
 
 export function useRegisterEventAccess() {
@@ -15,7 +16,7 @@ export function useRegisterEventAccess() {
   >({
     mutationFn: ({ eventId, payload }) => registerEventAccess(eventId, payload),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await invalidateDomainQueries(queryClient, 'events')
     },
   })
 }

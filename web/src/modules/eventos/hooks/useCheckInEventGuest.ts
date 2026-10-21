@@ -3,6 +3,7 @@
 import type { CheckInEventGuestRequest, Event } from '@/app/api/events/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { EventsServiceError, checkInEventGuest } from '@/services/eventos/service'
 
 export function useCheckInEventGuest() {
@@ -15,7 +16,7 @@ export function useCheckInEventGuest() {
   >({
     mutationFn: (payload) => checkInEventGuest(payload),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await invalidateDomainQueries(queryClient, 'events')
     },
   })
 }

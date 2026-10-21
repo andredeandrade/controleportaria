@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function AcessoRegistrarPage() {
   return (
-    <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }}>
+    <Stack spacing={{ xs: 5, sm: 6 }} py={{ xs: 3, sm: 5 }} sx={{ width: '100%', maxWidth: 880 }}>
       <Stack spacing={{ xs: 2.5, sm: 2 }}>
         <Stack direction="row" spacing={1.5} alignItems="center">
           <BackToPreviousPageButton
@@ -25,7 +25,7 @@ export default function AcessoRegistrarPage() {
         </Stack>
 
         <Typography variant="body2" color="text.secondary">
-          Identifique a categoria e preencha os dados para registrar o acesso.
+          Identifique a categoria e busque o cadastro para preencher automaticamente.
         </Typography>
       </Stack>
 

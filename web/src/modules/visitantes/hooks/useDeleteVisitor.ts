@@ -1,6 +1,8 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { deleteVisitor, VisitorsServiceError } from '@/services/visitantes/service'
 
 export function useDeleteVisitor() {
@@ -9,7 +11,7 @@ export function useDeleteVisitor() {
   return useMutation<void, VisitorsServiceError, string>({
     mutationFn: deleteVisitor,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['visitors'] })
+      await invalidateDomainQueries(queryClient, 'visitors')
     },
   })
 }

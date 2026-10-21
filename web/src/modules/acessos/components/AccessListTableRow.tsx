@@ -4,6 +4,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { AccessListTableDateTimeCell } from '@/modules/acessos/components/AccessListTableDateTimeCell'
+import { AccessStatusChip } from '@/modules/acessos/components/AccessStatusChip'
 import { RegisterExitButton } from '@/modules/acessos/styles/AccessStyles'
 import type { AccessRecord } from '@/modules/acessos/hooks/useAccessList'
 import { TableCell } from '@/modules/table/components/TableCell'
@@ -37,6 +38,9 @@ export function AccessListTableRow({ record, showActions, onRegisterExit }: Acce
       </TableCell>
       <TableCell>
         <AccessListTableDateTimeCell value={record.exitAt} />
+      </TableCell>
+      <TableCell>
+        <AccessStatusChip hasExited={record.hasExited} />
       </TableCell>
       {showActions ? (
         <TableCell>

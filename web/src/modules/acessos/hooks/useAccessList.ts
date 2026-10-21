@@ -17,6 +17,12 @@ type UseAccessListParams = {
 
 export type AccessRecord = AccessRecordListItem
 
+const VIEW_MODE_API_STATUS: Record<AccessListViewMode, 'all' | 'open' | 'closed'> = {
+  all: 'all',
+  active: 'open',
+  exited: 'closed',
+}
+
 export function useAccessList({ viewMode }: UseAccessListParams) {
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
@@ -33,7 +39,7 @@ export function useAccessList({ viewMode }: UseAccessListParams) {
     }
   }, [searchTerm])
 
-  const apiStatus = viewMode === 'active' ? 'open' : 'all'
+  const apiStatus = VIEW_MODE_API_STATUS[viewMode]
 
   const accessRecordsQuery = useQuery({
     queryKey: ['access-records', page, pageSize, debouncedSearchTerm, apiStatus],

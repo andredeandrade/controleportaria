@@ -1,6 +1,8 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+import { invalidateDomainQueries } from '@/lib/react-query/invalidation'
 import { deleteAuthorization, AuthorizationsServiceError } from '@/services/autorizacoes/service'
 
 export function useDeleteAuthorization() {
@@ -9,7 +11,7 @@ export function useDeleteAuthorization() {
   return useMutation<void, AuthorizationsServiceError, string>({
     mutationFn: deleteAuthorization,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['authorizations'] })
+      await invalidateDomainQueries(queryClient, 'authorizations')
     },
   })
 }

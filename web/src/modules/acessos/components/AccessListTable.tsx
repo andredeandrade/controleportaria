@@ -29,7 +29,7 @@ export function AccessListTable() {
     handleClearFilters,
   } = useAccessListContext()
 
-  const columnCount = showActions ? 6 : 5
+  const columnCount = showActions ? 7 : 6
 
   return (
     <Table>
@@ -39,6 +39,7 @@ export function AccessListTable() {
         <TableHeadCell>Placa</TableHeadCell>
         <TableHeadCell>Entrada</TableHeadCell>
         <TableHeadCell>Saída</TableHeadCell>
+        <TableHeadCell>Status</TableHeadCell>
         {showActions ? <TableHeadCell /> : null}
       </TableHead>
       <TableBody

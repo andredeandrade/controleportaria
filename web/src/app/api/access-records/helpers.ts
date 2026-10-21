@@ -28,10 +28,13 @@ export function readAccessToken(cookieStore: {
 
 export function getErrorMessage(payload: unknown, fallback: string): string {
   if (payload && typeof payload === 'object') {
-    const message = (payload as { message?: unknown }).message
+    // A API Express responde erros como `{ error }`; `message` é mantido por compatibilidade.
+    const { error, message } = payload as { error?: unknown; message?: unknown }
 
-    if (typeof message === 'string' && message.trim()) {
-      return message
+    for (const candidate of [error, message]) {
+      if (typeof candidate === 'string' && candidate.trim()) {
+        return candidate
+      }
     }
   }
 
